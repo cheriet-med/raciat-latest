@@ -17,7 +17,7 @@ export default function Video({ property }: { property: Property }) {
 
     return (
         <>
-            <h5 className="properties-title mb_20">Video</h5>
+            <h5 className="properties-title mb_20">فيديو</h5>
             <div className="widget-video" style={{ position: "relative" }}>
                 <Image
                     data-src={property.imgSrc}

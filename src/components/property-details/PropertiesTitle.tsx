@@ -18,15 +18,13 @@ export default function PropertiesTitle({ property }: { property: Property }) {
                 <div>
                     <div className="wrap-tag d-flex gap_8 mb_12">
                         <div
-                            className={`tag ${
-                                property.type === "Sale"
-                                    ? "sale"
-                                    : property.type === "Rent"
-                                    ? "rent"
-                                    : property.type
-                            }  text-button-small fw-6 text_primary-color`}
+                            className={`tag text-button-small fw-6 text_primary-color`}
+                             style={{
+                                                    backgroundColor: property.type === "بيع" ? "#dc3545" : "#28a745",
+                                                    color: "#fff"
+                                                }}
                         >
-                            For {property.type}
+                             {property.type}
                         </div>
                         <div className="tag categoreis text-button-small fw-6 text_primary-color">
                             {property.categories}
@@ -37,35 +35,31 @@ export default function PropertiesTitle({ property }: { property: Property }) {
                 <h4 className="price">
                     {property.price}
                     <span className="text_secondary-color text-body-1">
-                        {property.type === "Sale" ? "/Sqft" : "/month"}
+                     {" "}  SAR  {property.type === "Sale" ? "/Sqft" : ""}
                     </span>
                 </h4>
             </div>
             <div className="wrap-info d-flex justify-content-between align-items-end">
                 <div>
-                    <div className="text-body-default mb_12">Features:</div>
+                    <div className="text-body-default mb_12">مميزات:</div>
                     <ul className="info d-flex">
                         <li className="d-flex align-items-center gap_8 h6 text_primary-color fw-6">
                             <i className="icon-Bed"></i>
                             {property.beds}
-                            Beds
+                            غرف
                         </li>
                         <li className="d-flex align-items-center gap_8 h6 text_primary-color fw-6">
                             <i className="icon-Bathstub"></i>
-                            {property.baths} Baths
+                            {property.baths} حمام
                         </li>
                         <li className="d-flex align-items-center gap_8 h6 text_primary-color fw-6">
                             <i className="icon-Ruler"></i>
-                            {property.sqft} sqft
+                            {property.sqft} قدم مربع
                         </li>
                     </ul>
                 </div>
                 <ul className="list-action d-flex gap_16">
-                    <li>
-                        <a href="#" className="">
-                            <i className="icon-ArrowsLeftRight"></i>
-                        </a>
-                    </li>
+                    
                     <li>
                         <a href="#">
                             <span className="icon icon-Heart"></span>

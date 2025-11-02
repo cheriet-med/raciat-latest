@@ -92,7 +92,7 @@ function slideBarPrivacy() {
     window.addEventListener("scroll", onScroll);
     window.addEventListener("resize", onResize);
 
-    // Cleanup function
+    // تنظيف الأحداث عند التفريغ
     return () => {
         window.removeEventListener("scroll", onScroll);
         window.removeEventListener("resize", onResize);
@@ -102,7 +102,7 @@ function slideBarPrivacy() {
 export default function Privacy() {
     useEffect(() => {
         const cleanup = slideBarPrivacy();
-        return cleanup; 
+        return cleanup;
     }, []);
     return (
         <>
@@ -112,36 +112,34 @@ export default function Privacy() {
                         <div className="col-lg-4">
                             <ul className="privacy-table sticky-top">
                                 <li
-                                    className="nav_link text-title fw-6 "
+                                    className="nav_link text-title fw-6"
                                     data-target="terms"
                                 >
-                                    <a href="#">1. Terms</a>
+                                    <a href="#">1. الشروط</a>
                                 </li>
                                 <li
                                     className="nav_link text-title fw-6"
                                     data-target="limitations"
                                 >
-                                    <a href="#">2. Limitations</a>
+                                    <a href="#">2. القيود</a>
                                 </li>
                                 <li
                                     className="nav_link text-title fw-6"
                                     data-target="revisions"
                                 >
-                                    <a href="#">3. Revisions And Errata</a>
+                                    <a href="#">3. المراجعات والأخطاء</a>
                                 </li>
                                 <li
                                     className="nav_link text-title fw-6"
                                     data-target="modifications"
                                 >
-                                    <a href="#">
-                                        4. Site Terms Of Use Modifications
-                                    </a>
+                                    <a href="#">4. تعديلات شروط الاستخدام</a>
                                 </li>
                                 <li
                                     className="nav_link text-title fw-6"
                                     data-target="risks"
                                 >
-                                    <a href="#">5. Risks</a>
+                                    <a href="#">5. المخاطر</a>
                                 </li>
                                 <li className="highlight-bar"></li>
                             </ul>
@@ -149,184 +147,97 @@ export default function Privacy() {
                         <div className="col-lg-8">
                             <div className="content">
                                 <h4 className="mb_32 heading-title">
-                                    Terms Of Use
+                                    شروط الاستخدام
                                 </h4>
                                 <div id="terms">
                                     <h5 className="title mb_12 text-capitalize">
-                                        1. Terms{" "}
+                                        1. الشروط{" "}
                                     </h5>
                                     <p className="mb_12">
-                                        Lorem ipsum dolor sit amet, consectetur
-                                        adipiscing elit. Integer sed euismod
-                                        justo, sit amet efficitur dui. Aliquam
-                                        sodales vestibulum velit, eget
-                                        sollicitudin quam. Donec non aliquam
-                                        eros. Etiam sit amet lectus vel justo
-                                        dignissim condimentum.
+                                        هذا النص هو مثال توضيحي يمكن استبداله
+                                        بالمحتوى الحقيقي الخاص بسياسة الخصوصية
+                                        أو شروط الاستخدام. الغرض منه عرض كيفية
+                                        تنسيق النصوص داخل الصفحة.
                                     </p>
                                     <p className="mb_12">
-                                        In malesuada neque quis libero laoreet
-                                        posuere. In consequat vitae ligula quis
-                                        rutrum. Morbi dolor orci, maximus a
-                                        pulvinar sed, bibendum ac lacus.
-                                        Suspendisse in consectetur lorem.
-                                        Pellentesque habitant morbi tristique
-                                        senectus et netus et malesuada fames ac
-                                        turpis egestas. Aliquam elementum, est
-                                        sed interdum cursus, felis ex pharetra
-                                        nisi, ut elementum tortor urna eu nulla.
-                                        Donec rhoncus in purus quis blandit.
+                                        يمكن استخدام هذا الجزء لتوضيح
+                                        الالتزامات القانونية للمستخدمين وشروط
+                                        التعامل مع الموقع، بالإضافة إلى
+                                        التوجيهات العامة المتعلقة بالاستخدام
+                                        العادل للمحتوى والخدمات.
                                     </p>
                                     <p>
-                                        Etiam eleifend metus at nunc ultricies
-                                        facilisis. Morbi finibus tristique
-                                        interdum. Nullam vel eleifend est, eu
-                                        posuere risus. Vestibulum ligula ex,
-                                        ullamcorper sit amet molestie
+                                        يجب على المستخدمين قراءة هذه الشروط بعناية
+                                        قبل استخدام الموقع أو خدماته.
                                     </p>
                                 </div>
                                 <div id="limitations" className="pt_32">
                                     <h5 className="title mb_12 text-capitalize">
-                                        2. Limitations
+                                        2. القيود
                                     </h5>
                                     <p className="mb_12">
-                                        Etiam eleifend metus at nunc ultricies
-                                        facilisis. Morbi finibus tristique
-                                        interdum. Nullam vel eleifend est, eu
-                                        posuere risus. Vestibulum ligula ex,
-                                        ullamcorper sit amet molestie a, finibus
-                                        nec ex.
+                                        لا يجوز للمستخدمين إساءة استخدام خدمات
+                                        الموقع أو محاولة الوصول إلى بيانات غير
+                                        مصرح بها أو التلاعب بالمحتوى بأي شكل.
                                     </p>
                                     <ul className="mb_12">
                                         <li className="text-body-default">
-                                            Aliquam elementum, est sed interdum
-                                            cursus, felis ex pharetra nisi, ut
-                                            elementum tortor urna eu nulla.
-                                            Donec rhoncus in purus quis blandit.
+                                            يحظر نسخ أو إعادة توزيع المحتوى دون
+                                            إذن.
                                         </li>
                                         <li className="text-body-default">
-                                            Etiam eleifend metus at nunc
-                                            ultricies facilisis.
+                                            لا يجوز استخدام الموقع لأغراض غير
+                                            قانونية.
                                         </li>
                                         <li className="text-body-default">
-                                            Nullam vel eleifend est, eu posuere
-                                            risus. Vestibulum ligula ex,
-                                            ullamcorper sit amet molestie a,
-                                            finibus nec ex.
+                                            يحتفظ الموقع بالحق في تعليق أو حظر أي
+                                            حساب يخالف هذه القواعد.
                                         </li>
                                     </ul>
                                     <p>
-                                        Etiam eleifend metus at nunc ultricies
-                                        facilisis. Morbi finibus tristique
-                                        interdum. Nullam vel eleifend est, eu
-                                        posuere risus. Vestibulum ligula ex,
-                                        ullamcorper sit amet molestie
+                                        باستخدامك لهذا الموقع، فإنك توافق على
+                                        الالتزام بهذه الشروط.
                                     </p>
                                 </div>
                                 <div id="revisions" className="pt_32">
                                     <h5 className="title mb_12 text-capitalize">
-                                        3. Revisions and errata
+                                        3. المراجعات والأخطاء
                                     </h5>
                                     <p className="mb_12">
-                                        Lorem ipsum dolor sit amet, consectetur
-                                        adipiscing elit. Integer sed euismod
-                                        justo, sit amet efficitur dui. Aliquam
-                                        sodales vestibulum velit, eget
-                                        sollicitudin quam. Donec non aliquam
-                                        eros. Etiam sit amet lectus vel justo
-                                        dignissim condimentum.
-                                    </p>
-                                    <p className="mb_12">
-                                        In malesuada neque quis libero laoreet
-                                        posuere. In consequat vitae ligula quis
-                                        rutrum. Morbi dolor orci, maximus a
-                                        pulvinar sed, bibendum ac lacus.
-                                        Suspendisse in consectetur lorem.
-                                        Pellentesque habitant morbi tristique
-                                        senectus et netus et malesuada fames ac
-                                        turpis egestas. Aliquam elementum, est
-                                        sed interdum cursus, felis ex pharetra
-                                        nisi, ut elementum tortor urna eu nulla.
-                                        Donec rhoncus in purus quis
+                                        قد تحتوي المواد المعروضة على الموقع على
+                                        أخطاء فنية أو مطبعية. يحتفظ الموقع
+                                        بالحق في تعديل هذه المواد في أي وقت دون
+                                        إشعار مسبق.
                                     </p>
                                     <p>
-                                        Etiam eleifend metus at nunc ultricies
-                                        facilisis. Morbi finibus tristique
-                                        interdum. Nullam vel eleifend est, eu
-                                        posuere risus. Vestibulum ligula ex,
-                                        ullamcorper sit amet molestie a, finibus
-                                        nec ex.
+                                        نحن نسعى لتقديم معلومات دقيقة، ولكن لا
+                                        نضمن خلو المحتوى من الأخطاء بشكل كامل.
                                     </p>
                                 </div>
                                 <div id="modifications" className="pt_32">
                                     <h5 className="title mb_12 text-capitalize">
-                                        4. Site terms of use modifications
+                                        4. تعديلات شروط الاستخدام
                                     </h5>
                                     <p className="mb_12">
-                                        Etiam eleifend metus at nunc ultricies
-                                        facilisis. Morbi finibus tristique
-                                        interdum. Nullam vel eleifend est, eu
-                                        posuere risus. Vestibulum ligula ex,
-                                        ullamcorper sit amet molestie{" "}
-                                    </p>
-                                    <ul className="mb_12">
-                                        <li className="text-body-default">
-                                            Aliquam elementum, est sed interdum
-                                            cursus, felis ex pharetra nisi, ut
-                                            elementum tortor urna eu nulla.
-                                            Donec rhoncus in purus quis blandit.
-                                        </li>
-                                        <li className="text-body-default">
-                                            Etiam eleifend metus at nunc
-                                            ultricies facilisis.
-                                        </li>
-                                        <li className="text-body-default">
-                                            Nullam vel eleifend est, eu posuere
-                                            risus. Vestibulum ligula ex,
-                                            ullamcorper sit amet molestie a,
-                                            finibus nec ex.
-                                        </li>
-                                    </ul>
-                                    <p>
-                                        Etiam eleifend metus at nunc ultricies
-                                        facilisis. Morbi finibus tristique
-                                        interdum. Nullam vel eleifend est, eu
-                                        posuere risus. Vestibulum ligula ex,
-                                        ullamcorper sit amet molestie{" "}
+                                        يحتفظ الموقع بالحق في تعديل شروط
+                                        الاستخدام في أي وقت. يُعتبر استمرارك في
+                                        استخدام الموقع بعد التعديل موافقة ضمنية
+                                        منك على الشروط الجديدة.
                                     </p>
                                 </div>
                                 <div id="risks" className="pt_32">
                                     <h5 className="title mb_12 text-capitalize">
-                                        5. Risks
+                                        5. المخاطر
                                     </h5>
                                     <p className="mb_12">
-                                        Lorem ipsum dolor sit amet, consectetur
-                                        adipiscing elit. Integer sed euismod
-                                        justo, sit amet efficitur dui. Aliquam
-                                        sodales vestibulum velit, eget
-                                        sollicitudin quam. Donec non aliquam
-                                        eros. Etiam sit amet lectus vel justo
-                                        dignissim condimentum.
-                                    </p>
-                                    <p className="mb_12">
-                                        In malesuada neque quis libero laoreet
-                                        posuere. In consequat vitae ligula quis
-                                        rutrum. Morbi dolor orci, maximus a
-                                        pulvinar sed, bibendum ac lacus.
-                                        Suspendisse in consectetur lorem.
-                                        Pellentesque habitant morbi tristique
-                                        senectus et netus et malesuada fames ac
-                                        turpis egestas. Aliquam elementum, est
-                                        sed interdum cursus, felis ex pharetra
-                                        nisi, ut elementum tortor urna eu nulla.
-                                        Donec rhoncus in purus quis blandit.
+                                        يتحمل المستخدم مسؤولية استخدامه للموقع
+                                        والخدمات. لا يضمن الموقع توافر المحتوى
+                                        بشكل دائم أو خلوه من الانقطاعات.
                                     </p>
                                     <p>
-                                        Etiam eleifend metus at nunc ultricies
-                                        facilisis. Morbi finibus tristique
-                                        interdum. Nullam vel eleifend est, eu
-                                        posuere risus. Vestibulum ligula ex,
-                                        ullamcorper sit amet molestie{" "}
+                                        يُنصح المستخدمون بالاطلاع على سياسات
+                                        الأمان والخصوصية بشكل دوري للبقاء على
+                                        اطلاع بأي تغييرات.
                                     </p>
                                 </div>
                             </div>

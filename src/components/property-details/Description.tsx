@@ -3,25 +3,17 @@ import React from "react";
 export default function Description() {
     return (
         <div>
-            <h5 className="properties-title mb_20">Description</h5>
+            <h5 className="properties-title mb_20">الوصف</h5>
             <p className="mb_8 text-body-2">
-                Casa Lomas de Machalí offers a perfect blend of comfort,
-                privacy, and nature. Nestled in one of Machalí’s most secure and
-                peaceful residential areas, this beautiful property features
-                modern architecture, open interiors, and large windows that fill
-                the home with natural light.
+                يقدم منزل &quot;كاسا لوماس دي ماشالي&quot; مزيجًا مثاليا من الراحة والخصوصية والطبيعة. 
+                يقع في واحدة من أكثر المناطق السكنية أمانًا وهدوءًا في ماشالي، 
+                ويتميز هذا العقار الجميل بتصميم معماري عصري ومساحات داخلية مفتوحة 
+                ونوافذ كبيرة تملأ المنزل بالضوء الطبيعي.
             </p>
             <p className="mb_20 text-body-2">
-                Its tranquil surroundings and convenient access to local
-                amenities make it ideal for families or anyone seeking a serene
-                lifestyle just minutes from Rancagua.
+                يجعل موقعه الهادئ وسهولة الوصول إلى المرافق المحلية منه خيارًا مثاليًا 
+                للعائلات أو لأي شخص يبحث عن أسلوب حياة هادئ على بعد دقائق قليلة من رانكاغوا.
             </p>
-            <a
-                href="#"
-                className="hover-underline-link text_primary-color text-button"
-            >
-                View More
-            </a>
         </div>
     );
 }

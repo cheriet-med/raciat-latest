@@ -5,12 +5,12 @@ export default function AdvanceSearch3() {
     return (
         <div className="wd-search-form style-1">
             <div className="modal-header">
-                <h4>Advanced Search</h4>
+                <h4>البحث المتقدم</h4>
             </div>
             <div className="modal-body">
                 <div className="group-checkbox">
                     <div className="text-title text_primary-color mb_12 fw-6">
-                        Amenities:
+                      وسائل الراحة:
                     </div>
                     <div className="group-amenities">
                         {amenitiesList.map((amenity) => (

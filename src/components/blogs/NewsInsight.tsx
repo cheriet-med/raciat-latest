@@ -12,7 +12,7 @@ export default function NewsInsight() {
         <>
             <div className="tf-container sw-layout tf-spacing-1 pt-0">
                 <div className="heading-section text-center mb_48">
-                    <h3>News insight</h3>
+                    <h3>رؤى إخبارية</h3>
                 </div>
                 <Swiper
                     className="mySwiper"
@@ -63,7 +63,7 @@ export default function NewsInsight() {
                                 <div className="article-content">
                                     <div className="meta-post d-flex align-items-center mb_12">
                                         <div className="item text_secondary-color text-caption-1">
-                                            Post By{" "}
+                                            نشر من طرف{" "}
                                             <Link
                                                 href="#"
                                                 className="link text_primary-color"

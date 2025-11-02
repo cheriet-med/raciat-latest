@@ -1,45 +1,64 @@
+"use client";
+
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 
 export default function Floor() {
+    const [openFloor, setOpenFloor] = useState<string | null>("floor-one");
+
+    const toggleFloor = (floorId: string | null) => {
+        setOpenFloor(openFloor === floorId ? null : floorId);
+    };
+
     return (
         <>
-            <h5 className="properties-title mb_20">Floor Plans</h5>
+            <h5 className="properties-title mb_20">مخططات الطوابق</h5>
             <ul className="box-floor d-grid gap_20 mb_20" id="parent-floor">
+                {/* Floor 1 */}
                 <li className="floor-item">
                     <div
                         role="button"
                         className="floor-header d-flex align-items-center justify-content-between"
-                        data-bs-target="#floor-one"
-                        data-bs-toggle="collapse"
-                        aria-expanded="false"
-                        aria-controls="floor-one"
+                        onClick={() => toggleFloor("floor-one")}
+                        style={{ cursor: "pointer" }}
                     >
                         <div className="inner-left d-flex gap_8 align-items-center text_primary-color">
-                            <i className="icon icon-CaretDown"></i>
+                            <i
+                                className="icon icon-CaretDown"
+                                style={{
+                                    transform:
+                                        openFloor === "floor-one"
+                                            ? "rotate(0deg)"
+                                            : "rotate(-90deg)",
+                                    transition: "transform 0.3s ease",
+                                }}
+                            ></i>
                             <span className="text-button fw-7">
-                                First Floor
+                                الطابق الأول
                             </span>
                         </div>
                         <ul className="inner-right d-flex gap_20">
                             <li className="d-flex align-items-center gap_8 text-body-default text_primary-color">
-                                <i className="icon icon-Bed"></i>3 Beds
+                                <i className="icon icon-Bed"></i>3 غرف نوم
                             </li>
                             <li className="d-flex align-items-center gap_8 text-body-default text_primary-color">
-                                <i className="icon icon-Bathstub"></i>2 Baths
+                                <i className="icon icon-Bathstub"></i>2 حمامات
                             </li>
                         </ul>
                     </div>
                     <div
-                        id="floor-one"
-                        className="collapse show"
-                        data-bs-parent="#parent-floor"
+                        style={{
+                            maxHeight:
+                                openFloor === "floor-one" ? "1000px" : "0",
+                            overflow: "hidden",
+                            transition: "max-height 0.3s ease",
+                        }}
                     >
                         <div className="contnet">
                             <div className="box-img">
                                 <Image
-                                    src="/assets/images/section/floor-1.png"
-                                    alt="img-floor"
+                                    src="/assets/images/section/f1.jpg"
+                                    alt="مخطط الطابق"
                                     width={850}
                                     height={652}
                                 />
@@ -47,40 +66,52 @@ export default function Floor() {
                         </div>
                     </div>
                 </li>
+
+                {/* Floor 2 */}
                 <li className="floor-item">
                     <div
-                        className="floor-header d-flex align-items-center justify-content-between collapsed"
+                        className="floor-header d-flex align-items-center justify-content-between"
                         role="button"
-                        data-bs-target="#floor-two"
-                        data-bs-toggle="collapse"
-                        aria-expanded="false"
-                        aria-controls="floor-two"
+                        onClick={() => toggleFloor("floor-two")}
+                        style={{ cursor: "pointer" }}
                     >
                         <div className="inner-left d-flex gap_8 align-items-center text_primary-color">
-                            <i className="icon icon-CaretDown"></i>
+                            <i
+                                className="icon icon-CaretDown"
+                                style={{
+                                    transform:
+                                        openFloor === "floor-two"
+                                            ? "rotate(0deg)"
+                                            : "rotate(-90deg)",
+                                    transition: "transform 0.3s ease",
+                                }}
+                            ></i>
                             <span className="text-button fw-7">
-                                Second Floor
+                                الطابق الثاني
                             </span>
                         </div>
                         <ul className="inner-right d-flex gap_20">
                             <li className="d-flex align-items-center gap_8 text-body-default text_primary-color">
-                                <i className="icon icon-Bed"></i>3 Beds
+                                <i className="icon icon-Bed"></i>3 غرف نوم
                             </li>
                             <li className="d-flex align-items-center gap_8 text-body-default text_primary-color">
-                                <i className="icon icon-Bathstub"></i>2 Baths
+                                <i className="icon icon-Bathstub"></i>2 حمامات
                             </li>
                         </ul>
                     </div>
                     <div
-                        id="floor-two"
-                        className="collapse"
-                        data-bs-parent="#parent-floor"
+                        style={{
+                            maxHeight:
+                                openFloor === "floor-two" ? "1000px" : "0",
+                            overflow: "hidden",
+                            transition: "max-height 0.3s ease",
+                        }}
                     >
                         <div className="contnet">
                             <div className="box-img">
                                 <Image
-                                    src="/assets/images/section/floor-1.png"
-                                    alt="img-floor"
+                                    src="/assets/images/section/f2.jpg"
+                                    alt="مخطط الطابق"
                                     width={850}
                                     height={652}
                                 />
@@ -89,30 +120,6 @@ export default function Floor() {
                     </div>
                 </li>
             </ul>
-            <div className="wrap-download">
-                <a
-                    href="#"
-                    target="_blank"
-                    className="attachments-item d-flex align-items-center gap_12 text-button fw-7 text_primary-color effect-icon"
-                >
-                    <div className="icon">
-                        <i className="icon-FilePdf"></i>
-                    </div>
-                    <span>Villa-Document.Pdf</span>
-                    <i className="icon-DownloadSimple"></i>
-                </a>
-                <a
-                    href="#"
-                    target="_blank"
-                    className="attachments-item d-flex align-items-center gap_12 text-button fw-7 text_primary-color effect-icon"
-                >
-                    <div className="icon">
-                        <i className="icon-FileDoc"></i>
-                    </div>
-                    <span>Villa-Document.Pdf</span>
-                    <i className="icon-DownloadSimple"></i>
-                </a>
-            </div>
         </>
     );
 }

@@ -53,10 +53,8 @@ function useTabSlide() {
 
         window.addEventListener("resize", updateTabSlideEffect);
 
-        // Initial update
         updateTabSlideEffect();
 
-        // Cleanup
         return () => {
             tabItems.forEach((item) => {
                 item.removeEventListener(
@@ -76,11 +74,12 @@ export default function BoxFilter() {
     const handleCloseAdvanced = () => setShowAdvanced(false);
 
     return (
-        <>
-            <div className="tab-slide mb_14">
+        <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+            <div className="tab-slide mb_14" style={{ maxWidth: '100%' }}>
                 <ul
                     className="menu-tab tf-grid-layout tf-col-2 gap_8"
                     role="tablist"
+                    style={{ maxWidth: '100%' }}
                 >
                     <li className="item-slide-effect"></li>
                     <li className="nav-tab-item active" role="presentation">
@@ -89,7 +88,7 @@ export default function BoxFilter() {
                             className="text-title tab-link fw-6 active"
                             data-bs-toggle="tab"
                         >
-                            For Rent
+                            للإيجار
                         </a>
                     </li>
                     <li className="nav-tab-item" role="presentation">
@@ -98,94 +97,100 @@ export default function BoxFilter() {
                             className="text-title tab-link fw-6"
                             data-bs-toggle="tab"
                         >
-                            For Sale
+                            للبيع
                         </a>
                     </li>
                 </ul>
             </div>
-            <div className="tab-content">
+            <div className="tab-content" style={{ maxWidth: '100%' }}>
                 <div className="tab-pane fade active show" role="tabpanel">
-                    <div className="form-sl">
-                        <div className="wd-filter-select">
-                            <div className="inner-group d-grid gap_16">
-                                <form className="w-full">
+                    <div className="form-sl" style={{ maxWidth: '100%' }}>
+                        <div className="wd-filter-select" style={{ maxWidth: '100%' }}>
+                            <div className="inner-group d-grid gap_16" style={{ maxWidth: '100%' }}>
+                                <form className="w-full" style={{ maxWidth: '100%' }}>
                                     <label
                                         htmlFor="lookingFor"
                                         className="text-button text_primary-color mb_8"
                                     >
-                                        Looking For
+                                        ماذا تبحث عن؟
                                     </label>
-                                    <fieldset>
+                                    <fieldset style={{ maxWidth: '100%' }}>
                                         <input
                                             type="text"
-                                            placeholder="Search keyword"
+                                            placeholder="ابحث بكلمة مفتاحية"
                                             id="lookingFor"
+                                            style={{ 
+                                                width: '100%',
+                                                maxWidth: '100%',
+                                                boxSizing: 'border-box'
+                                            }}
                                         />
                                     </fieldset>
                                 </form>
-                                <div>
+                                <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
                                     <div className="text-button text_primary-color mb_8">
-                                        Location
+                                        الموقع
                                     </div>
                                     <DropdownSelect2 options={cityOptions} />
                                 </div>
-                                <div>
+                                <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
                                     <div className="text-button text_primary-color mb_8">
-                                        Bedrooms
+                                        عدد الغرف
                                     </div>
                                     <DropdownSelect2 options={bedroomOptions} />
                                 </div>
-                                <div className="box-select">
+                                <div className="box-select" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
                                     <div className="text-button text_primary-color mb_8">
-                                        Bathrooms
+                                        عدد الحمامات
                                     </div>
                                     <DropdownSelect2
                                         options={bathroomOptions}
                                     />
                                 </div>
-                                <div>
+                                <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
                                     <div className="text-button text_primary-color mb_8">
-                                        Your Budget
+                                        ميزانيتك
                                     </div>
                                     <DropdownSelect2 options={budgetOptions} />
                                 </div>
-                                <div className="tf-grid-layout sm-col-2 gap_20">
-                                    <div className="box-select">
+                               
+                                    <div className="box-select" style={{ minWidth: 0 }}>
                                         <div className="text-button text_primary-color mb_8">
-                                            Min Size
+                                            الحد الأدنى للمساحة
                                         </div>
                                         <DropdownSelect2
                                             options={minSizeOptions}
                                         />
                                     </div>
-                                    <div className="box-select">
+                                    <div className="box-select" style={{ minWidth: 0 }}>
                                         <div className="text-button text_primary-color mb_8">
-                                            Max Size
+                                            الحد الأقصى للمساحة
                                         </div>
                                         <DropdownSelect2
                                             options={maxSizeOptions}
                                         />
                                     </div>
-                                </div>
-                                <div className="box-select">
+                            
+                                <div className="box-select" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
                                     <div className="text-button text_primary-color mb_8">
-                                        Garages
+                                        عدد المرائب
                                     </div>
                                     <DropdownSelect2 options={garageOptions} />
                                 </div>
                                 <div
                                     className="show-avanced d-flex gap_4 align-items-center text_primary-color text-button link"
                                     onClick={handleShowAdvanced}
+                                    style={{ cursor: 'pointer', maxWidth: '100%' }}
                                 >
                                     <i className="icon-Faders"></i>
-                                    Show Advanced
+                                    عرض الخيارات المتقدمة
                                 </div>
-                                <div className="form-style">
+                                <div className="form-style" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
                                     <button
                                         type="submit"
                                         className="tf-btn w-full"
                                     >
-                                        <span>Search</span>
+                                        <span>بحث</span>
                                         <span className="bg-effect"></span>
                                     </button>
                                 </div>
@@ -201,8 +206,8 @@ export default function BoxFilter() {
                 className="modal-filter"
                 centered
             >
-                <AdvanceSearch3  />
+                <AdvanceSearch3 />
             </Modal>
-        </>
+        </div>
     );
 }

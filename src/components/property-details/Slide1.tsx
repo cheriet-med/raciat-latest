@@ -17,37 +17,37 @@ type PropertyImage = {
 
 const propertyImages: PropertyImage[] = [
     {
-        src: "/assets/images/section/properties-details-1.jpg",
+        src: "/assets/images/home/1.jpeg",
         alt: "img-property",
         width: 930,
         height: 620,
     },
     {
-        src: "/assets/images/section/properties-details-2.jpg",
+       src: "/assets/images/home/10.jpeg",
         alt: "img-property",
         width: 930,
         height: 620,
     },
     {
-        src: "/assets/images/section/properties-details-3.jpg",
+       src: "/assets/images/home/21.jpg",
         alt: "img-property",
         width: 930,
         height: 620,
     },
     {
-        src: "/assets/images/section/properties-details-1.jpg",
+    src: "/assets/images/home/40.jpeg",
         alt: "img-property",
         width: 930,
         height: 620,
     },
     {
-        src: "/assets/images/section/properties-details-2.jpg",
+     src: "/assets/images/home/26.jpeg",
         alt: "img-property",
         width: 930,
         height: 620,
     },
     {
-        src: "/assets/images/section/properties-details-3.jpg",
+    src: "/assets/images/home/56.jpeg",
         alt: "img-property",
         width: 930,
         height: 620,
@@ -125,21 +125,7 @@ export default function Slide1() {
                                                 </div>
                                             </a>
                                             <div className="wrap-btn d-flex gap_10">
-                                                <div className="widget-video">
-                                                    <a
-                                                        onClick={() =>
-                                                            setIsOpen(true)
-                                                        }
-                                                        data-fancybox="gallery2"
-                                                        className="tf-btn tf-btn btn-bg-1 popup-youtube"
-                                                    >
-                                                        <span className="d-flex align-items-center gap_8">
-                                                            <i className="icon-PlayCircle"></i>
-                                                            Play Video
-                                                        </span>
-                                                        <span className="bg-effect"></span>
-                                                    </a>
-                                                </div>
+   
                                                 <a
                                                     onClick={open}
                                                     data-fancybox="gallery"
@@ -147,7 +133,7 @@ export default function Slide1() {
                                                 >
                                                     <span className="d-flex align-items-center gap_8">
                                                         <i className="icon-Image"></i>
-                                                        View All Photo
+                                                        عرض جميع الصور
                                                     </span>
                                                     <span className="bg-effect"></span>
                                                 </a>

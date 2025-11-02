@@ -5,19 +5,18 @@ import { calculateLoan } from "@/actions/calculatorAction";
 export default function Caculator() {
     return (
         <div>
-            <h5 className="properties-title mb_20">Loan Calculator</h5>
+            <h5 className="properties-title mb_20">حاسبة القرض</h5>
             <div className="wrap-form">
                 <form className="form-calculator" action={calculateLoan}>
-                    <div className=" tf-grid-layout xl-col-4 md-col-2">
-                        <fieldset className="">
+                    <div className="tf-grid-layout xl-col-4 md-col-2">
+                        <fieldset>
                             <label
                                 htmlFor="total"
                                 className="text-body-default text_primary-color mb_8"
                             >
-                                Total Amount:
+                                المبلغ الإجمالي:
                             </label>
                             <input
-                                className=""
                                 id="total"
                                 type="text"
                                 name="text"
@@ -27,15 +26,14 @@ export default function Caculator() {
                                 required
                             />
                         </fieldset>
-                        <fieldset className="">
+                        <fieldset>
                             <label
                                 htmlFor="interest"
                                 className="text-body-default text_primary-color mb_8"
                             >
-                                Interest Rate
+                                معدل الفائدة
                             </label>
                             <input
-                                className=""
                                 id="interest"
                                 type="text"
                                 name="text"
@@ -47,26 +45,25 @@ export default function Caculator() {
                         </fieldset>
                         <div>
                             <div className="text-body-default text_primary-color mb_8">
-                                Loan Term (months)
+                                مدة القرض (بالأشهر)
                             </div>
                             <DropdownSelect2
-                                defaultOption="60 months"
+                                defaultOption="60 شهرًا"
                                 options={[
-                                    "60 months",
-                                    "40 months",
-                                    "30 months",
+                                    "60 شهرًا",
+                                    "40 شهرًا",
+                                    "30 شهرًا",
                                 ]}
                             />
                         </div>
-                        <fieldset className="">
+                        <fieldset>
                             <label
                                 htmlFor="payment"
                                 className="text-body-default text_primary-color mb_8"
                             >
-                                Down Payment
+                                الدفعة الأولى
                             </label>
                             <input
-                                className=""
                                 id="payment"
                                 type="text"
                                 name="text"
@@ -81,27 +78,27 @@ export default function Caculator() {
                         className="tf-btn btn-bg-1 btn-px-28 w-full"
                         type="submit"
                     >
-                        <span>Calculate</span>
+                        <span>احسب</span>
                         <span className="bg-effect"></span>
                     </button>
                 </form>
                 <ul className="info tf-grid-layout sm-col-3 gap_8">
                     <li>
-                        <p className="mb_4">Monthly Payment:</p>
+                        <p className="mb_4">القسط الشهري:</p>
                         <div className="text-button text_primary-color fw-7">
-                            $788.56/month
+                            ‎$788.56 / الشهر
                         </div>
                     </li>
                     <li>
-                        <p className="mb_4">Total Interest Payment:</p>
+                        <p className="mb_4">إجمالي الفوائد:</p>
                         <div className="text-button text_primary-color fw-7">
-                            $1413.60
+                            ‎$1413.60
                         </div>
                     </li>
                     <li>
-                        <p className="mb_4">Est. Total Loan:</p>
+                        <p className="mb_4">إجمالي القرض التقديري:</p>
                         <div className="text-button text_primary-color fw-7">
-                            $47713.60
+                            ‎$47713.60
                         </div>
                     </li>
                 </ul>

@@ -35,7 +35,7 @@ export default function Testimonial1() {
     ];
 
     const brands = [
-       
+        { src: "/logos/1.webp", alt: "brand 1" },
         { src: "/logos/2.webp", alt: "brand 2" },
         { src: "/logos/3.webp", alt: "brand 3" },
         { src: "/logos/4.webp", alt: "brand 4" },
@@ -116,17 +116,29 @@ export default function Testimonial1() {
                 </Swiper>
                 <div className="sw-dots style-1 sw-pagination-layout justify-content-center d-flex mt_24"></div>
             </div>
-            <div className="wrap-infiniteslide">
-                <AutoRepeatMarquee  speed={50} pauseOnHover>
-                    {brands.map((brand, idx) => (
-                        <div className="marquee-item" key={idx}>
-                            <div className="brand">
-                                <img src={brand.src} alt={brand.alt} sizes="18px"/>
-                            </div>
-                        </div>
-                    ))}
-                </AutoRepeatMarquee>
+<div className="wrap-infiniteslide">
+    <AutoRepeatMarquee speed={50} pauseOnHover>
+        {brands.map((brand, idx) => (
+            <div 
+                className="marquee-item" 
+                key={idx}
+                style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center' 
+                }}
+            >
+                <div className="brand">
+                    <img 
+                        src={brand.src} 
+                        alt={brand.alt} 
+                        style={{ width: '150px', height: 'auto' }}
+                    />
+                </div>
             </div>
+        ))}
+    </AutoRepeatMarquee>
+</div>
         </>
     );
 }

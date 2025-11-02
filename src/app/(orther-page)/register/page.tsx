@@ -10,7 +10,7 @@ export default function page() {
             <div className="page-title style-default">
                 <div className="thumbs">
                     <Image
-                        src="/assets/images/page-title/page-title-16.jpg"
+                       src="/hero8.png"
                         width={1920}
                         height={300}
                         alt=""
@@ -18,12 +18,12 @@ export default function page() {
                 </div>
                 <div className="content text-center">
                     <div className="tf-container">
-                        <h2 className="title text_white mb_12">Register</h2>
+                        <h2 className="title text_white mb_12">تسجيل</h2>
                         <ul className="breadcrumb justify-content-center text-button fw-4">
                             <li>
-                                <Link href="/">Home</Link>
+                                <Link href="/">الرئيسية</Link>
                             </li>
-                            <li>Register</li>
+                            <li>تسجيل</li>
                         </ul>
                     </div>
                 </div>

@@ -51,7 +51,7 @@ export default function Header() {
                                        تسجيل الدخول
                                     </Link>
                                     <Link 
-                                        href="#" 
+                                        href="/register" 
                                         className="tf-btn"
                                         style={{
                                           

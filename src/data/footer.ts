@@ -8,6 +8,7 @@ export type FooterSection = {
     heading: string;
     links: FooterLink[];
 };
+
 export const footerSections: FooterSection[] = [
     {
         className: "company",
@@ -17,7 +18,7 @@ export const footerSections: FooterSection[] = [
             { href: "/listing-topmap-grid", label: "عقارات للإيجار" },
             { href: "/listing-topmap-grid", label: "عقارات للشراء" },
             { href: "/listing-topmap-grid", label: "جميع العقارات" },
-            { href: "#", label: "وكلاؤنا" },
+          
         ],
     },
     {
@@ -27,8 +28,8 @@ export const footerSections: FooterSection[] = [
             { href: "/about-us", label: "من نحن" },
             { href: "/contacts", label: "اتصل بنا" },
             { href: "#", label: "فريقنا" },
-            { href: "/blog-standard", label: "آخر الأخبار" },
-            { href: "/our-pricing", label: "أسعارنا" },
+            { href: "/blog-grid", label: "آخر الأخبار" },
+           
         ],
     },
 ];

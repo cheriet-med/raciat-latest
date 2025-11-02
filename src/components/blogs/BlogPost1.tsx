@@ -1,10 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import FormComments from "../common/FormComments";
 import SideBar2 from "./SideBar2";
 import NewsInsight from "./NewsInsight";
-import Comment from "../common/Comment";
 
 type BlogItem = {
     imgSrc: string;
@@ -22,7 +20,7 @@ type BlogItem = {
 
 export default function BlogPost1({ blogItem }: { blogItem: BlogItem }) {
     return (
-        <div>
+        <div dir="rtl">
             <div className="thumbs-main-post">
                 <div className="thumbs">
                     <Image
@@ -35,8 +33,8 @@ export default function BlogPost1({ blogItem }: { blogItem: BlogItem }) {
             </div>
 
             <div className="main-content">
-                <div className="blog-post ">
-                    <div className="tf-container tf-spacing-1 ">
+                <div className="blog-post">
+                    <div className="tf-container tf-spacing-1">
                         <div className="row">
                             <div className="col-lg-8">
                                 <div className="details-post">
@@ -49,9 +47,7 @@ export default function BlogPost1({ blogItem }: { blogItem: BlogItem }) {
                                             <div className="item author">
                                                 <div className="avatar">
                                                     <Image
-                                                        src={
-                                                            blogItem.authorAvatar
-                                                        }
+                                                        src={blogItem.authorAvatar}
                                                         width={40}
                                                         height={40}
                                                         alt="avatar"
@@ -59,60 +55,50 @@ export default function BlogPost1({ blogItem }: { blogItem: BlogItem }) {
                                                 </div>
                                                 <Link
                                                     href="#"
-                                                    className="link text_primary-color fw-6 text-title "
+                                                    className="link text_primary-color fw-6 text-title"
                                                 >
                                                     {blogItem.authorName}
                                                 </Link>
                                             </div>
-                                            <div className="item text_primary-color text-title fw-6 d-flex align-items-center gap_8 ">
+                                            <div className="item text_primary-color text-title fw-6 d-flex align-items-center gap_8">
                                                 <i className="icon-CalendarBlank"></i>{" "}
                                                 {blogItem.date}
                                             </div>
                                         </div>
                                     </div>
+
                                     <p className="passive text-body-2">
-                                        When evaluating the best states for
-                                        rental property investments, there are
-                                        several key factors to consider.
-                                        Understanding the differences between
-                                        each state&apos;s rental market can
-                                        significantly impact your
-                                        decision-making process, helping you
-                                        choose the location that best aligns
-                                        with your financial goals, investment
-                                        strategy, and property management
-                                        preferences.
+                                        عند تقييم أفضل الولايات للاستثمار في العقارات المؤجرة،
+                                        هناك العديد من العوامل الرئيسية التي يجب أخذها بعين الاعتبار.
+                                        فهم الفروقات بين أسواق الإيجار في كل ولاية يمكن أن يؤثر بشكل كبير
+                                        على عملية اتخاذ القرار، ويساعدك على اختيار الموقع الذي يتناسب مع
+                                        أهدافك المالية واستراتيجيتك الاستثمارية وتفضيلات إدارة العقارات الخاصة بك.
                                     </p>
+
                                     <div className="quote">
                                         <p className="h5 mb_11">
-                                            &quot;Choosing the right property
-                                            isn&apos;t just about
-                                            location—it&apos;s about finding a
-                                            space that fits your lifestyle,
-                                            goals, and future plans.&quot;
+                                            &quot;اختيار العقار المناسب لا يتعلق فقط بالموقع،
+                                            بل بإيجاد مساحة تتناسب مع نمط حياتك وأهدافك وخططك المستقبلية.&quot;
                                         </p>
                                         <Link
                                             href="#"
                                             className="text-title fw-6 text_primary-color link name"
                                         >
-                                            John Smith
+                                            جون سميث
                                         </Link>
                                         <div className="icon">
                                             <i className="icon-quote-line"></i>
                                         </div>
                                     </div>
+
                                     <p className="passive text-body-2">
-                                        From rental demand and vacancy rates to
-                                        property taxes, landlord-friendly laws,
-                                        and long-term appreciation potential,
-                                        each state offers a unique set of
-                                        benefits and trade-offs. By carefully
-                                        weighing these aspects, you can make a
-                                        more informed choice that not only meets
-                                        your short-term cash flow goals but also
-                                        supports your long-term wealth-building
-                                        strategy.
+                                        من الطلب على الإيجار ومعدلات الشواغر إلى ضرائب العقارات،
+                                        والقوانين التي تحمي الملاك، وإمكانيات النمو على المدى الطويل،
+                                        تقدم كل ولاية مجموعة فريدة من المزايا والمقايضات.
+                                        ومن خلال دراسة هذه الجوانب بعناية، يمكنك اتخاذ قرار أكثر وعيًا
+                                        يدعم أهدافك المالية قصيرة وطويلة الأمد.
                                     </p>
+
                                     <div className="wrap-image tf-grid-layout sm-col-2">
                                         <Image
                                             src="/assets/images/blog/thumbs-1.jpg"
@@ -127,152 +113,89 @@ export default function BlogPost1({ blogItem }: { blogItem: BlogItem }) {
                                             alt="thumbs"
                                         />
                                     </div>
+
                                     <div className="passive mb_27">
                                         <h5 className="mb_12">
-                                            1. Rental Demand And Vacancy Rates
+                                            1. الطلب على الإيجار ومعدلات الشواغر
                                         </h5>
                                         <p className="text-body-2">
-                                            States with growing populations and
-                                            strong job markets typically show
-                                            higher rental demand, reducing the
-                                            likelihood of long vacancy periods.
-                                            Locations like Texas and Florida,
-                                            for example, have become
-                                            increasingly attractive due to
-                                            consistent population growth and
-                                            diverse economic activity.
+                                            الولايات التي تشهد نموًا سكانيًا قويًا وأسواق عمل نشطة
+                                            غالبًا ما تظهر طلبًا أعلى على الإيجار، مما يقلل من فترات الشغور الطويلة.
+                                            على سبيل المثال، أصبحت ولايات مثل تكساس وفلوريدا
+                                            أكثر جاذبية بسبب النمو السكاني المستمر والنشاط الاقتصادي المتنوع.
                                         </p>
                                     </div>
+
                                     <div className="passive mb_40">
-                                        <h5 className="mb_12">
-                                            2. Cost And ROI Potential
-                                        </h5>
+                                        <h5 className="mb_12">2. التكلفة وإمكانيات العائد على الاستثمار</h5>
                                         <p className="text-body-2">
-                                            Some states, particularly in the
-                                            Midwest and Southeast, offer lower
-                                            property prices and higher rental
-                                            yields. States like Ohio or Georgia
-                                            may allow you to enter the market at
-                                            a lower cost while enjoying solid
-                                            monthly returns and manageable
-                                            expenses.
+                                            تقدم بعض الولايات، خصوصًا في الغرب الأوسط والجنوب الشرقي،
+                                            أسعار عقارات أقل وعوائد إيجار أعلى.
+                                            على سبيل المثال، ولايات مثل أوهايو أو جورجيا قد تتيح لك
+                                            دخول السوق بتكلفة أقل مع تحقيق عوائد شهرية جيدة ونفقات قابلة للإدارة.
                                         </p>
                                     </div>
+
                                     <div className="passive">
-                                        <h5 className="mb_12">Conclusion</h5>
+                                        <h5 className="mb_12">الخلاصة</h5>
                                         <p className="text-body-2">
-                                            Choosing the best state for rental
-                                            property investment depends on your
-                                            specific goals—whether that’s
-                                            maximizing cash flow, minimizing
-                                            taxes, or capitalizing on market
-                                            growth. Understanding these key
-                                            differences across states can help
-                                            you make a smarter, more strategic
-                                            investment aligned with your
-                                            financial objectives.
+                                            يعتمد اختيار أفضل ولاية للاستثمار في العقارات المؤجرة
+                                            على أهدافك الخاصة — سواء كان ذلك لتحقيق أقصى تدفق نقدي،
+                                            أو تقليل الضرائب، أو الاستفادة من نمو السوق.
+                                            إن فهم هذه الفروقات الرئيسية بين الولايات
+                                            سيساعدك على اتخاذ قرار استثماري أكثر ذكاءً واستراتيجية
+                                            يتماشى مع أهدافك المالية.
                                         </p>
                                     </div>
+
                                     <div className="tag-share d-flex justify-content-between">
                                         <div className="tag d-flex align-items-center gap_12">
                                             <span className="text-button fw-7 text_primary-color">
-                                                Tag:
+                                                الوسوم:
                                             </span>
                                             <ul className="tags-list">
                                                 <li>
-                                                    <Link
-                                                        href="#"
-                                                        className="tags-item text-caption-1"
-                                                    >
-                                                        Housing
+                                                    <Link href="#" className="tags-item text-caption-1">
+                                                        الإسكان
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link
-                                                        href="#"
-                                                        className="tags-item text-caption-1"
-                                                    >
-                                                        Investment
+                                                    <Link href="#" className="tags-item text-caption-1">
+                                                        الاستثمار
                                                     </Link>
                                                 </li>
                                                 <li>
-                                                    <Link
-                                                        href="#"
-                                                        className="tags-item text-caption-1"
-                                                    >
-                                                        Property
+                                                    <Link href="#" className="tags-item text-caption-1">
+                                                        العقارات
                                                     </Link>
                                                 </li>
                                             </ul>
                                         </div>
+
                                         <div className="share d-flex align-items-center gap_16">
                                             <span className="text-button fw-7 text_primary-color">
-                                                Share This Post:
+                                                شارك هذا المقال:
                                             </span>
                                             <ul className="tf-social d-flex gap_24">
                                                 <li>
-                                                    <Link
-                                                        href="#"
-                                                        className="icon-FacebookLogo"
-                                                    ></Link>
+                                                    <Link href="#" className="icon-FacebookLogo"></Link>
                                                 </li>
                                                 <li>
-                                                    <Link
-                                                        href="#"
-                                                        className="icon-XLogo"
-                                                    ></Link>
+                                                    <Link href="#" className="icon-XLogo"></Link>
                                                 </li>
                                                 <li>
-                                                    <Link
-                                                        href="#"
-                                                        className="icon-InstagramLogo"
-                                                    ></Link>
+                                                    <Link href="#" className="icon-InstagramLogo"></Link>
                                                 </li>
                                             </ul>
                                         </div>
                                     </div>
-                                    <div className="tf-article-navigation">
-                                        <div className="item prev">
-                                            <Link
-                                                href="single-post-1.html"
-                                                className="hover-underline-link text-button text_primary-color fw-7 mb_8"
-                                            >
-                                                Previous
-                                            </Link>
-                                            <h5>
-                                                <Link
-                                                    href="#"
-                                                    className="link line-clamp-2"
-                                                >
-                                                    How To Identify High-Growth
-                                                    Neighborhoods In 2025
-                                                </Link>
-                                            </h5>
-                                        </div>
-                                        <div className="item next">
-                                            <Link
-                                                href="single-post-1.html"
-                                                className="hover-underline-link text-button text_primary-color fw-7 mb_8"
-                                            >
-                                                Next
-                                            </Link>
-                                            <h5>
-                                                <Link
-                                                    href="#"
-                                                    className="link line-clamp-2"
-                                                >
-                                                    The Future Of Office Spaces
-                                                    In A Hybrid Work Era
-                                                </Link>
-                                            </h5>
-                                        </div>
-                                    </div>
+
+
                                 </div>
-                                <div className="mb_40">
-                                    <Comment />
-                                </div>
-                                <FormComments />
+
+
                             </div>
+
                             <div className="col-lg-4">
                                 <SideBar2
                                     authorAvatar={blogItem.authorAvatar}
