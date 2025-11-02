@@ -8,6 +8,10 @@ import "../../public/assets/scss/app.scss";
 import BackToTop from "@/components/common/BackToTop";
 import ClientScripts from "@/components/common/ClientScripts";
 import { Metadata } from "next";
+import { PreloaderProvider } from "@/context/PreloaderContext";
+import Preloader from "@/components/Preloader";
+
+
 
 const manrope = Manrope({
     variable: "--font-manrope",
@@ -26,11 +30,16 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" dir="rtl">
+            
+            <PreloaderProvider>
             <body className={manrope.variable}>
+                        
+  <Preloader />
                 <div id="wrapper">{children}</div>
                 <ClientScripts />
                 <BackToTop />
             </body>
+             </PreloaderProvider>
         </html>
     );
 }

@@ -81,42 +81,57 @@ export default function Header() {
             </header>
 
             {/* Offcanvas menu */}
-            <div className="mobile-nav-wrap">
+<div className="mobile-nav-wrap">
                 <Offcanvas
                     isOpen={isMenuOpen}
                     onClose={() => setIsMenuOpen(false)}
+                    
                 >
-                    <div 
-                        className="offcanvas-header top-nav-mobile"
-                        style={{
-                            backgroundColor: '#1e3a8a',
-                            color: 'white'
-                        }}
-                    >
-                        <div className="offcanvas-title">
-                            <Link href="/" className="site-logo">
-                                <Image
-                                    src="/assets/images/logo/logo.png"
-                                    alt="logo"
-                                    className="main-logo"
-                                    width={193}
-                                    height={44}
-                                />
-                            </Link>
-                        </div>
-                        <div
-                            className="btn-close-menu"
-                            onClick={() => setIsMenuOpen(false)}
-                            style={{ color: 'white' }}
-                        >
-                            <i className="icon-times-solid"></i>
-                        </div>
-                    </div>
+<div 
+    className="offcanvas-header top-nav-mobile"
+    style={{
+        backgroundColor: '#142B40 ',
+        color: '#1e3a8a',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        direction: 'rtl',
+        position: 'relative',
+        padding: '20px'
+    }}
+>
+    <div
+        className="btn-close-menu"
+        onClick={() => setIsMenuOpen(false)}
+        style={{ 
+            color: 'white',
+            cursor: 'pointer',
+            position: 'absolute',
+            left: '20px',
+            top: '50%',
+            transform: 'translateY(-50%)'
+        }}
+    >
+        <i className="icon-times-solid"></i>
+    </div>
+    <div className="offcanvas-title">
+        <Link href="/" className="site-logo">
+            <Image
+                src="/raciat-logo.webp"
+                alt="logo"
+                className="main-logo"
+                width={193}
+                height={44}
+            />
+        </Link>
+    </div>
+</div>
                     <div 
                         className="offcanvas-body inner-mobile-nav"
                         style={{
-                            backgroundColor: '#1e3a8a',
-                            color: 'white'
+                            backgroundColor: '#142B40 ',
+                            color: 'white',
+                            direction: 'rtl'
                         }}
                     >
                         <div className="mb-body">
@@ -126,11 +141,16 @@ export default function Header() {
                                     href="#" 
                                     className="tf-btn"
                                     style={{
-                                        backgroundColor: 'white',
-                                        color: '#1e3a8a'
+                                        backgroundColor: '#E4E95B',
+                                        color: 'white'
                                     }}
                                 >
-                                 <span>إنشاء حساب</span>
+                                 <span
+                                 style={{
+                                        backgroundColor: '#E4E95B',
+                                        
+                                    }}
+                                 >إنشاء حساب</span>
                                     <span className="bg-effect"></span>
                                 </a>
                                 <a 

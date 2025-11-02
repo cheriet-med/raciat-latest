@@ -1,22 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { menuItems } from "@/data/menu";
-
+import { FaAngleDown } from "react-icons/fa6";
 const getCollapseId = (index: number) => `dropdown-menu-${index + 1}`;
 
 export default function MobileMenu() {
     const pathname = usePathname();
+    const [openDropdowns, setOpenDropdowns] = useState<Set<number>>(new Set());
+
+    const toggleDropdown = (index: number) => {
+        setOpenDropdowns(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(index)) {
+                newSet.delete(index);
+            } else {
+                newSet.add(index);
+            }
+            return newSet;
+        });
+    };
 
     return (
-        <ul id="menu-mobile-menu" className="style-1">
+        <ul id="menu-mobile-menu" className="style-1" style={{ direction: 'rtl' }}>
             {menuItems.map((item, idx) => {
                 const hasChildren = item.links && item.links.length > 0;
                 const collapseId = getCollapseId(idx);
-
                 const isParentActive =
                     item.href === pathname ||
                     (item.links && item.links.some((link) => link.href === pathname));
+                const isOpen = openDropdowns.has(idx);
 
                 if (hasChildren) {
                     return (
@@ -27,18 +40,43 @@ export default function MobileMenu() {
                             }`}
                         >
                             <a
-                                href={`#${collapseId}`}
-                                className="item-menu-mobile collapsed"
-                                data-bs-toggle="collapse"
-                                aria-expanded={isParentActive ? "true" : "false"}
+                                href="#"
+                                className={` ${isOpen ? '' : 'collapsed'}`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    toggleDropdown(idx);
+                                }}
+                                aria-expanded={isOpen ? "true" : "false"}
                                 aria-controls={collapseId}
+                                style={{ 
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    gap: '10px',
+                                    padding:"15px",
+                                    color:"white"
+                                }}
                             >
                                 {item.title}
+                                <span style={{ 
+                                    transition: 'transform 0.3s ease',
+                                    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                                    flexShrink: 0
+                                }}>
+                                  <FaAngleDown/>
+                                </span>
                             </a>
                             <div
                                 id={collapseId}
-                                className={`collapse`}
-                                data-bs-parent="#menu-mobile-menu"
+                                className={`collapse ${isOpen ? 'show' : ''}`}
+                                style={{
+                                    maxHeight: isOpen ? '1000px' : '0',
+                                    overflow: 'hidden',
+                                    transition: 'max-height 0.3s ease-in-out',
+                                    padding:"10px",
+                                   
+                                }}
                             >
                                 <ul className="sub-mobile">
                                     {item.links.map((link) => {
@@ -47,6 +85,7 @@ export default function MobileMenu() {
                                             <li
                                                 key={link.label}
                                                 className={`menu-item${isActive ? " active" : ""}`}
+                                                style={{  color:"white"}}
                                             >
                                                 {link.href ? (
                                                     <Link href={link.href}>{link.label}</Link>
@@ -63,9 +102,10 @@ export default function MobileMenu() {
                 }
 
                 const isActive = item.href === pathname;
-
                 return (
-                    <li key={item.title} className={`menu-item${isActive ? " active" : ""}`}>
+                    <li key={item.title} className={`menu-item${isActive ? " active" : ""}`}
+                       style={{  color:"white"}}
+                    >
                         {item.href ? (
                             <Link href={item.href} className="item-menu-mobile">
                                 {item.title}
