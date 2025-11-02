@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+  background: white;
+  font-family: var(--font-montserrat), sans-serif;
+}
+.prose-inherit * {
+  color: inherit !important;
+}
+.section-process-1 .wrap-process {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.section-process-1 .process-item {
+  position: relative;
+  padding-right: 2rem; /* move content away from the line */
+}
+
+.section-process-1 .process-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0.5rem; /* line on the right side */
+  width: 2px;
+  height: 100%;
+  background-color: #ccc;
+}
+
+.section-process-1 .process-item:last-child::before {
+  display: none; /* remove line after last item */
+}
+
+.section-process-1 .number {
+  position: relative;
+  right: 0; /* ensure number aligns with the line */
+  font-weight: bold;
+}
+
+
+.rtl-dropdown {
+  direction: rtl;
+  text-align: right;
+}
+
+.rtl-dropdown .current::after {
+  left: 0 !important;
+  right: auto !important;
+  margin-left: 0 !important;
+  margin-right: 15px;
+}
+
+.rtl-dropdown .list {
+  text-align: right;
+}
+
+/* RTL Dropdown Styles */
+.nice-select[style*="direction: rtl"] .current {
+  padding-left: 30px !important;
+  padding-right: 14px !important;
+  text-align: right !important;
+}
+
+.nice-select[style*="direction: rtl"] .current::after {
+  left: 12px !important;
+  right: auto !important;
+}
+
+.nice-select[style*="direction: rtl"] .list {
+  text-align: right !important;
+}
+
+.nice-select[style*="direction: rtl"] .option {
+  text-align: right !important;
+}
+
+
+
+
+
+/* Dark blue background and white text */
+.bg-dark-blue {
+    background-color: #1e3a8a; /* You can adjust this dark blue shade */
+}
+
+.text-white {
+    color: white;
+}
+
+.text-dark-blue {
+    color: #1e3a8a;
+}
+
+/* Ensure burger menu lines are white */
+.burger span {
+    background-color: white;
+}
+
+/* Style for the button with white background and dark blue text */
+.tf-btn.bg-white {
+    background-color: white;
+    color: #1e3a8a;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.tf-btn.bg-white:hover {
+    background-color: #f0f0f0;
+}
+
+/* Style for links */
+.link.text-white {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.link.text-white:hover {
+    color: #e0e0e0;
+}
+
+
+/* Force dark blue background and white text */
+header.header.style-default.header-fixed {
+    background-color: #1e3a8a !important;
+    color: white !important;
+}
+
+header.header.style-default.header-fixed .tf-container.w-xxl {
+    background-color: #1e3a8a !important;
+}
+
+header.header.style-default.header-fixed .header-inner,
+header.header.style-default.header-fixed .header-right,
+header.header.style-default.header-fixed .link {
+    color: white !important;
+}
+
+header.header.style-default.header-fixed .tf-btn {
+    background-color: white !important;
+    color: #1e3a8a !important;
+    border: none !important;
+}
+
+/* Mobile menu styles */
+.top-nav-mobile,
+.inner-mobile-nav {
+    background-color: #1e3a8a !important;
+    color: white !important;
+}
+
+.top-nav-mobile .btn-close-menu,
+.inner-mobile-nav .text-need,
+.inner-mobile-nav .mb-info,
+.inner-mobile-nav .mb-info li,
+.inner-mobile-nav .number,
+.inner-mobile-nav .link,
+.inner-mobile-nav .icon-FacebookLogo,
+.inner-mobile-nav .icon-XLogo,
+.inner-mobile-nav .icon-TiktokLogo,
+.inner-mobile-nav .icon-InstagramLogo,
+.inner-mobile-nav .icon-YoutubeLogo {
+    color: white !important;
+}
+
+/* Burger menu lines */
+.mobile-button .burger span {
+    background-color: white !important;
+}
