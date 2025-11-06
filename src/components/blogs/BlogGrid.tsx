@@ -58,7 +58,7 @@ export default function BlogGrid() {
                                     {item.date}
                                 </div>
                             </div>
-                            <h5 className="title mb_12">
+                            <h5 className="title mb_12 text-3xl font-bold">
                                 <Link  href={`/blog-post-1/${item.id}`} className="link">
                                     {item.title}
                                 </Link>

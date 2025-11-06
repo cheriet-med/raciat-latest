@@ -1,4 +1,4 @@
-import About from "@/components/homes/homepage-1/About";
+
 import Banner from "@/components/homes/homepage-1/Banner";
 import Hero from "@/components/homes/homepage-1/Hero";
 import Location from "@/components/homes/homepage-1/Location";
@@ -13,7 +13,7 @@ export default function Home() {
     return (
         <Layout>
             <Hero />
-            <About />
+            <div className="py-24"> </div>
             <Properties />
             <Banner />
             <Properties2 />
@@ -24,3 +24,6 @@ export default function Home() {
         </Layout>
     );
 }
+
+
+/***<About /> */

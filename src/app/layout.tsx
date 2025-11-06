@@ -10,6 +10,7 @@ import ClientScripts from "@/components/common/ClientScripts";
 import { Metadata } from "next";
 import { PreloaderProvider } from "@/context/PreloaderContext";
 import Preloader from "@/components/Preloader";
+import "./globals.css";
 
 
 

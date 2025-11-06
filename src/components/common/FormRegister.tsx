@@ -19,7 +19,7 @@ export default function FormRegister() {
             <div className="row justify-content-center">
                 <div className="col-lg-6">
                     <form className="form-account" action={registerAction}>
-                        <h3 className="text-center mb_24">إنشاء حساب</h3>
+                        <h3 className="text-center mb_24  text-4xl  lg:text-5xl  font-bold">إنشاء حساب</h3>
 
                         {/* اسم المستخدم أو البريد الإلكتروني */}
                         <fieldset className="mb_20">

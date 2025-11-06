@@ -288,7 +288,7 @@ export default function Properties1() {
                                 </li>
                                 <li>عقارات</li>
                             </ul>
-                            <h4>عقارات</h4>
+                            <h4 className="text-4xl lg:text-5xl font-bold">عقارات</h4>
                         </div>
                         <div className="right d-flex gap_12">
                             <ul
@@ -393,7 +393,7 @@ export default function Properties1() {
                                                 </div>
                                                 <div className="content">
                                                     <h4
-                                                        className="price mb_12"
+                                                        className="price mb_12 text-4xl lg:text-5xl font-bold"
                                                         suppressHydrationWarning
                                                     >
                                                         SAR {" "}
@@ -493,7 +493,7 @@ export default function Properties1() {
                                                 </div>
                                                 <div className="content">
                                                     <div className="d-flex align-items-center gap_6 top mb_16 flex-wrap justify-content-between">
-                                                        <h4 className="price " suppressHydrationWarning>
+                                                        <h4 className="price text-4xl lg:text-5xl font-bold" suppressHydrationWarning>
                                                             SAR {" "}
                                                             {property.price.toLocaleString()}
                                                             <span className="text_secondary-color text-body-default">

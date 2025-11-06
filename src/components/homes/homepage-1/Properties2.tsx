@@ -70,7 +70,7 @@ export default function Properties2() {
                                 <div className="property-item">
                                     <div className="dots"></div>
                                     <div className="content">
-                                        <h4 className="title mb_8">
+                                        <h4 className="title mb_8 text-5xl font-bold">
                                             <Link
                                                 href={'/property-details-1/1'}
                                                 className="link"

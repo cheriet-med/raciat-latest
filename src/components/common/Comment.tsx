@@ -6,7 +6,7 @@ export default function Comment() {
     return (
         <div className="reply-comment mb_40 ">
             <div className="title d-flex align-items-center justify-content-between mb_20">
-                <h5>تقييمات العملاء</h5>
+                <h5 className="text-2xl lg:text-3xl font-bold">تقييمات العملاء</h5>
                 <Link
                     href="#leaveComment"
                     className="tf-btn btn-bg-1 btn-px-28"

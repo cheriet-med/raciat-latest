@@ -6,30 +6,38 @@ export default function Process() {
             <style>{`
                 .wrap-process {
                     direction: rtl;
+                    position: relative;
+                }
+                
+                /* Remove any default lines */
+                .process-item.style-1::before,
+                .process-item.style-1::after {
+                    display: none !important;
+                }
+                
+                /* Single continuous line on the right side aligned with numbers */
+                .wrap-process::before {
+                    content: '';
+                    position: absolute;
+                    right: 32px;
+                    top: 5px;
+                    width: 2px;
+                    height: calc(100% - 10px);
+                    background: #e0e0e0;
+                    z-index: 0;
                 }
                 
                 .process-item.style-1 {
                     position: relative;
                 }
                 
-                /* Move the line to the right side */
-                .process-item.style-1:not(:last-child)::after {
-                    content: '';
-                    position: absolute;
-                    right: 20px;
-                    top: 40px;
-                    width: 2px;
-                    height: calc(100% - 20px);
-                    background: #e0e0e0;
-                }
-                
                 /* Style for the number container */
                 .process-item.style-1 .number {
                     position: relative;
                     z-index: 1;
+                    background: white;
                 }
             `}</style>
-            
             <div
                 className="parallaxie"
                 style={{
@@ -42,14 +50,14 @@ export default function Process() {
                             <span className="sub text-uppercase fw-6 text_secondary-color-2">
                                 خطوات العمل
                             </span>
-                            <h3>خطوات شراء المنزل</h3>
+                            <h3 className="text-5xl font-bold">خطوات شراء المنزل</h3>
                         </div>
                         <div className="wrap-process">
                             <div className="process-item style-1">
                                 <span className="number h5">01.</span>
                                 <div className="content">
-                                    <h5 className="mb_8">
-                                       اكتشف منزل أحلامك
+                                    <h5 className="mb_8 text-4xl">
+                                        اكتشف منزل أحلامك
                                     </h5>
                                     <p>
                                         تصفح مجموعة مختارة من العقارات المصممة خصيصاً لتناسب نمط حياتك وميزانيتك.
@@ -59,7 +67,7 @@ export default function Process() {
                             <div className="process-item style-1">
                                 <span className="number h5">02.</span>
                                 <div className="content">
-                                    <h5 className="mb_8">حدد موعد المعاينة</h5>
+                                    <h5 className="mb_8 text-4xl">حدد موعد المعاينة</h5>
                                     <p>
                                         احجز جولة في الوقت المناسب لك واستكشف المكان شخصياً أو عبر الجولة الافتراضية.
                                     </p>
@@ -68,7 +76,7 @@ export default function Process() {
                             <div className="process-item style-1">
                                 <span className="number h5">03.</span>
                                 <div className="content">
-                                    <h5 className="mb_8">أتمم الصفقة</h5>
+                                    <h5 className="mb_8 text-4xl">أتمم الصفقة</h5>
                                     <p>
                                         احصل على إرشاد خبير لإنهاء الأوراق والانتقال إلى منزلك الجديد بثقة تامة.
                                     </p>

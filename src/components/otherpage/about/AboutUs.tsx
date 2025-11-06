@@ -5,7 +5,7 @@ export default function AboutUs() {
         <div className="tf-container section-about">
             <div className="heading-section justify-content-center text-center mb_48">
                 <span className="sub text-uppercase fw-6">معلومات عنا</span>
-                <h3 className="split-text split-lines-rotation-x">
+                <h3 className="split-text split-lines-rotation-x text-5xl lg-text-7xl font-bold">
 خبرة عقارية راسخة وتميز في تنفيذ المشاريع
                 </h3>
             </div>
@@ -27,7 +27,7 @@ export default function AboutUs() {
                                     <i className="icon-Certificate"></i>
                                 </div>
                             </div>
-                            <h6 className="text_secondary-color sub">
+                            <h6 className="text_secondary-color sub text-4xl">
                                 الجوائز المحققة
                             </h6>
                         </div>
@@ -41,7 +41,7 @@ export default function AboutUs() {
                                         <i className="icon-BuildingOffice"></i>
                                     </div>
                                 </div>
-                                <h6 className="text_secondary-color sub">
+                                <h6 className="text_secondary-color sub text-4xl">
                                 العملاء الراضون
                                 </h6>
                             </div>
@@ -54,7 +54,7 @@ export default function AboutUs() {
                                         <i className="icon-ChartDonut"></i>
                                     </div>
                                 </div>
-                                <h6 className="text_secondary-color sub">
+                                <h6 className="text_secondary-color sub text-4xl">
                                    الزيارات الشهرية
                                 </h6>
                             </div>
@@ -64,7 +64,7 @@ export default function AboutUs() {
             </div>
             <div className="tf-grid-layout md-col-2">
                 <div className="box">
-                    <h4 className="title d-flex gap_12 align-items-center mb_20">
+                    <h4 className="title d-flex gap_12 align-items-center mb_20 text-5xl lg-text-7xl font-bold">
                         <i className="icon-Crown"></i>
                     
 
@@ -79,7 +79,7 @@ export default function AboutUs() {
                   
                 </div>
                 <div className="box">
-                    <h4 className="title d-flex gap_12 align-items-center mb_20">
+                    <h4 className="title d-flex gap_12 align-items-center mb_20 text-5xl lg-text-7xl font-bold">
                         <i className="icon-Target"></i>
                         مهمتنا
                     </h4>

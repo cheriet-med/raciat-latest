@@ -14,7 +14,7 @@ export default function LatestNews() {
                     <span className="sub text-uppercase fw-6 text_secondary-color-2 effect-rotate">
                        اخر اﻷخبار
                     </span>
-                    <h3 className="split-text effect-blur-fade">
+                    <h3 className="split-text effect-blur-fade text-5xl lg:text-7xl font-bold">
                         دليل راسيات المساعد
                     </h3>
                 </div>

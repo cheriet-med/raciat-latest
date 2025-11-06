@@ -30,7 +30,7 @@ export default function WhyChoose() {
                        لماذا تختارنا؟
 
                     </span>
-                    <h3 className="text_white split-text effect-blur-fade">
+                    <h3 className="text_white split-text effect-blur-fade text-5xl lg-text-7xl font-bold">
                         الاختيار الأول للعملاء والمستثمرين <br />
                         في القطاع العقاري
                     </h3>
@@ -47,7 +47,7 @@ export default function WhyChoose() {
                             <i className={item.icon}></i>
                         </div>
                         <div className="content">
-                            <h5 className="text_white mb_8">{item.title}</h5>
+                            <h5 className="text_white mb_8 text-5xl lg-text-7xl font-bold">{item.title}</h5>
                             <p className="text_secondary-color-2">
                                 {item.description}
                             </p>

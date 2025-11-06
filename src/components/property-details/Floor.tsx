@@ -12,7 +12,7 @@ export default function Floor() {
 
     return (
         <>
-            <h5 className="properties-title mb_20">مخططات الطوابق</h5>
+            <h5 className="properties-title mb_20 text-2xl lg:text-3xl font-bold">مخططات الطوابق</h5>
             <ul className="box-floor d-grid gap_20 mb_20" id="parent-floor">
                 {/* Floor 1 */}
                 <li className="floor-item">

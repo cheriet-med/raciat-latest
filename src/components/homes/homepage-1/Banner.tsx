@@ -20,7 +20,7 @@ export default function Banner() {
                                     <i className="icon-Certificate"></i>
                                 </div>
                             </div>
-                            <h6 className="text_secondary-color sub">
+                            <h6 className="text_secondary-color sub text-4xl">
                                 الجوائز المحققة
                             </h6>
                         </div>
@@ -34,7 +34,7 @@ export default function Banner() {
                                         <i className="icon-BuildingOffice"></i>
                                     </div>
                                 </div>
-                                <h6 className="text_secondary-color sub">
+                                <h6 className="text_secondary-color sub text-4xl">
                                     العملاء الراضون
                                 </h6>
                             </div>
@@ -47,7 +47,7 @@ export default function Banner() {
                                         <i className="icon-ChartDonut"></i>
                                     </div>
                                 </div>
-                                <h6 className="text_secondary-color sub">
+                                <h6 className="text_secondary-color sub text-4xl">
                                    الزيارات الشهرية
                                 </h6>
                             </div>

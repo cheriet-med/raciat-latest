@@ -24,13 +24,18 @@ export default function Properties() {
     return (
         <div className="section-features-property-4 tf-spacing-1 pt-0">
             <div className="tf-container">
-                <div className="heading-section justify-content-center text-center mb_46">
-                    <span className="sub text-uppercase fw-6 text_secondary-color-2  effect-rotate">
-                        العقارات المميزة
-                    </span>
-                    <h3 className="split-text effect-blur-fade">
-                        اكتشف منزل أحلامك
-                    </h3>
+                <div className="flex justify-between mb_46 flex-wrap gap-5">
+     <h2 className="split-text effect-blur-fade text-5xl lg:text-7xl font-extrabold">
+  إكتشف منزل أحلامك
+</h2>              
+<div className="flex gap-2 flex-wrap">
+    <button className="px-8 py-4 w-48 rounded-lg bg-sec hover:bg-prim font-bold text-white ">شقق</button>
+     <button className="px-8 py-4 w-48 rounded-lg bg-prim hover:bg-sec font-bold text-white ">فلل</button>
+      <button className="px-8 py-4 w-48 rounded-lg bg-prim hover:bg-sec font-bold text-white ">بناء</button>
+       <button className="px-8 py-4 w-48 rounded-lg bg-prim hover:bg-sec font-bold text-white ">مكاتب</button>
+</div>
+
+
                 </div>
                 {isMobile ? (
                     <Swiper
@@ -83,14 +88,14 @@ export default function Properties() {
                                     </div>
                                     <div className="content">
                                         <h4
-                                            className="price mb_12"
+                                            className="price mb_12 text-4xl font-bold"
                                             suppressHydrationWarning
                                         >
                                             SAR {property.price.toLocaleString()}
                                             <span className="text_secondary-color text-body-default">
                                                 {property.type === "Sale"
                                                     ? "/Sqft"
-                                                    : "/"}
+                                                    : ""}
                                             </span>
                                         </h4>
                                         <Link
@@ -172,7 +177,7 @@ export default function Properties() {
                                         </div>
                                         <div className="content">
                                             <h4
-                                                className="price mb_12"
+                                                className="price mb_12 text-5xl font-bold"
                                                 suppressHydrationWarning
                                             >
                                                 SAR{" "}

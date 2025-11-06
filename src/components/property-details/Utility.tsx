@@ -49,7 +49,7 @@ export default function PropertyUtility() {
 
     return (
         <>
-            <h5 className="properties-title mb_20">مرافق العقار</h5>
+            <h5 className="properties-title mb_20 text-2xl lg:text-3xl font-bold">مرافق العقار</h5>
             <div className="tf-grid-layout md-col-2">
                 {renderColumn(firstColumn)}
                 {renderColumn(secondColumn)}

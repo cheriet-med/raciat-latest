@@ -6,7 +6,7 @@ export default function PageTitle() {
         <div className="page-title style-default">
             <div className="thumbs">
                 <Image
-                    src="/hero5.png"
+                    src="/hero8.png"
                     width={1920}
                     height={300}
                     alt=""
@@ -15,7 +15,7 @@ export default function PageTitle() {
             </div>
             <div className="content text-center">
                 <div className="tf-container">
-                    <h2 className="title text_white mb_12">
+                    <h2 className="title text_white mb_12  text-5xl  lg:text-7xl  font-bold">
 اتصل بنا</h2>
                     <ul className="breadcrumb justify-content-center text-button fw-4">
                         <li>

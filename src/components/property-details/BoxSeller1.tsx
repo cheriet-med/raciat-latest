@@ -22,7 +22,7 @@ export default function BoxSeller1() {
 
     return (
         <>
-            <h5 className="mb_24">تواصل معنا</h5>
+            <h5 className="mb_24 text-2xl lg:text-3xl font-bold">تواصل معنا</h5>
                         <ul className="info mb_23">
                 <li className="item d-flex gap_12 mb_20">
                     <i className="icon icon-MapPin"></i>

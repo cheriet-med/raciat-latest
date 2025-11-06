@@ -12,7 +12,7 @@ export default function FormContact() {
             <div className="col-md-6">
                 <div className="box-contact">
                     <div className="heading mb_23">
-                        <h4 className="mb_8">تواصل معنا</h4>
+                        <h4 className="mb_8 text-4xl  lg:text-5xl  font-bold">تواصل معنا</h4>
                         <p>
                          نحن هنا لمساعدتك في أي أسئلة أو مخاوف أو استفسارات - اتصل بنا اليوم!
 
@@ -79,7 +79,7 @@ export default function FormContact() {
             <div className="col-md-6">
                 <form className="form-contact" action={sendContact}>
                     <div className="heading mb_24">
-                        <h4 className="mb_8">تواصل معنا
+                        <h4 className="mb_8  text-4xl  lg:text-5xl  font-bold">تواصل معنا
 </h4>
                         <p>
                             يسعدنا التواصل معك! إذا كانت لديك أي أسئلة

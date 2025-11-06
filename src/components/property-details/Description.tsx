@@ -3,7 +3,7 @@ import React from "react";
 export default function Description() {
     return (
         <div>
-            <h5 className="properties-title mb_20">الوصف</h5>
+            <h5 className="properties-title mb_20 text-2xl lg:text-3xl font-bold">الوصف</h5>
             <p className="mb_8 text-body-2">
                 يقدم منزل &quot;كاسا لوماس دي ماشالي&quot; مزيجًا مثاليا من الراحة والخصوصية والطبيعة. 
                 يقع في واحدة من أكثر المناطق السكنية أمانًا وهدوءًا في ماشالي، 

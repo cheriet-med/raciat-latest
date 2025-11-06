@@ -15,7 +15,7 @@ export default function PageTitle() {
             </div>
             <div className="content text-center">
                 <div className="tf-container">
-                    <h2 className="title text_white mb_12">معلومات عنا
+                    <h2 className="title text_white mb_12 text-5xl lg-text-7xl font-bold">معلومات عنا
 </h2>
                     <ul className="breadcrumb justify-content-center text-button fw-4">
                         <li>

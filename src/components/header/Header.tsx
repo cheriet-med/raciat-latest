@@ -11,11 +11,8 @@ export default function Header() {
     return (
         <>
             <header 
-                className={`header style-default header-fixed`}
-                style={{
-                    backgroundColor: '#142B40',
-                    color: 'white'
-                }}
+                className={`header  header-fixed bg-prim`}
+                
             >
                 <div 
                     className="tf-container w-xxl"
@@ -24,16 +21,16 @@ export default function Header() {
                     <div className="row">
                         <div className="col-12">
                             <div 
-                                className="header-inner"
+                                className="header-inner "
                                 style={{ color: 'white' }}
                             >
-                                <Link href="/" className="site-logo">
+                                <Link href="/" className="site-logo ">
                                     <Image
                                         src="/raciat-logo.webp"
                                         alt="logo"
                                         className="main-logo"
-                                        width={90}
-                                        height={18}
+                                        width={120}
+                                        height={32}
                                     />
                                 </Link>
                                 <Nav />
@@ -52,12 +49,8 @@ export default function Header() {
                                     </Link>
                                     <Link 
                                         href="/register" 
-                                        className="tf-btn"
-                                        style={{
-                                          
-                                            color: '#1e3a8a',
-                                            border: 'none'
-                                        }}
+                                        className="tf-btn bg-sec hidden md:flex"
+                                    
                                     >
                                         <span>إنشاء حساب</span>
                                         <span className="bg-effect"></span>

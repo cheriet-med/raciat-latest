@@ -3,7 +3,7 @@ import React from "react";
 export default function Overview() {
     return (
         <div>
-            <h5 className="properties-title mb_20">نظرة عامة</h5>
+            <h5 className="properties-title mb_20 text-2xl lg:text-3xl font-bold">نظرة عامة</h5>
             <div className="tf-grid-layout tf-col-2 xl-col-4 md-col-3">
                 <div className="item d-flex gap_16">
                     <i className="icon icon-HouseSimple"></i>

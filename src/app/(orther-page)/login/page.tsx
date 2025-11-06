@@ -18,7 +18,7 @@ export default function page() {
                 </div>
                 <div className="content text-center">
                     <div className="tf-container">
-                        <h2 className="title text_white mb_12">تسجيل الدخول</h2>
+                        <h2 className="title text_white mb_12  text-5xl  lg:text-7xl  font-bold">تسجيل الدخول</h2>
                         <ul className="breadcrumb justify-content-center text-button fw-4">
                             <li>
                                 <Link href="/">الرئيسية</Link>

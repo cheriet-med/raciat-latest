@@ -30,18 +30,18 @@ export default function PropertiesTitle({ property }: { property: Property }) {
                             {property.categories}
                         </div>
                     </div>
-                    <h4>{property.title}</h4>
+                    <h4 className="text-4xl lg:text-5xl font-bold">{property.title}</h4>
                 </div>
-                <h4 className="price">
+                <h4 className="price text-4xl lg:text-5xl font-bold">
                     {property.price}
-                    <span className="text_secondary-color text-body-1">
+                    <span className="text_secondary-color text-body-1 ">
                      {" "}  SAR  {property.type === "Sale" ? "/Sqft" : ""}
                     </span>
                 </h4>
             </div>
             <div className="wrap-info d-flex justify-content-between align-items-end">
                 <div>
-                    <div className="text-body-default mb_12">مميزات:</div>
+                    <div className="text-body-default mb_12 text-2xl lg:text-3xl font-bold">مميزات:</div>
                     <ul className="info d-flex">
                         <li className="d-flex align-items-center gap_8 h6 text_primary-color fw-6">
                             <i className="icon-Bed"></i>

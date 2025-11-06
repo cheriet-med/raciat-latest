@@ -3,7 +3,7 @@ import React from "react";
 export default function Nearby() {
     return (
         <>
-            <h5 className="properties-title mb_20">ما هو قريب منك؟</h5>
+            <h5 className="properties-title mb_20 text-2xl lg:text-3xl font-bold">ما هو قريب منك؟</h5>
             <p className="text-body-2">
                 سواء كنت تؤسس عائلة أو تستمتع بإقامة هادئة، ستقدّر القرب من
                 الخدمات الأساسية، والمساحات الخضراء، وخيارات الترفيه.

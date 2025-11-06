@@ -28,7 +28,7 @@ export default function OurHistory() {
                       تاريخنا
 
                     </span>
-                    <h3 className="split-text effect-blur-fade">
+                    <h3 className="split-text effect-blur-fade text-5xl lg-text-7xl font-bold">
                    المعالم التي تحددنا
 
                     </h3>
@@ -58,7 +58,7 @@ export default function OurHistory() {
                             >
                                 <div className="heading">
                                     <h3 className="mb_8">{item.year}</h3>
-                                    <span className="sub text-label text-uppercase fw-6">
+                                    <span className="sub text-label text-uppercase fw-6 text-3xl font-extrabold">
                                         {item.title}
                                     </span>
                                 </div>

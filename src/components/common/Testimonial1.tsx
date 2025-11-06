@@ -48,7 +48,7 @@ export default function Testimonial1() {
                 <span className="sub text-uppercase fw-6 text_secondary-color-2">
                    شهادة تقدير من العملاء
                 </span>
-                <h3 className="split-text effect-blur-fade">خدمة احترافية وثقة تامة لتحقيق أحلامنا العقارية</h3>
+                <h3 className="split-text effect-blur-fade text-5xl lg-text-7xl font-bold">خدمة احترافية وثقة تامة لتحقيق أحلامنا العقارية</h3>
             </div>
             <div className="tf-container">
                 <Swiper

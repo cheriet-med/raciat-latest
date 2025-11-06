@@ -12,7 +12,7 @@ export default function Relatest() {
         <>
             <div className="tf-container sw-layout tf-spacing-1 pt-0">
                 <div className="heading-section mb_48">
-                    <h3>أحدث العقارات</h3>
+                    <h3 className="text-4xl lg:text-5xl font-bold">أحدث العقارات</h3>
                 </div>
                 <Swiper
                     className="mySwiper"
@@ -79,7 +79,7 @@ export default function Relatest() {
                                 </div>
                                 <div className="content">
                                     <h4
-                                        className="price mb_12"
+                                        className="price mb_12 text-4xl lg:text-5xl font-bold"
                                         suppressHydrationWarning
                                     >
                                         SAR {property.price.toLocaleString()}

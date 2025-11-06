@@ -15,7 +15,7 @@ export default function FormLogin() {
             <div className="row justify-content-center">
                 <div className="col-lg-6">
                     <form className="form-account" action={loginAction}>
-                        <h3 className="text-center mb_23">تسجيل الدخول</h3>
+                        <h3 className="text-center mb_23  text-4xl  lg:text-5xl  font-bold">تسجيل الدخول</h3>
                         <fieldset className="mb_20">
                             <label
                                 htmlFor="email"

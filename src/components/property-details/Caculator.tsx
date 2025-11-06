@@ -5,7 +5,7 @@ import { calculateLoan } from "@/actions/calculatorAction";
 export default function Caculator() {
     return (
         <div>
-            <h5 className="properties-title mb_20">حاسبة القرض</h5>
+            <h5 className="properties-title mb_20 text-2xl lg:text-3xl font-bold">حاسبة القرض</h5>
             <div className="wrap-form">
                 <form className="form-calculator" action={calculateLoan}>
                     <div className="tf-grid-layout xl-col-4 md-col-2">
