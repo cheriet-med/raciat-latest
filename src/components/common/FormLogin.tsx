@@ -1,20 +1,189 @@
 "use client";
-import Link from "next/link";
+
 import React, { useState } from "react";
-import { loginAction } from "@/actions/loginAction"; 
+
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { FaEye, FaEyeSlash, FaCircleNotch } from "react-icons/fa";
+import MailChecker from "mailchecker";
+
+
 
 export default function FormLogin() {
-    const [showPassword, setShowPassword] = useState(false);
+   
 
     const handleTogglePassword = () => {
         setShowPassword((prev) => !prev);
     };
 
+      const router = useRouter();
+    
+      const [isLoading, setIsLoading] = useState(false);
+      const [error, setError] = useState<string | null>(null);
+      const [error1, setError1] = useState("");
+      const [error2, setError2] = useState("");
+      const [showPassword, setShowPassword] = useState(false);
+      const [passwordSuggestion, setPasswordSuggestion] = useState("");
+      const [isCopied, setIsCopied] = useState(false);
+      const [email, setEmail] = useState('');
+      const [emailsend, setEmailsend] = useState(false);
+      const [emailsenderror, setEmailsenderror] = useState(false);
+      const [enteremail, setEnteremail] = useState(false);
+    
+      const handleGoogleLogin = () => {
+        signIn("google", { callbackUrl: "/en/account" });
+      };
+    
+      const handleFacebookleLogin = () => {
+        signIn("facebook", { callbackUrl: "/en/account" });
+      };
+    
+      const isValidEmail = async (email: string): Promise<{ valid: boolean; message?: string }> => {
+        if (!email || email.trim() === "") {
+          return { valid: false, message: "Email is required" };
+        }
+    
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          return { valid: false, message: "Invalid email format" };
+        }
+    
+        if (!MailChecker.isValid(email)) {
+          return { valid: false, message: "Disposable emails are not allowed" };
+        }
+    
+        return { valid: true };
+      };
+    
+      const validatePassword = (password: string): string | null => {
+        if (password.length < 8) {
+          return "Password must be at least 8 characters";
+        }
+    
+        if (!/[A-Z]/.test(password)) {
+          return "Password must contain at least one uppercase letter";
+        }
+    
+        if (!/[a-z]/.test(password)) {
+          return "Password must contain at least one lowercase letter";
+        }
+    
+        if (!/[0-9]/.test(password)) {
+          return "Password must contain at least one number";
+        }
+    
+        if (!/[!@#$%^&*]/.test(password)) {
+          return "Password must contain at least one special character";
+        }
+    
+        return null;
+      };
+    
+      const resetPassword = async () => {
+        if(!email){
+          setEnteremail(true);
+          return;
+        }
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_URL}auth/users/reset_password/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email }),
+          });
+          
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+         
+          setEmailsend(true);
+          setEmailsenderror(false);
+          setEnteremail(false);
+        } catch {
+          setEmailsenderror(true);
+          setEmailsend(false);
+        }
+      };
+    
+      const generatePasswordSuggestion = () => {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+        let password = "";
+        for (let i = 0; i < 12; i++) {
+          password += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        setPasswordSuggestion(password);
+      };
+    
+      const handlePasswordFocus = () => {
+        generatePasswordSuggestion();
+      };
+    
+      const handleCopyPassword = () => {
+        if (passwordSuggestion) {
+          navigator.clipboard.writeText(passwordSuggestion)
+            .then(() => {
+              setIsCopied(true);
+              setTimeout(() => setIsCopied(false), 2000);
+            })
+            .catch(() => {
+              console.error("Failed to copy password");
+            });
+        }
+      };
+    
+      const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setError(null);
+        setError1("");
+        setError2("");
+    
+        const formData = new FormData(e.currentTarget);
+        const email = formData.get('email') as string;
+        const password = formData.get('password') as string;
+    
+        const emailValidation = await isValidEmail(email);
+        if (!emailValidation.valid) {
+          setError1(emailValidation.message || "Invalid email");
+          setIsLoading(false);
+          return;
+        }
+    
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+          setError2(passwordError);
+          setIsLoading(false);
+          return;
+        }
+    
+        try {
+          const result = await signIn("credentials", {
+            redirect: false,
+            email,
+            password,
+          });
+    
+          if (result?.error) {
+            setError("Please verify your email or password");
+          } else {
+            router.push(`/account`);
+          }
+        } catch (err) {
+          setError("An error occurred during sign in");
+          console.error("Sign-in error:", err);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
     return (
         <div className="tf-container tf-spacing-1" dir="rtl">
             <div className="row justify-content-center">
                 <div className="col-lg-6">
-                    <form className="form-account" action={loginAction}>
+                    <form className="form-account" onSubmit={handleSubmit} >
                         <h3 className="text-center mb_23  text-4xl  lg:text-5xl  font-bold">تسجيل الدخول</h3>
                         <fieldset className="mb_20">
                             <label
@@ -31,7 +200,9 @@ export default function FormLogin() {
                                 autoComplete="email"
                                 placeholder="أدخل بريدك الإلكتروني"
                                 required
+                                onChange={(e) => setEmail(e.target.value)}
                             />
+                               {error1 && <p className="text-background text-sm mt-1">{error1}</p>}
                         </fieldset>
                         <label
                             htmlFor="password"
@@ -47,8 +218,12 @@ export default function FormLogin() {
                                 name="password"
                                 placeholder="أدخل كلمة المرور"
                                 required
-                                 
+                                   onFocus={handlePasswordFocus}
+
                             />
+                              {error2 && <p className="text-background text-sm">{error2}</p>}
+
+            {error && <p className="text-background text-sm text-center">{error}</p>}
 <button
     type="button"
     className="toggle-password"
@@ -85,32 +260,44 @@ export default function FormLogin() {
                                     </span>
                                 </label>
                             </fieldset>
-                            <a
-                                href="#"
+                            <button
+                                
                                 className="hover-line-text forgot text-body-default"
+                                onClick={resetPassword}
                             >
                                 هل نسيت كلمة المرور؟
-                            </a>
+                            </button>
                         </div>
+                         {emailsend && <p className="text-background text-sm text-center">Password reset email sent successfully</p>}
+            {emailsenderror && <p className="text-background text-sm text-center">Error sending password reset email</p>}
+            {enteremail && <p className="text-background text-sm text-center">Please enter your email address</p>}
+
                         <div className="or">
                             <span className="text-body-default">أو سجل الدخول عبر</span>
                         </div>
                         <div className="signin-with d-grid gap_9 mb_24">
  
-                            <a href="#" className="tf-btn btn-border w-full">
+                            <div   onClick={handleGoogleLogin} className="tf-btn btn-border w-full cursor-pointer">
                                 <span className="d-flex align-items-center gap_12">
                                     <img src="/assets/images/logo/google.svg" alt="logo" />
                                     المتابعة باستخدام جوجل
                                 </span>
                                 <span className="bg-effect"></span>
-                            </a>
+                            </div>
 
                         </div>
                         <button
                             type="submit"
                             className="btn-signup tf-btn btn-bg-1 w-full mb_12"
                         >
-                            <span>تسجيل الدخول</span>
+                            {isLoading ? (
+                <>
+                  جاري الدخول <FaCircleNotch className="animate-spin" />
+                </>
+              ) : (
+                 <span>تسجيل الدخول</span>
+              )}
+                          
                             <span className="bg-effect"></span>
                         </button>
 

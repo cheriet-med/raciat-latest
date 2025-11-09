@@ -5,9 +5,14 @@ import Link from "next/link";
 import MobileMenu from "./MobileMenu";
 import { useState } from "react";
 import Offcanvas from "../common/Offcanvas";
+import { useSession } from "next-auth/react";
+import { FaRegUser } from "react-icons/fa6";
+import { LuCircleUserRound } from "react-icons/lu";
+
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+      const { data: session, status } = useSession();
     return (
         <>
             <header 
@@ -38,6 +43,7 @@ export default function Header() {
                                     className="header-right d-flex align-items-center gap_20"
                                     style={{ color: 'white' }}
                                 >
+                                   { status === "authenticated" ?  "":
                                     <Link
                                         href="/login"
                                         style={{ 
@@ -46,7 +52,17 @@ export default function Header() {
                                         }}
                                     >
                                        تسجيل الدخول
-                                    </Link>
+                                    </Link> }
+
+                                     { status === "authenticated" ?   
+                                     <Link 
+                                        href="/account" 
+                                        className="font-extrabold group-hover:text-sec text-white flex gap-3 items-center justify-center"
+                                    >
+                                        <LuCircleUserRound size={24} />
+                                        <span >حسابي </span>
+                                        <span className="bg-effect"></span>
+                                    </Link>:
                                     <Link 
                                         href="/register" 
                                         className="tf-btn bg-sec hidden md:flex"
@@ -54,7 +70,7 @@ export default function Header() {
                                     >
                                         <span>إنشاء حساب</span>
                                         <span className="bg-effect"></span>
-                                    </Link>
+                                    </Link>}
                                     <div
                                         className="mobile-button d-xl-none"
                                         onClick={() => setIsMenuOpen(true)}
@@ -130,6 +146,7 @@ export default function Header() {
                         <div className="mb-body">
                             <MobileMenu />
                             <div className="support">
+                                  { status === "authenticated" ?  "":
                                 <a 
                                     href="#" 
                                     className="tf-btn"
@@ -145,7 +162,7 @@ export default function Header() {
                                     }}
                                  >إنشاء حساب</span>
                                     <span className="bg-effect"></span>
-                                </a>
+                                </a>}
                                 <a 
                                     href="#" 
                                     className="text-need"

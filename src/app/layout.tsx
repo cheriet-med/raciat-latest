@@ -1,46 +1,39 @@
+// app/layout.tsx
 import { Manrope } from "next/font/google";
+import { Metadata } from "next";
+import "./globals.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "photoswipe/dist/photoswipe.css";
 import "swiper/css";
 import "swiper/css/pagination";
 import "../../public/assets/icons/icomoon/style.css";
 import "../../public/assets/scss/app.scss";
+import Preloader from "@/components/Preloader";
 import BackToTop from "@/components/common/BackToTop";
 import ClientScripts from "@/components/common/ClientScripts";
-import { Metadata } from "next";
-import { PreloaderProvider } from "@/context/PreloaderContext";
-import Preloader from "@/components/Preloader";
-import "./globals.css";
-
-
+import { Providers } from "./providers";
 
 const manrope = Manrope({
-    variable: "--font-manrope",
-    subsets: ["latin"],
+  variable: "--font-manrope",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-    title: "راسيات الماسة العقارية",
-    description: "دليلك للأستثمار العقاري",
+  title: "راسيات الماسة العقارية",
+  description: "دليلك للأستثمار العقاري",
 };
 
-export default function RootLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
-    return (
-        <html lang="en" dir="rtl">
-            
-            <PreloaderProvider>
-            <body className={manrope.variable}>
-                        
-  <Preloader />
-                <div id="wrapper">{children}</div>
-                <ClientScripts />
-                <BackToTop />
-            </body>
-             </PreloaderProvider>
-        </html>
-    );
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="ar" dir="rtl">
+      <body className={manrope.variable}>
+        <Providers>
+          <Preloader />
+          <div id="wrapper">{children}</div>
+          <ClientScripts />
+          <BackToTop />
+        </Providers>
+      </body>
+    </html>
+  );
 }

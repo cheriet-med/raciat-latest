@@ -4,7 +4,7 @@ export default function Banner() {
     return (
         <div className="banner-2">
             <div
-                className="parallaxie"
+                className="parallaxie "
                 style={{
                     background: 'url("/hero2.avif")',
                 }}
