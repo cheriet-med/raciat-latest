@@ -76,7 +76,7 @@ const EditNameTitle = ({
         onClick={() => setIsOpen(true)}
       >
         <GoPencil size={18} />
-        <p>Edit</p> 
+        <p>تعديل</p> 
       </div>
 
       {/* Popup Modal */}
@@ -93,7 +93,7 @@ const EditNameTitle = ({
                 <input
                   id="fullName"
                   type="text"
-                  className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
+                  className="w-full p-3 border border-gray-300  focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Enter your full name..."
@@ -107,7 +107,7 @@ const EditNameTitle = ({
                 <input
                   id="title"
                   type="text"
-                  className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
+                  className="w-full p-3 border border-gray-300  focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter your title..."
@@ -145,14 +145,14 @@ const EditNameTitle = ({
 
             <div className="flex justify-end gap-3 mt-6">
               <button
-                className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors disabled:opacity-50 rounded-lg"
+                className="px-3 py-1 border border-gray-300 hover:bg-gray-50 transition-colors disabled:opacity-50 rounded-lg"
                 onClick={() => setIsOpen(false)}
                 disabled={isSaving}
               >
                 Cancel
               </button>
               <button
-                className="px-3 py-1 bg-secondary text-white rounded hover:bg-accent transition-colors disabled:bg-accent disabled:cursor-not-allowed rounded-lg"
+                className="px-3 py-1 bg-secondary text-white hover:bg-accent transition-colors disabled:bg-accent disabled:cursor-not-allowed rounded-lg"
                 onClick={handleSave}
                 disabled={isSaving || (!fullName.trim() && !title.trim())}
               >

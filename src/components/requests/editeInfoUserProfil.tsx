@@ -134,18 +134,18 @@ const EditInfo = ({
     <div className="relative">
       {/* Edit Button */}
       <div 
-        className="absolute right-4 top-4 border border-1 px-3 py-0.5 rounded-3xl border-secondary shadow-sm text-sm flex gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
+        className="absolute right-4 top-4 border border-1 px-3 py-0.5 items-center text-sec rounded-3xl border-sec shadow-sm text-sm flex gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
         onClick={() => setIsOpen(true)}
       >
         <GoPencil size={18} />
-        <p>Edit</p> 
+        <p>تعديل</p> 
       </div>
 
       {/* Popup Modal */}
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white p-6 rounded-2xl shadow-lg max-w-lg w-full max-h-[80vh] overflow-y-auto">
-            <h2 className="text-xl font-semibold mb-4 font-playfair">Edit Profile Information</h2>
+            <h2 className="text-xl font-semibold mb-4 font-playfair">تعديل معلومات الملف الشخصي</h2>
             
             <div className="space-y-4">
 
@@ -157,7 +157,7 @@ const EditInfo = ({
                 <input
                   id="fullName"
                   type="text"
-                  className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
+                  className="w-full p-3 border border-gray-300  focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Enter your full name..."
@@ -171,7 +171,7 @@ const EditInfo = ({
                 <input
                   id="title"
                   type="text"
-                  className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
+                  className="w-full p-3 border border-gray-300  focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter your title..."
@@ -185,7 +185,7 @@ const EditInfo = ({
                 <input
                   id="wantToGo"
                   type="text"
-                  className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
+                  className="w-full p-3 border border-gray-300  focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
                   value={wantToGo}
                   onChange={(e) => setWantToGo(e.target.value)}
                   placeholder="Places you want to visit..."
@@ -199,7 +199,7 @@ const EditInfo = ({
                 <input
                   id="timeSpend"
                   type="text"
-                  className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
+                  className="w-full p-3 border border-gray-300  focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
                   value={timeSpend}
                   onChange={(e) => setTimeSpend(e.target.value)}
                   placeholder="How you spend your time..."
@@ -214,7 +214,7 @@ const EditInfo = ({
                 <input
                   id="born"
                   type="text"
-                  className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
+                  className="w-full p-3 border border-gray-300  focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
                   value={born}
                   onChange={(e) => setBorn(e.target.value)}
                   placeholder="Where you were born..."
@@ -228,7 +228,7 @@ const EditInfo = ({
                 <input
                   id="pets"
                   type="text"
-                  className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
+                  className="w-full p-3 border border-gray-300  focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
                   value={pets}
                   onChange={(e) => setPets(e.target.value)}
                   placeholder="Your pets..."
@@ -242,7 +242,7 @@ const EditInfo = ({
                 <input
                   id="obsessed"
                   type="text"
-                  className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
+                  className="w-full p-3 border border-gray-300  focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
                   value={obsessed}
                   onChange={(e) => setObsessed(e.target.value)}
                   placeholder="Things you're obsessed with..."
@@ -256,7 +256,7 @@ const EditInfo = ({
                 <input
                   id="language"
                   type="text"
-                  className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
+                  className="w-full p-3 border border-gray-300  focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
                   placeholder="Languages you speak..."
@@ -270,7 +270,7 @@ const EditInfo = ({
                 <input
                   id="location"
                   type="text"
-                  className="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
+                  className="w-full p-3 border border-gray-300  focus:ring-2 focus:ring-seondary focus:border-transparent rounded-xl"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="Your current location..."
@@ -287,14 +287,14 @@ const EditInfo = ({
             )}
             <div className="flex justify-end gap-3 mt-6">
               <button
-                className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors disabled:opacity-50 rounded-lg"
+                className="px-3 py-1 border border-gray-300  hover:bg-gray-50 transition-colors disabled:opacity-50 rounded-lg"
                 onClick={() => setIsOpen(false)}
                 disabled={isSaving}
               >
                 Cancel
               </button>
               <button
-                className="px-3 py-1 bg-secondary text-white rounded hover:bg-accent transition-colors disabled:bg-accent disabled:cursor-not-allowed rounded-lg"
+                className="px-3 py-1 bg-secondary text-white  hover:bg-accent transition-colors disabled:bg-accent disabled:cursor-not-allowed rounded-lg"
                 onClick={handleSave}
                 disabled={isSaving}
               >

@@ -58,18 +58,18 @@ const EditAboutPopup = ({ initialAbout = '', infoId, onUpdateSuccess, mutate }: 
     <div className="relative">
       {/* Edit Button */}
       <div 
-        className="absolute right-4 top-4 border border-1 px-3 py-0.5 rounded-3xl border-secondary shadow-sm text-sm flex gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
+        className="absolute right-4 top-4 border border-1 items-center text-sec px-3 py-0.5 rounded-3xl border-sec shadow-sm text-sm flex gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
         onClick={() => setIsOpen(true)}
       >
         <GoPencil size={18} />
-        <p>Edit</p> 
+        <p>تعديل</p> 
       </div>
 
       {/* Popup Modal */}
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white p-6  shadow-lg max-w-2xl w-full rounded-2xl"> {/* Increased max-width */}
-            <h2 className="text-xl font-semibold mb-4 font-playfair">Edit About Information</h2>
+            <h2 className="text-xl font-semibold mb-4 font-playfair">تعديل معلومات عني</h2>
             
             {/* Replaced textarea with Tiptap */}
             <div className="mb-4">
@@ -87,14 +87,14 @@ const EditAboutPopup = ({ initialAbout = '', infoId, onUpdateSuccess, mutate }: 
 
             <div className="flex justify-end gap-3">
               <button
-                className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 transition-colors disabled:opacity-50 rounded-lg"
+                className="px-3 py-1 border border-gray-300  hover:bg-gray-50 transition-colors disabled:opacity-50 rounded-lg"
                 onClick={() => setIsOpen(false)}
                 disabled={isSaving}
               >
-                Cancel
+                إلغاء
               </button>
               <button
-                className="px-3 py-1 bg-secondary text-white rounded hover:bg-accent transition-colors disabled:bg-accent disabled:cursor-not-allowed rounded-lg"
+                className="px-3 py-1 bg-secondary text-white  hover:bg-accent transition-colors disabled:bg-accent disabled:cursor-not-allowed rounded-lg"
                 onClick={handleSave}
                 disabled={isSaving || !about.trim()}
               >
@@ -104,9 +104,9 @@ const EditAboutPopup = ({ initialAbout = '', infoId, onUpdateSuccess, mutate }: 
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Saving...
+                    جاري الحفظ...
                   </span>
-                ) : 'Save Changes'}
+                ) : 'حفظ التغييرات'}
               </button>
             </div>
           </div>

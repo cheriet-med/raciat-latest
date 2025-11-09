@@ -5,7 +5,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   
   return {
-    title: "My Goamico Dashboard",
+    title: "حسابي على راسيات",
     description: "Manage your Goamico account, view your bookings, and access personalized travel recommendations.",
     robots: {
       index: false, // Most dashboards should NOT be indexed

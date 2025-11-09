@@ -189,7 +189,7 @@ export default function DashboardUser() {
               </div>
 
               <div className="flex-1">
-                <p className="font-medium font-playfair text-white text-sm">{session?.user?.full_name}</p>
+                <p className="font-medium font-playfair text-white text-xl">{session?.user?.full_name}</p>
               </div>
             </div>
            
