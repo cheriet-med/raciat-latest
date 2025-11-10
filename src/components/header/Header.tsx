@@ -31,7 +31,7 @@ export default function Header() {
                             >
                                 <Link href="/" className="site-logo ">
                                     <Image
-                                        src="/raciat-logo.webp"
+                                        src="/logo.png"
                                         alt="logo"
                                         className="main-logo"
                                         width={120}

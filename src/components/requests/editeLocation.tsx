@@ -137,7 +137,7 @@ const EditLocationPopup = ({
     <div>
       {/* Edit Button */}
       <div 
-        className="absolute bg-white text-sec items-center right-4 top-4 border border-1 px-3 py-0.5 rounded-3xl border-sec shadow-sm text-sm flex gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
+        className="absolute bg-white text-sec items-center right-4 top-4 border border-1 px-3 py-0.5 rounded-3xl border-sec shadow-sm text-xl flex gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
         onClick={() => setIsOpen(true)}
       >
         <GoPencil size={18} />
@@ -146,9 +146,9 @@ const EditLocationPopup = ({
 
       {/* Popup Modal */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6 rounded-2xl shadow-lg max-w-md w-full">
-            <h2 className="text-xl font-semibold mb-4 font-playfair">تعديل إحداثيات الموقع</h2>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="rounded-2xl bg-white p-6 max-w-5xl mx-auto ">
+            <h2 className="text-3xl font-semibold mb-8 font-playfair">تعديل إحداثيات الموقع</h2>
             
             {isLoading ? (
               <div className="flex justify-center items-center py-8">
@@ -161,7 +161,7 @@ const EditLocationPopup = ({
               <>
                 <div className="flex gap-2">
                   <div>
-                    <label className="block text-sm font-medium text-secondary mb-1">
+                    <label className="block text-xl font-medium text-secondary mb-1">
                       Latitude 
                     </label>
                     <input
@@ -176,12 +176,12 @@ const EditLocationPopup = ({
                       placeholder="Enter latitude (e.g., 40.7128)"
                     />
                     {latitude && !isValidCoordinate(latitude, 'lat') && (
-                      <p className="mt-1 text-sm text-red-600">Invalid latitude value</p>
+                      <p className="mt-1 text-xl text-red-600">Invalid latitude value</p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-secondary mb-1">
+                    <label className="block text-xl font-medium text-secondary mb-1">
                       Longtitude 
                     </label>
                     <input
@@ -196,27 +196,27 @@ const EditLocationPopup = ({
                       placeholder="Enter longtitude (e.g., -74.0060)"
                     />
                     {longtitude && !isValidCoordinate(longtitude, 'lng') && (
-                      <p className="mt-1 text-sm text-red-600">Invalid longtitude value</p>
+                      <p className="mt-1 text-xl text-red-600">Invalid longtitude value</p>
                     )}
                   </div>
                 </div>
                 
                 {error && (
-                  <div className="mt-4 p-2 bg-red-100 text-red-700 rounded text-sm">
+                  <div className="mt-4 p-2 bg-red-100 text-red-700 rounded text-xl">
                     {error}
                   </div>
                 )}
 
                 <div className="flex justify-end gap-3 mt-6">
                   <button
-                    className="px-3 py-1 border border-gray-300  hover:bg-gray-50 transition-colors disabled:opacity-50 rounded-lg"
+                    className="px-6 py-3 border border-gray-300  hover:bg-gray-50 transition-colors disabled:opacity-50 rounded-lg"
                     onClick={() => setIsOpen(false)}
                     disabled={isSaving}
                   >
                     إلغاء
                   </button>
                   <button
-                    className="px-3 py-1 bg-secondary text-white  hover:bg-accent transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed rounded-lg"
+                    className="px-6 py-3 bg-sec text-white  hover:bg-prim transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed rounded-lg"
                     onClick={handleSave}
                     disabled={isSaving || !isFormValid()}
                   >

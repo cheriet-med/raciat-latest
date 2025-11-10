@@ -189,20 +189,20 @@ const VerifyPhoneOTP = ({
 
       {/* Popup Modal */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6 rounded-2xl shadow-lg max-w-lg w-full">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="rounded-2xl bg-white p-6 max-w-5xl mx-auto ">
             
 
             
               <>
-                <h2 className="text-xl font-semibold mb-2 font-playfair">أدخل OTP</h2>
+                <h2 className="text-3xl font-semibold mb-8 font-playfair">أدخل OTP</h2>
                 <p className="text-2xl text-gray-600 mb-6">
                   لقد أرسلنا رمزًا مكونًا من 6 أرقام إلى {phoneNumber}
                 </p>
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-secondary mb-3">
+                    <label className="block text-xl font-medium text-secondary mb-3">
                       أدخل رمز OTP
                     </label>
                     <div className="flex justify-between gap-2">
@@ -212,7 +212,7 @@ const VerifyPhoneOTP = ({
                           ref={(el:any) => otpInputRefs.current[index] = el}
                           type="text"
                           maxLength={1}
-                          className="w-12 h-12 text-center text-lg font-semibold border border-gray-300 rounded-lg focus:ring-1 focus:ring-accent focus:border-transparent"
+                          className="w-12 h-16 text-center text-lg font-semibold border border-gray-300 rounded-lg focus:ring-1 focus:ring-accent focus:border-transparent"
                           value={digit}
                           onChange={(e) => handleOtpChange(index, e.target.value)}
                           onKeyDown={(e) => handleOtpKeyDown(index, e)}
@@ -229,7 +229,7 @@ const VerifyPhoneOTP = ({
                     </p>
                   ) : (
                     <button
-                      className="text-sm text-accent hover:text-secondary underline"
+                      className="text-xl text-sec hover:text-secondary underline"
                       onClick={handleResendOTP}
                       disabled={isSending}
                     >
@@ -246,14 +246,14 @@ const VerifyPhoneOTP = ({
 
                 <div className="flex justify-end gap-3 mt-6">
                   <button
-                    className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                    className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
                     onClick={() => setIsOpen(false)}
                     disabled={isVerifying}
                   >
                     رجوع
                   </button>
                   <button
-                    className="px-3 py-1 bg-secondary text-white rounded-lg hover:bg-accent transition-colors disabled:bg-accent disabled:cursor-not-allowed"
+                    className="px-6 py-3 bg-sec text-white rounded-lg hover:bg-prim transition-colors disabled:bg-prim disabled:cursor-not-allowed"
                     onClick={handleVerifyOTP}
                     disabled={isVerifying || otp.join('').length !== 6}
                   >

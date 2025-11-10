@@ -275,7 +275,7 @@ const sendVerificationEmail = async () => {
           {/* Email Address */}
           <div className="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt className="font-medium text-gray-900 font-playfair text-3xl">عنوان البريد الإلكتروني</dt>
-            <dd className="mt-1 text-sm text-gray-700 sm:col-span-2 sm:mt-0 flex justify-between items-center">
+            <dd className="mt-1 text-2xl text-gray-700 sm:col-span-2 sm:mt-0 flex justify-between items-center">
               <div>
                 <div className="flex gap-4 items-center text-2xl">
                   <span>{profileData.email}</span>
@@ -296,22 +296,22 @@ const sendVerificationEmail = async () => {
                 </div>
                 
 {emailsendvalidation && (
-  <p className="text-sec text-sm text-center">
+  <p className="text-sec text-2xl text-center">
     تم إرسال رسالة التحقق، يرجى التحقق من صندوق الوارد أو مجلد الرسائل غير المرغوب فيها.
   </p>
 )}
 {emailsenderrorvalidation && (
-  <p className="text-sec text-sm text-center">
+  <p className="text-sec text-2xl text-center">
     لم نتمكن من إرسال رسالة التحقق. يرجى المحاولة مرة أخرى.
   </p>
 )}
 {emailsend && (
-  <p className="text-sec text-sm text-center">
+  <p className="text-sec text-2xl text-center">
     تم إرسال تأكيد تحديث البريد الإلكتروني بنجاح.
   </p>
 )}
 {emailsenderror && (
-  <p className="text-sec text-sm text-center">
+  <p className="text-sec text-2xl text-center">
     لم يتم إرسال البريد الإلكتروني. يرجى إعادة المحاولة.
   </p>
 )}
@@ -339,12 +339,12 @@ const sendVerificationEmail = async () => {
               <div>
                 <span>***********</span>
 {passwordsend && (
-  <p className="text-sec text-sm text-center">
+  <p className="text-sec text-2xl text-center">
     تم إرسال البريد الإلكتروني لتعديل كلمة المرور بنجاح.
   </p>
 )}
 {passwordsenderror && (
-  <p className="text-sec text-sm text-center">
+  <p className="text-sec text-2xl text-center">
     فشل إرسال البريد الإلكتروني لتعديل كلمة المرور.
   </p>
 )}
@@ -457,13 +457,13 @@ const sendVerificationEmail = async () => {
 <h1 className="text-4xl font-semibold font-playfair text-white">
   حذف الحساب
 </h1>
-<p className="text-sm text-white">
+<p className="text-2xl text-white">
   هل أنت متأكد أنك تريد حذف هذا الحساب؟ لا يمكن التراجع عن هذا الإجراء.
 </p>
 
 
             {successMessage && (
-              <div className="mt-4 p-2 bg-green-100 text-green-700 rounded text-sm">
+              <div className="mt-4 p-2 bg-green-100 text-green-700 rounded text-2xl">
                 {successMessage}
               </div>
             )}
@@ -494,7 +494,7 @@ const sendVerificationEmail = async () => {
             </div>
 
             {error && (
-              <div className="mt-4 p-2 bg-red-100 text-red-700 rounded text-sm">
+              <div className="mt-4 p-2 bg-red-100 text-red-700 rounded text-2xl">
                 {error}
               </div>
             )}
@@ -543,7 +543,7 @@ const sendVerificationEmail = async () => {
               <h3 className="text-lg font-semibold font-playfair text-gray-900 mb-2">
                 {popup.title}
               </h3>
-              <p className="text-sm text-gray-600 mb-6">
+              <p className="text-2xl text-gray-600 mb-6">
                 {popup.message}
               </p>
             </div>

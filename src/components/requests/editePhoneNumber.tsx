@@ -72,13 +72,13 @@ const EditPhone = ({
 
       {/* Popup Modal */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6 rounded-2xl shadow-lg max-w-md w-full">
-            <h2 className="text-xl font-semibold mb-4 font-playfair">تعديل رقم الهاتف</h2>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="rounded-2xl bg-white p-6 max-w-5xl mx-auto ">
+            <h2 className="text-3xl font-semibold mb-8 font-playfair">تعديل رقم الهاتف</h2>
             
             <div className="space-y-4">
               <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-secondary mb-1">
+                <label htmlFor="fullName" className="block text-xl font-medium text-secondary mb-1">
                  رقم الهاتف
                 </label>
                 <input
@@ -100,14 +100,14 @@ const EditPhone = ({
 
             <div className="flex justify-end gap-3 mt-6">
               <button
-                className="px-3 py-1 border border-gray-300  hover:bg-gray-50 transition-colors disabled:opacity-50 rounded-lg"
+                className="px-6 py-3 border border-gray-300  hover:bg-gray-50 transition-colors disabled:opacity-50 rounded-lg"
                 onClick={() => setIsOpen(false)}
                 disabled={isSaving}
               >
                 إلغاء
               </button>
               <button
-                className="px-3 py-1 bg-secondary text-white  hover:bg-accent transition-colors disabled:bg-accent disabled:cursor-not-allowed rounded-lg"
+                className="px-6 py-3 bg-sec text-white  hover:bg-prim  transition-colors disabled:bg-prim disabled:cursor-not-allowed rounded-lg"
                 onClick={handleSave}
                 disabled={isSaving || !fullName.trim()}
               >

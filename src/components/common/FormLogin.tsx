@@ -33,11 +33,11 @@ export default function FormLogin() {
       const [enteremail, setEnteremail] = useState(false);
     
       const handleGoogleLogin = () => {
-        signIn("google", { callbackUrl: "/en/account" });
+        signIn("google", { callbackUrl: "/account" });
       };
     
       const handleFacebookleLogin = () => {
-        signIn("facebook", { callbackUrl: "/en/account" });
+        signIn("facebook", { callbackUrl: "/account" });
       };
     
       const isValidEmail = async (email: string): Promise<{ valid: boolean; message?: string }> => {

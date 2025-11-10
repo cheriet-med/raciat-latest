@@ -67,9 +67,9 @@ const EditAboutPopup = ({ initialAbout = '', infoId, onUpdateSuccess, mutate }: 
 
       {/* Popup Modal */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6  shadow-lg max-w-2xl w-full rounded-2xl"> {/* Increased max-width */}
-            <h2 className="text-xl font-semibold mb-4 font-playfair">تعديل معلومات عني</h2>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="rounded-2xl bg-white p-6 max-w-5xl mx-auto ">
+            <h2 className="text-3xl font-semibold mb-8 font-playfair">تعديل معلومات عني</h2>
             
             {/* Replaced textarea with Tiptap */}
             <div className="mb-4">
@@ -87,14 +87,14 @@ const EditAboutPopup = ({ initialAbout = '', infoId, onUpdateSuccess, mutate }: 
 
             <div className="flex justify-end gap-3">
               <button
-                className="px-3 py-1 border border-gray-300  hover:bg-gray-50 transition-colors disabled:opacity-50 rounded-lg"
+                className="px-6 py-3 border border-gray-300  hover:bg-gray-50 transition-colors disabled:opacity-50 rounded-lg"
                 onClick={() => setIsOpen(false)}
                 disabled={isSaving}
               >
                 إلغاء
               </button>
               <button
-                className="px-3 py-1 bg-secondary text-white  hover:bg-accent transition-colors disabled:bg-accent disabled:cursor-not-allowed rounded-lg"
+                className="px-6 py-3 bg-sec text-white  hover:bg-prim transition-colors disabled:bg-accent disabled:cursor-not-allowed rounded-lg"
                 onClick={handleSave}
                 disabled={isSaving || !about.trim()}
               >

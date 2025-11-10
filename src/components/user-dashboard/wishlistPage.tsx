@@ -130,7 +130,7 @@ export default function DashboardUser() {
           <div className='flex justify-center items-center mb-16'>
             <div className="w-48 h-48 relative rounded-full overflow-hidden ">
                 <Image
-                  src="/raciat-logo.webp"
+                  src="/logo.png"
                   alt="logo"
                   fill
                   style={{ 
