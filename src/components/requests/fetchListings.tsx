@@ -1,9 +1,10 @@
 'use client';
 import useSWR from "swr";
+
 // Explicitly define the fetcher's return type
 const fetcher = async <T,>(url: string): Promise<T> => {
-const controller = new AbortController();
-//const timeoutId = setTimeout(() => controller.abort(), 20000); // 20-second timeout
+  const controller = new AbortController();
+  //const timeoutId = setTimeout(() => controller.abort(), 20000); // 20-second timeout
 
   try {
     const response = await fetch(url, {
@@ -24,42 +25,36 @@ const controller = new AbortController();
     throw new Error("Failed to fetch data. Please try again later.");
   } 
 };
+
 interface Listing {
   id: number;
   user: any; // ForeignKey typically translates to the ID of the related model
   name: string | null;
   description: string | null;
   category: string | null;
-  rating: string | null;
-  price_per_night: string | null;
-  currency: string | null;
   types: string | null;
-  capacity: string | null;
-  size: string | null;
-  rooms_number:string;
-  cancellation_policy: string | null;
-  price_range: string | null;
-  average_cost: string | null;
-  established: string | null;
-  chef: string | null;
+  price: string | null;
+  currency: string | null;
+  video_link: string | null;
+  rooms_number: string | null;
+  badrooms_number: string | null;
   image: string | null; // Assuming CloudinaryField returns a string URL
-  receipt: string | null;
-  opening_hours_monday: string | null;
-  opening_hours_tuesday: string | null;
-  opening_hours_wednesday: string | null;
-  opening_hours_thursday: string | null;
-  opening_hours_friday: string | null;
-  opening_hours_saturday: string | null;
-  opening_hours_sunday: string | null;
-  organic_ingredients: boolean;
-  sustainable_seafood: boolean;
   latitude: string | null;
-  longtitude: any; // Note: typo in original (should be longitude)
-  location: any;
-  is_inwishlist:boolean;
+  longtitude: string | null; // Fixed typo from original
+  location: string | null;
   created_at_meta: string | null;
   updated_at_meta: string | null;
+  size: string | null;
+  capacity: string | null;
+  established: string | null;
+  garages: string | null;
+  region: string | null;
+  // Removed fields that don't exist in the Django model:
+  // rating, price_per_night, cancellation_policy, price_range, 
+  // average_cost, chef, receipt, opening_hours fields,
+  // organic_ingredients, sustainable_seafood, is_inwishlist
 }
+
 const useFetchListing = () => {
   const { data, error, isLoading, mutate } = useSWR<Listing[]>(
     `${process.env.NEXT_PUBLIC_URL}product/`,

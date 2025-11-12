@@ -286,20 +286,22 @@ export default function FormLogin() {
                             </div>
 
                         </div>
-                        <button
-                            type="submit"
-                            className="btn-signup tf-btn btn-bg-1 w-full mb_12"
-                        >
-                            {isLoading ? (
-                <>
-                  جاري الدخول <FaCircleNotch className="animate-spin" />
-                </>
-              ) : (
-                 <span>تسجيل الدخول</span>
-              )}
-                          
-                            <span className="bg-effect"></span>
-                        </button>
+ <button
+  type="submit"
+  className="btn-signup tf-btn btn-bg-1 w-full mb_12 flex items-center justify-center gap-2"
+>
+  {isLoading ? (
+    <>
+      <p className="text-white m-0">جاري الدخول</p>
+      <FaCircleNotch className="h-6 w-6 animate-spin text-white" />
+    </>
+  ) : (
+    <span>تسجيل الدخول</span>
+  )}
+
+  <span className="bg-effect"></span>
+</button>
+
 
                         <p className="login-link text-center">
                             لم تسجل بعد؟{" "}

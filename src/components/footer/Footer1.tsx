@@ -3,7 +3,7 @@ import { footerSections } from "@/data/footer";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { subscribeNewsletter } from "@/actions/newsletterAction";
 
 // Accordion logic unchanged
@@ -112,8 +112,27 @@ const handleFooter = (): void => {
     window.addEventListener("resize", updateAccordion);
 };
 
+// Email validation function
+const isValidEmail = (email: string): { valid: boolean; message?: string } => {
+    if (!email || email.trim() === "") {
+        return { valid: false, message: "البريد الإلكتروني مطلوب" };
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return { valid: false, message: "صيغة البريد الإلكتروني غير صالحة" };
+    }
+
+    return { valid: true };
+};
+
 export default function Footer1() {
     const pathname = usePathname();
+    const [email, setEmail] = useState("");
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState(false);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         handleFooter();
         return () => {
@@ -123,10 +142,51 @@ export default function Footer1() {
 
     const handleNewsletterSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const form = event.currentTarget;
-        const formData = new FormData(form);
-        // Call the server action
-        await subscribeNewsletter(formData);
+        setLoading(true);
+        setError("");
+        setSuccess(false);
+
+        // Validate email
+        const emailValidation = isValidEmail(email);
+        if (!emailValidation.valid) {
+            setError(emailValidation.message || "بريد إلكتروني غير صالح");
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const now = new Date();
+            const date = now.toISOString().split("T")[0]; // YYYY-MM-DD
+            const time = now.toTimeString().split(" ")[0]; // HH:mm:ss
+            const language = "ar"; // Arabic locale
+
+            const response = await fetch(`${process.env.NEXT_PUBLIC_URL}newsletterpost/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+                },
+                body: JSON.stringify({
+                    email,
+                    language,
+                    date,
+                    time,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error("فشل في الاشتراك");
+            }
+
+            const data = await response.json();
+            setEmail(""); // clear input
+            setSuccess(true);
+        } catch (error) {
+            console.error("Error:", error);
+            setError("حدث خطأ، يرجى المحاولة مرة أخرى لاحقاً");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -166,7 +226,7 @@ export default function Footer1() {
                                         البريد اﻹلكتروني :{" "}
                                     </span>
                                     <Link
-                                        href="mailto:themesflat@gmail.com"
+                                        href="mailto:info@raciat.com"
                                         className="text_white link ms_4"
                                     >
                                        info@raciat.com
@@ -223,47 +283,66 @@ export default function Footer1() {
                                     className="form-newsletter style-1 mb_20"
                                     onSubmit={handleNewsletterSubmit}
                                 >
-<div
-    id="subscribe-content"
-    className="position-relative"
-    style={{direction: 'rtl'}}
->
-    <fieldset 
-        className="fieldset-item"
-        style={{direction: 'rtl'}}
-    >
-        <input
-            type="email"
-            placeholder="البريد الإكتروني"
-            id="subscribe-email"
-            name="email"
-            aria-required="true"
-            required
-            style={{
-                direction: 'rtl',
-                textAlign: 'right',
-                paddingRight: '15px',
-                paddingLeft: '50px'
-            }}
-        />
-    </fieldset>
-    <button
-        id="subscribe-button"
-        type="submit"
-        className="button-submit animate-hover-btn"
-        style={{
-            position: 'absolute',
-            left: '10px',
-            right: 'auto'
-        }}
-    >
-        <span 
-            className="icon-ArrowUpRight"
-            style={{transform: 'rotate(90deg)'}}
-        ></span>
-    </button>
-</div>
-                                    <div id="subscribe-msg"></div>
+                                    <div
+                                        id="subscribe-content"
+                                        className="position-relative"
+                                        style={{direction: 'rtl'}}
+                                    >
+                                        <fieldset 
+                                            className="fieldset-item"
+                                            style={{direction: 'rtl'}}
+                                        >
+                                            <input
+                                                type="email"
+                                                placeholder="البريد الإكتروني"
+                                                id="subscribe-email"
+                                                name="email"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                aria-required="true"
+                                                required
+                                                disabled={loading}
+                                                style={{
+                                                    direction: 'rtl',
+                                                    textAlign: 'right',
+                                                    paddingRight: '15px',
+                                                    paddingLeft: '50px'
+                                                }}
+                                            />
+                                        </fieldset>
+                                        <button
+                                            id="subscribe-button"
+                                            type="submit"
+                                            disabled={loading}
+                                            className="button-submit animate-hover-btn"
+                                            style={{
+                                                position: 'absolute',
+                                                left: '10px',
+                                                right: 'auto'
+                                            }}
+                                        >
+                                            {loading ? (
+                                                <span>...</span>
+                                            ) : (
+                                                <span 
+                                                    className="icon-ArrowUpRight"
+                                                    style={{transform: 'rotate(90deg)'}}
+                                                ></span>
+                                            )}
+                                        </button>
+                                    </div>
+                                    <div id="subscribe-msg">
+                                        {success && (
+                                            <p className="text-success mt-4" style={{ textAlign: 'right', direction: 'rtl' }}>
+                                                شكراً للانضمام إلى نشرتنا الإخبارية!
+                                            </p>
+                                        )}
+                                        {error && (
+                                            <p className="text-error mt-4" style={{ textAlign: 'right', direction: 'rtl' }}>
+                                                {error}
+                                            </p>
+                                        )}
+                                    </div>
                                 </form>
                                 <p className="text_color-1">
                                   من خلال الضغط على الاشتراك فإنك توافق على

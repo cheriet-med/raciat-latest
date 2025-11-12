@@ -315,20 +315,22 @@ export default function FormRegister() {
                         </div>
 
                         {/* زر التسجيل */}
-                        <button
-                            type="submit"
-                            className="btn-signup tf-btn btn-bg-1 w-full mb_12"
-                        >
-                             {isLoading ? (
-                <>
-                 تسجيل<FaCircleNotch className="animate-spin" />
-                </>
-              ) : (
-                                           <span>تسجيل</span>
+<button
+  type="submit"
+  className="btn-signup tf-btn btn-bg-1 w-full mb_12 flex items-center justify-center gap-2"
+>
+  {isLoading ? (
+    <>
+      <p className="text-white m-0">تسجيل</p>
+      <FaCircleNotch className="h-6 w-6 animate-spin text-white" />
+    </>
+  ) : (
+    <span>تسجيل</span>
+  )}
 
-              )}
-                            <span className="bg-effect"></span>
-                        </button>
+  <span className="bg-effect"></span>
+</button>
+
                     </form>
                 </div>
             </div>

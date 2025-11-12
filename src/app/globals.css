@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Override Bootstrap yellow/warning variables to match project theme */
+:root {
+  --bs-yellow: #D9AA52;
+  --bs-warning: #D9AA52;
+  --bs-warning-rgb: 217,170,82;
+}
+
 
 body {
   background: white;
@@ -185,3 +192,58 @@ header.header.style-default.header-fixed .tf-btn {
   animation: spin 1s linear infinite;
 }
 
+
+
+
+/* globals.css or your custom CSS file */
+.ProseMirror {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  min-height: 200px;
+  outline: none;
+  background-color: white;
+  height: 250px;
+  overflow-y: scroll;
+}
+
+.ProseMirror:focus {
+  border-color: #3b82f6; /* Blue border on focus */
+}
+
+
+.bullet-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.ordered-list {
+  list-style-type: decimal;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.tiptap p {
+  margin-bottom: 1rem; /* Adjust this value to control the space between paragraphs */
+}
+/* Or if you want to target only post content */
+.prose p {
+  margin-bottom: 1rem; /* Adjust as needed */
+}
+
+
+/* Or if you want to target only post content */
+.post-content p {
+  margin-bottom: 1rem;
+}
+
+.tiptap ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.tiptap ol {
+  list-style-type: decimal;
+  padding-left: 20px;
+  padding-right: 20px;
+}

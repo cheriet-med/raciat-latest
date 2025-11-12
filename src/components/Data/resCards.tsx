@@ -265,7 +265,7 @@ export default function ResCards() {
               <PropertyCard
                 id={res.id} // Use restaurant ID or fallback
                 name={res.name}
-                price={"Averege Price "+res.average_cost +" -$$" ||"Averege Price "+res.price_range +" -$$"}
+                price=""
                 address={res.location || ''}
                 imageUrl={`${process.env.NEXT_PUBLIC_IMAGE}/${res.image}`}
                 averageRating={4}

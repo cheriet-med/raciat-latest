@@ -421,8 +421,8 @@ export default function RestaurantForm() {
       <div className="px-4">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="bg-highlights px-8 py-6">
-            <h1 className="text-3xl font-bold text-white font-playfair">Add New Restaurant</h1>
+          <div className="bg-sec px-8 py-6">
+            <h1 className="text-3xl font-bold text-white font-playfair">Add New Post</h1>
             <p className="text-white mt-2">Fill in all required fields marked with a star. To enhance your post, complete all fields. For best results, use a high-quality image sized 160 x 30</p>
           </div>
 
@@ -430,7 +430,7 @@ export default function RestaurantForm() {
             {/* Status Messages */}
             {successMessage && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
-                <div className="w-6 h-6 bg-highlights rounded-full flex items-center justify-center">
+                <div className="w-6 h-6 bg-sec rounded-full flex items-center justify-center">
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -455,20 +455,33 @@ export default function RestaurantForm() {
                   <div className="bg-gray-50 rounded-xl p-2">
                     <div>
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-semibold text-gray-500 mb-2">Restaurant Name *</label>
+                        <label className="block text-sm font-semibold text-gray-500 mb-2">Title *</label>
                         <input
                           type="text"
                           name="name"
                           value={product.name}
                           onChange={handleProductChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                          placeholder="Enter restaurant name"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                          placeholder="Enter title"
                         />
                         {errorname && <p className="text-sm mt-2 text-accent">{errorname}</p>}
                       </div>
 
-                      <div className="mt-6">
+                              <div className="md:col-span-2 mt-6">
                         <label className="block text-sm font-semibold text-gray-500 mb-2">Description *</label>
+                      <textarea
+  name="name"
+  value={product.name}
+
+  rows={6}  // makes it 6 rows tall
+  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+  placeholder="Enter description"
+/>
+                        {errorname && <p className="text-sm mt-2 text-accent">{errorname}</p>}
+                      </div>
+
+ <div className="mt-6">
+                        <label className="block text-sm font-semibold text-gray-500 mb-2">Content *</label>
                         <TiptapEditor
                           content={product.description}
                           onChange={handleDescriptionChange}
@@ -476,189 +489,15 @@ export default function RestaurantForm() {
                         {errordescription && <p className="text-sm mt-2 text-accent">{errordescription}</p>}
                       </div>
 
-                      <div className="flex gap-2 mt-6">
-                        <div className='w-full'>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Average cost *</label>
-                          <div className="relative">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-                            <input
-                              type="number"
-                              name="price_per_night"
-                              value={product.price_per_night}
-                              onChange={handleProductChange}
-                              className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                              placeholder="0.00"
-                            />
-                          </div>
-                          {errorprice && <p className="text-sm mt-2 text-accent">{errorprice}</p>}
-                        </div>
 
-                        <div className='w-full'>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Type *</label>
-                          <input
-                            type="text"
-                            name="type"
-                            value={product.type}
-                            onChange={handleProductChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                            placeholder="e.g., Fine Dining, Casual, Fast Food"
-                          />
-                          {errortype && <p className="text-sm mt-2 text-accent">{errortype}</p>}
-                        </div>
-                      </div>
+          
 
-                      <div className="flex gap-2 mt-4 flex-wrap">
-                        <div className="flex gap-2 w-full">
-                          <div className='w-full'>
-                            <label className="block text-sm font-semibold text-gray-500 mb-2">Capacity</label>
-                            <div className="relative">
-                              <AiOutlineFieldNumber className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
-                              <input
-                                type="number"
-                                name="capacity"
-                                value={product.capacity}
-                                onChange={handleProductChange}
-                                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                                placeholder="Seats"
-                              />
-                            </div>
-                          </div>
+ 
+   
 
-                          <div className='w-full'>
-                            <label className="block text-sm font-semibold text-gray-500 mb-2">Size</label>
-                            <input
-                              type="text"
-                              name="size"
-                              value={product.size}
-                              onChange={handleProductChange}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                              placeholder="e.g., 2500 sq ft"
-                            />
-                          </div>
-                        </div>
 
-                        <div className='w-1/2'>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Established Year</label>
-                          <div className="relative">
-                            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input
-                              type="number"
-                              name="established"
-                              placeholder='e.g., 1993'
-                              value={product.established}
-                              onChange={handleProductChange}
-                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Location and Chef Section */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Location *</label>
-                          <div className="relative">
-                            <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input
-                              type="text"
-                              name="location"
-                              value={product.location}
-                              onChange={handleProductChange}
-                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                              placeholder="e.g., Downtown, Manhattan"
-                            />
-                          </div>
-                            {errorlocation && <p className="text-sm mt-2 text-accent">{errorlocation}</p>}
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Head Chef</label>
-                          <div className="relative">
-                            <ChefHat className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input
-                              type="text"
-                              name="chef"
-                              value={product.chef}
-                              onChange={handleProductChange}
-                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                              placeholder="Chef's name"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* GPS Coordinates */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Latitude *</label>
-                          <input
-                            type="number"
-                            name="latitude"
-                            value={product.latitude}
-                            onChange={handleProductChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                            placeholder="e.g., 40.7128"
-                          />
-                            {errorlatitude && <p className="text-sm mt-2 text-accent">{errorlatitude}</p>}
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Longitude *</label>
-                          <input
-                            type="number"
-                            name="longitude"
-                            value={product.longitude}
-                            onChange={handleProductChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                            placeholder="e.g., -74.0060"
-                          />
-                            {errorlongtitude && <p className="text-sm mt-2 text-accent">{errorlongtitude}</p>}
-                        </div>
-                      </div>
-
-                      {/* Restaurant Features */}
-                      <div className="mt-6">
-                        <label className="block text-sm font-semibold text-gray-500 mb-4">Restaurant Features</label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="flex items-center">
-                            <input
-                              type="checkbox"
-                              name="organic_ingredients"
-                              checked={product.organic_ingredients}
-                              onChange={handleCheckboxChange}
-                              className="h-5 w-5 text-highlights rounded focus:ring-highlights border-gray-300"
-                            />
-                            <label className="ml-3 text-sm font-medium text-gray-700">
-                              Organic Ingredients
-                            </label>
-                          </div>
-
-                          <div className="flex items-center">
-                            <input
-                              type="checkbox"
-                              name="sustainable_seafood"
-                              checked={product.sustainable_seafood}
-                              onChange={handleCheckboxChange}
-                              className="h-5 w-5 text-highlights rounded focus:ring-highlights border-gray-300"
-                            />
-                            <label className="ml-3 text-sm font-medium text-gray-700">
-                              Sustainable Seafood
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-6">
-                      <label className="block text-sm font-semibold text-gray-500 mb-2">Cancellation Policy *</label>
-                      <TiptapEditor
-                        content={product.cancellation_policy}
-                        onChange={handleCancellationPolicyChange}
-                      />
-                      {errorcancelation && <p className="text-sm mt-2 text-accent">{errorcancelation}</p>}
-                    </div>
-                  </div>
-                </div>
+                  
+                </div> </div> </div>
 
                 <div>
                   {/* Images Section */}
@@ -668,7 +507,7 @@ export default function RestaurantForm() {
                       <label className="block text-sm font-semibold text-gray-500 mb-3">Main Image *</label>
                       {!mainImagePreview ? (
                         <label className="block w-full cursor-pointer">
-                          <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-highlights hover:bg-gray-50 transition-all h-72">
+                          <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sec hover:bg-gray-50 transition-all h-[450px]">
                             <LuImagePlus className="w-12 h-12 text-gray-400 mx-auto mt-10" />
                             <p className="text-lg font-medium text-gray-600 mb-1 font-playfair">Click to upload main image</p>
                             <p className="text-sm text-gray-500">PNG, JPG, AVIF up to 10MB</p>
@@ -695,7 +534,7 @@ export default function RestaurantForm() {
                               <button
                                 type="button"
                                 onClick={removeMainImage}
-                                className="w-10 h-10 bg-highlights text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors shadow-lg opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100"
+                                className="w-10 h-10 bg-sec text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors shadow-lg opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100"
                               >
                                 <X className="w-5 h-5" />
                               </button>
@@ -717,281 +556,20 @@ export default function RestaurantForm() {
                       )}
                     </div>
 
-                {/* Additional Images */}
-            <div className=" bg-gray-50 rounded-xl p-2">
-                  <label className="block text-sm font-semibold text-gray-500 mb-3">Additional Images</label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
-                    {images.map((img, index) => (
-                      <div key={index} className="relative group">
-                        <Image 
-                        src={img.url} alt={`Preview ${index + 1}`}  
-                        width={150}
-                        height={150}
-                        className="w-full h-24 object-cover rounded-lg" />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute -top-2 -right-2 w-6 h-6 bg-highlights text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-secondary"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                    <label className="cursor-pointer">
-                      <div className="w-full h-24 border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50 rounded-lg flex items-center justify-center hover:border-highlights transition-colors">
-                        <Plus className="w-6 h-6 text-gray-400" />
-                      </div>
-                      <input
-                        type="file"
-                        multiple
-                        accept="image/avif,image/png,image/jpeg,image/webp"
-                        onChange={handleImageChange}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                  {images.length > 0 && (
-                    <p className="text-sm text-gray-500">{images.length} additional image(s) selected</p>
-                  )}
-                </div>
+
               </div>
-<div className='my-2'></div>
 
 
-{/* Receipt Image */}
-                    <div className="mb-2 bg-gray-50 rounded-xl p-2 mt-1">
-                      <label className="block text-sm font-semibold text-gray-500 mb-3"> Upload your receipt to post a trusted, verified review *</label>
-                      <p className="text-sm font-medium text-gray-600 mb-1 font-playfair">To ensure our reviews are authentic and only come from real customers, we verify visits using receipts</p>
-                      
-                      {!recieptPreview ? (
-                        <label className="block w-full cursor-pointer">
-                          <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-highlights hover:bg-gray-50 transition-all h-72">
-                            <LuImagePlus className="w-12 h-12 text-gray-400 mx-auto mt-10" />
-                            <p className="text-lg font-medium text-gray-600 mb-1 font-playfair">Click to upload Receipt image</p>
-                            <p className="text-sm text-gray-500">PNG, JPG, AVIF up to 10MB</p>
-                          </div>
-                          {errorreciept && <p className="text-sm mt-2 text-accent">{errorreciept}</p>}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleReciepChange}
-                            className="hidden"
-                          />
-                        </label>
-                      ) : (
-                        <div className="relative inline-block">
-                          <div className="relative group">
-                            <Image
-                              src={recieptPreview}
-                              alt="Main preview"
-                              width={150}
-                              height={150}
-                              className="object-cover h-full w-full rounded-xl shadow-lg border-2 border-gray-200"
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-xl transition-all duration-200 flex items-center justify-center">
-                              <button
-                                type="button"
-                                onClick={removeRecieptImage}
-                                className="w-10 h-10 bg-highlights text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors shadow-lg opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100"
-                              >
-                                <X className="w-5 h-5" />
-                              </button>
-                            </div>
-                          </div>
-                          <div className="mt-3 text-center">
-                            <label className="inline-flex items-center gap-2 px-3 py-1 text-gray-800 rounded-3xl hover:bg-gray-100 border border-1 border-secondary transition-colors cursor-pointer font-medium">
-                              <Upload className="w-4 h-4" />
-                              Change Image
-                              <input
-                                type="file"
-                                accept="image/avif,image/png,image/jpeg,image/webp"
-                                onChange={removeRecieptImage}
-                                className="hidden"
-                              />
-                            </label>
-                          </div>
-                        </div>
-                      )}
-                    </div>
 
 
-<div className='my-2'></div>
-
- {/* Opening Hours Section */}
-              <div className="bg-gray-50 rounded-xl p-6 ">
-                <div className="flex items-center gap-2 mb-6">
-                  <Clock className="w-5 h-5 text-gray-500" />
-                  <h2 className="font-semibold text-gray-800 font-playfair">Opening Hours</h2>
-                </div>
-                
-                <div className="flex gap-4 flex-wrap">
-                  {dayNames.map(({ key, label }) => (
-                    <div key={key} >
-                      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-                      <div className="flex items-center gap-2 bg-white w-fit rounded-lg p-4 border border-gray-200">
  
-                         <TimeRangePicker 
-                          onChange={(value:any) => handleTimeRangeChange(key, value)}
-                          value={product[key as keyof Product] as string || null}
-                          clockIcon={null}
-                        clearIcon={null}
-                        />
-                      </div>
-                     
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="mt-4 p-3 ">
-                  <p className="text-sm text-accent">
-                    <strong>Tip:</strong> Leave time fields empty for closed days.
-                  </p>
-                </div>
-              </div>
-
-              <div className='my-2'></div>
-
-
-
-
-
-
-              {/* Nearby Attractions */}
-              <div className="bg-gray-50 rounded-xl p-6">
-                <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-                  <h2 className="font-semibold text-gray-800 flex items-center gap-1 font-playfair">
-                    
-                      <MapPin className="w-5 h-5 text-gray-500" />
-                  
-                    Nearby Attractions
-                  </h2>
-                  <button
-                    type="button"
-                    onClick={addNearbyAttraction}
-                    className="flex items-center gap-2 px-3 py-1  text-gray-600 rounded-3xl hover:bg-gray-100 border border-1 border-secondary transition-colors font-medium"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Attraction
-                  </button>
-                </div>
-                
-                <div className="space-y-4">
-                  {nearbyAttractions.map((attraction, index) => (
-                    <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-500 mb-2">Attraction Name</label>
-                          <input
-                            type="text"
-                            name="name"
-                            value={attraction.name}
-                            onChange={(e) => handleNearbyChange(index, e)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:highlights focus:border-highlights"
-                            placeholder="e.g., Central Park"
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-500 mb-2">Distance</label>
-                            <input
-                              type="text"
-                              name="distance"
-                              value={attraction.distance}
-                              onChange={(e) => handleNearbyChange(index, e)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:highlights focus:border-highlights"
-                              placeholder="e.g., 5 min walk"
-                            />
-                          </div>
-                          {nearbyAttractions.length > 1 && (
-                            <div className="flex items-end">
-                              <button
-                                type="button"
-                                onClick={() => removeNearbyAttraction(index)}
-                                className="p-2 text-highlights hover:bg-gray-50 rounded-lg transition-colors"
-                              >
-                                <Trash2 className="w-5 h-5" />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-<div className='my-2'></div>
-              {/* Awards */}
-              <div className="bg-gray-50 rounded-xl p-6">
-               <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-                  <h2 className="font-semibold text-gray-800 flex items-center gap-1 font-playfair">
-                 
-                      <Award className="w-5 h-5 text-gray-500" />
-                 
-                    Awards & Recognition
-                  </h2>
-                  <button
-                    type="button"
-                    onClick={addAward}
-                    className="flex items-center gap-2 px-3 py-1  text-gray-600 rounded-3xl hover:bg-gray-100 border border-1 border-secondary transition-colors font-medium"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Award
-                  </button>
-                </div>
-                
-                <div className="space-y-4">
-                  {awards.map((award, index) => (
-                    <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-500 mb-2">Award Name</label>
-                          <input
-                            type="text"
-                            name="name"
-                            value={award.name}
-                            onChange={(e) => handleAwardChange(index, e)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-highlights focus:border-highlights"
-                            placeholder="e.g., Best Hotel 2024"
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-500 mb-2">Year</label>
-                            <input
-                              type="number"
-                              name="year"
-                              value={award.year}
-                              onChange={(e) => handleAwardChange(index, e)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-highlights focus:border-highlights"
-                              placeholder="2024"
-                            />
-                          </div>
-                          {awards.length > 1 && (
-                            <div className="flex items-end">
-                              <button
-                                type="button"
-                                onClick={() => removeAward(index)}
-                                className="p-2 text-highlights hover:bg-gray-50 rounded-lg transition-colors"
-                              >
-                                <Trash2 className="w-5 h-5" />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-               </div>
-            
 
               {/* Submit Button */}
               <div className="flex justify-center pt-6">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`px-4 py-2 bg-highlights w-full text-white font-semibold rounded-xl ${
+                  className={`px-4 py-2 bg-sec w-full text-white font-semibold rounded-xl ${
                     isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-secondary'
                   }`}
                 >
@@ -1010,7 +588,7 @@ export default function RestaurantForm() {
                  
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-white w-full text-gray-600 border border-1 font-semibold rounded-xl hover:bg-highlights hover:text-white" 
+                  className="px-4 py-2 bg-white w-full text-gray-600 border border-1 font-semibold rounded-xl hover:bg-sec hover:text-white" 
                      onClick={()=>router.push('/en/account/listings')} 
                 >
                   Cancel

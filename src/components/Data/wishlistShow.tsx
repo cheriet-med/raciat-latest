@@ -241,12 +241,12 @@ const wishlistProductIds = wishlist?.map(w => Number(w.product));
           <div key={index}>
             <PropertyCard
               id={res.id } // Use restaurant ID or fallback
-              location={res.location}
-              price={res.price_per_night || res.price_range || res.average_cost || ""}
+              location=""
+              price=""
               category={res.category ?? ""}
               address={res.name ?? ""}
               imageUrl={`${process.env.NEXT_PUBLIC_IMAGE}/${res.image}` }
-              averageRating={Number(res.rating) || 0}
+              averageRating={0}
               lengtReviews={85}
               onUpdate={async () => {
               await Promise.all([wishlistMutate(), listingMutate()]);

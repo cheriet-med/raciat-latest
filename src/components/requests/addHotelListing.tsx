@@ -11,14 +11,15 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import { MdOutlineBedroomChild } from "react-icons/md";
-
+import AmenitiesSelector from './amenities';
 
 // TypeScript interfaces
 interface Product {
   name: string;
   description: string;
-  price_per_night: string;
+  price: string;
   capacity: string;
+  category: string;
   size: string;
   cancellation_policy: string;
   established: string;
@@ -38,7 +39,12 @@ interface Product {
   opening_hours_sunday: string;
   organic_ingredients: boolean;
   sustainable_seafood: boolean;
-  user: any ;
+  user: any;
+  currency: string;
+  video_link: string;
+  badrooms_number: string;
+  garages: string;
+  region: string;
 }
 
 interface NearbyAttraction {
@@ -62,18 +68,19 @@ interface ImagePreview {
 
 export default function HotelForm() {
   const router = useRouter();
-     const { data: session, status } = useSession({ required: true });
+  const { data: session, status } = useSession({ required: true });
   const [product, setProduct] = useState<Product>({
     name: '',
     description: '',
-    price_per_night: '',
+    category: '',
+    price: '',
     capacity: '',
     size: '',
     type: '',
     cancellation_policy: '',
     established: '',
     image: null,
-    receipt:null,
+    receipt: null,
     latitude: '',
     longitude: '',
     location: '',
@@ -88,6 +95,11 @@ export default function HotelForm() {
     organic_ingredients: false,
     sustainable_seafood: false,
     user: session?.user?.id,
+    currency: '',
+    video_link: '',
+    badrooms_number: '',
+    garages: '',
+    region: '',
   });
   
   const [images, setImages] = useState<ImagePreview[]>([]);
@@ -108,6 +120,7 @@ export default function HotelForm() {
   const [errorlatitude, setErrorlatitude] = useState('');
   const [errorlongtitude, setErrorlongtitude] = useState('');
   const [errorreciept, setErrorreciept] = useState('');
+
   const handleProductChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setProduct(prev => ({ ...prev, [name]: value }));
@@ -126,15 +139,14 @@ export default function HotelForm() {
     setProduct(prev => ({ ...prev, cancellation_policy: content }));
   };
 
-
-    const handleTimeRangeChange = (dayKey: string, value: string | null) => {
+  const handleTimeRangeChange = (dayKey: string, value: string | null) => {
     setProduct(prev => ({ 
       ...prev, 
       [dayKey]: value || '' 
     }));
   };
 
- const handleReciepChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleReciepChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setProduct(prev => ({ ...prev, receipt: file }));
@@ -150,7 +162,6 @@ export default function HotelForm() {
       setRecieptPreview(null);
     }
   };
-
 
   const handleMainImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -257,7 +268,7 @@ export default function HotelForm() {
       setErrorreciept('Enter Listing reciept Please');
       return;
     }
-    if (!product.price_per_night.trim()) {
+    if (!product.price.trim()) {
       setErrorprice('Enter Listing price Please');
       return;
     }
@@ -266,16 +277,16 @@ export default function HotelForm() {
       setErrortype('Enter Listing type Please');
       return;
     }
-   if (!product.location.trim()) {
-       setErrorlocation('Enter Listing Location Please');
+    if (!product.location.trim()) {
+      setErrorlocation('Enter Listing Location Please');
       return;
     }  
-     if (!product.latitude.trim()) {
-       setErrorlatitude('Enter Listing latitude Please');
+    if (!product.latitude.trim()) {
+      setErrorlatitude('Enter Listing latitude Please');
       return;
     }  
-     if (!product.longitude.trim()) {
-       setErrorlongtitude('Enter Listing longitude Please');
+    if (!product.longitude.trim()) {
+      setErrorlongtitude('Enter Listing longitude Please');
       return;
     }  
     if (!product.cancellation_policy.trim()) {
@@ -293,25 +304,21 @@ export default function HotelForm() {
       productFormData.append('name', product.name);
       productFormData.append('description', product.description);
       productFormData.append('types', product.type);
-      productFormData.append('price_per_night', product.price_per_night);
+      productFormData.append('price', product.price);
       productFormData.append('capacity', product.capacity);
       productFormData.append('size', product.size);
       productFormData.append('cancellation_policy', product.cancellation_policy);
       productFormData.append('established', product.established);
-      productFormData.append('category', 'Hotel');
+      productFormData.append('category', product.category);
       productFormData.append('latitude', product.latitude);
       productFormData.append('longtitude', product.longitude);
       productFormData.append('location', product.location);
       productFormData.append('rooms_number', product.chef);
-      productFormData.append('opening_hours_monday', product.opening_hours_monday);
-      productFormData.append('opening_hours_tuesday', product.opening_hours_tuesday);
-      productFormData.append('opening_hours_wednesday', product.opening_hours_wednesday);
-      productFormData.append('opening_hours_thursday', product.opening_hours_thursday);
-      productFormData.append('opening_hours_friday', product.opening_hours_friday);
-      productFormData.append('opening_hours_saturday', product.opening_hours_saturday);
-      productFormData.append('opening_hours_sunday', product.opening_hours_sunday);
-      productFormData.append('organic_ingredients', product.organic_ingredients.toString());
-      productFormData.append('sustainable_seafood', product.sustainable_seafood.toString());
+      productFormData.append('currency', product.currency);
+      productFormData.append('video_link', product.video_link);
+      productFormData.append('badrooms_number', product.badrooms_number);
+      productFormData.append('garages', product.garages);
+      productFormData.append('region', product.region);
 
       if (product.image) {
         productFormData.append('image', product.image);
@@ -320,6 +327,7 @@ export default function HotelForm() {
       if (product.receipt) {
         productFormData.append('receipt', product.receipt);
       }
+
       const productResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}product/`, {
         method: 'POST',
         headers: {
@@ -402,35 +410,30 @@ export default function HotelForm() {
       );
     } finally {
       setIsSubmitting(false);
-       router.push('/en/account/listings');  
+      router.push('/account/listings');  
     }
   };
 
-  const dayNames = [
-    { key: 'opening_hours_monday', label: 'Monday' },
-    { key: 'opening_hours_tuesday', label: 'Tuesday' },
-    { key: 'opening_hours_wednesday', label: 'Wednesday' },
-    { key: 'opening_hours_thursday', label: 'Thursday' },
-    { key: 'opening_hours_friday', label: 'Friday' },
-    { key: 'opening_hours_saturday', label: 'Saturday' },
-    { key: 'opening_hours_sunday', label: 'Sunday' },
-  ];
+
 
   return (
     <div className="py-4">
       <div className="px-4">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="bg-highlights px-8 py-6">
-            <h1 className="text-3xl font-bold text-white font-playfair">Add New Restaurant</h1>
-            <p className="text-white mt-2">Fill in all required fields marked with a star. To enhance your post, complete all fields. For best results, use a high-quality image sized 160 x 30</p>
-          </div>
+<div className="bg-sec px-8 py-6 text-right">
+  <h1 className="text-3xl font-bold text-white font-playfair">إضافة عقار جديد</h1>
+  <p className="text-white mt-2">
+    يرجى ملء جميع الحقول المطلوبة والمميزة بعلامة النجمة. لتحسين منشورك، أكمل جميع الحقول. للحصول على أفضل النتائج، استخدم صورة عالية الجودة بحجم 160 × 30.
+  </p>
+</div>
+
 
           <div className="p-1">
             {/* Status Messages */}
             {successMessage && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
-                <div className="w-6 h-6 bg-highlights rounded-full flex items-center justify-center">
+                <div className="w-6 h-6 bg-sec rounded-full flex items-center justify-center">
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -461,7 +464,7 @@ export default function HotelForm() {
                           name="name"
                           value={product.name}
                           onChange={handleProductChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
                           placeholder="Enter Listing name"
                         />
                         {errorname && <p className="text-sm mt-2 text-accent">{errorname}</p>}
@@ -476,35 +479,49 @@ export default function HotelForm() {
                         {errordescription && <p className="text-sm mt-2 text-accent">{errordescription}</p>}
                       </div>
 
-                      <div className="flex gap-2 mt-6">
-                        <div className='w-full'>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Price *</label>
+                      <div className="flex gap-2 mt-6 flex-wrap">
+                        <div className='flex-1 min-w-[200px]'>
+                         <label className="block text-sm font-semibold text-gray-500 mb-2 text-right">السعر *</label>
+
                           <div className="relative">
-                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                            
                             <input
                               type="number"
-                              name="price_per_night"
-                              value={product.price_per_night}
+                              name="السعر"
+                              value={product.price}
                               onChange={handleProductChange}
-                              className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
+                              className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
                               placeholder="0.00"
                             />
                           </div>
                           {errorprice && <p className="text-sm mt-2 text-accent">{errorprice}</p>}
                         </div>
 
-                        <div className='w-full'>
+                        <div className='flex-1 min-w-[200px]'>
+                          <label className="block text-sm font-semibold text-gray-500 mb-2">Currency</label>
+                          <input
+                            type="text"
+                            name="currency"
+                            value={product.currency}
+                            onChange={handleProductChange}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                            placeholder="e.g., USD, EUR, GBP"
+                          />
+                        </div>
+
+                        <div className='flex-1 min-w-[200px]'>
                           <label className="block text-sm font-semibold text-gray-500 mb-2">Type *</label>
                           <input
                             type="text"
                             name="type"
                             value={product.type}
                             onChange={handleProductChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                            placeholder="e.g., Fine Dining, Casual, Fast Food"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                            placeholder="e.g., Luxury, Budget, Boutique"
                           />
                           {errortype && <p className="text-sm mt-2 text-accent">{errortype}</p>}
                         </div>
+
                       </div>
 
                       <div className="flex gap-2 mt-4 flex-wrap">
@@ -518,8 +535,8 @@ export default function HotelForm() {
                                 name="capacity"
                                 value={product.capacity}
                                 onChange={handleProductChange}
-                                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                                placeholder="Seats"
+                                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                                placeholder="Max guests"
                               />
                             </div>
                           </div>
@@ -531,29 +548,47 @@ export default function HotelForm() {
                               name="size"
                               value={product.size}
                               onChange={handleProductChange}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
                               placeholder="e.g., 2500 sq ft"
                             />
                           </div>
                         </div>
 
-                        <div className='w-1/2'>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Established Year</label>
-                          <div className="relative">
-                            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                       
+                          <div className="flex gap-2 w-full">
+                                            <div className='flex-1'>
+                                              <label className="block text-sm font-semibold text-gray-500 mb-2">Established Year</label>
+
+                           
                             <input
                               type="number"
                               name="established"
                               placeholder='e.g., 1993'
                               value={product.established}
                               onChange={handleProductChange}
-                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
+                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
                             />
                           </div>
+
+<div className='flex-1'>
+                          <label className="block text-sm font-semibold text-gray-500 mb-2">category *</label>
+                          <select
+                            name="category"
+                            value={product.category}
+                            onChange={(e) => setProduct(prev => ({ ...prev, category: e.target.value }))}
+                            className="w-full px-4 py-2.5 h-18 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all bg-white"
+                          >
+                            <option value="">إختر توع</option>
+                            <option value="شقق">شقق</option>
+                            <option value="بناء">بناء</option>
+                            <option value="فلل">فلل</option>
+                          </select>
+                          {errortype && <p className="text-sm mt-2 text-accent">{errortype}</p>}
+                        </div>
                         </div>
                       </div>
 
-                      {/* Location and Chef Section */}
+                      {/* Location and Region Section */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                         <div>
                           <label className="block text-sm font-semibold text-gray-500 mb-2">Location *</label>
@@ -564,15 +599,32 @@ export default function HotelForm() {
                               name="location"
                               value={product.location}
                               onChange={handleProductChange}
-                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
+                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
                               placeholder="e.g., Downtown, Manhattan"
                             />
                           </div>
-                            {errorlocation && <p className="text-sm mt-2 text-accent">{errorlocation}</p>}
+                          {errorlocation && <p className="text-sm mt-2 text-accent">{errorlocation}</p>}
                         </div>
 
                         <div>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Number of rooms</label>
+                          <label className="block text-sm font-semibold text-gray-500 mb-2">Region</label>
+                          <div className="relative">
+                            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <input
+                              type="text"
+                              name="region"
+                              value={product.region}
+                              onChange={handleProductChange}
+                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                              placeholder="e.g., New York State, California"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-500 mb-2">Number of Rooms</label>
                           <div className="relative">
                             <MdOutlineBedroomChild className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                             <input
@@ -580,8 +632,38 @@ export default function HotelForm() {
                               name="chef"
                               value={product.chef}
                               onChange={handleProductChange}
-                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                              placeholder="Number of rooms"
+                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                              placeholder="Total rooms"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-500 mb-2">Number of Bedrooms</label>
+                          <div className="relative">
+                            <MdOutlineBedroomChild className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            <input
+                              type="number"
+                              name="badrooms_number"
+                              value={product.badrooms_number}
+                              onChange={handleProductChange}
+                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                              placeholder="Number of bedrooms"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-semibold text-gray-500 mb-2">Garages</label>
+                          <div className="relative">
+                            <AiOutlineFieldNumber className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+                            <input
+                              type="number"
+                              name="garages"
+                              value={product.garages}
+                              onChange={handleProductChange}
+                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                              placeholder="Parking spaces"
                             />
                           </div>
                         </div>
@@ -593,39 +675,49 @@ export default function HotelForm() {
                           <label className="block text-sm font-semibold text-gray-500 mb-2">Latitude *</label>
                           <input
                             type="number"
+                            step="any"
                             name="latitude"
                             value={product.latitude}
                             onChange={handleProductChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
                             placeholder="e.g., 40.7128"
                           />
-                            {errorlatitude && <p className="text-sm mt-2 text-accent">{errorlatitude}</p>}
+                          {errorlatitude && <p className="text-sm mt-2 text-accent">{errorlatitude}</p>}
                         </div>
 
                         <div>
                           <label className="block text-sm font-semibold text-gray-500 mb-2">Longitude *</label>
                           <input
                             type="number"
+                            step="any"
                             name="longitude"
                             value={product.longitude}
                             onChange={handleProductChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
                             placeholder="e.g., -74.0060"
                           />
-                            {errorlongtitude && <p className="text-sm mt-2 text-accent">{errorlongtitude}</p>}
+                          {errorlongtitude && <p className="text-sm mt-2 text-accent">{errorlongtitude}</p>}
                         </div>
                       </div>
 
+                      {/* Video Link */}
+                      <div className="mt-4">
+                        <label className="block text-sm font-semibold text-gray-500 mb-2">Video Link</label>
+                        <input
+                          type="url"
+                          name="video_link"
+                          value={product.video_link}
+                          onChange={handleProductChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                          placeholder="e.g., https://youtube.com/watch?v=..."
+                        />
+                      </div>
 
-                    </div>
 
-                    <div className="mt-6">
-                      <label className="block text-sm font-semibold text-gray-500 mb-2">Cancellation Policy *</label>
-                      <TiptapEditor
-                        content={product.cancellation_policy}
-                        onChange={handleCancellationPolicyChange}
-                      />
-                      {errorcancelation && <p className="text-sm mt-2 text-accent">{errorcancelation}</p>}
+
+     
+
+
                     </div>
                   </div>
                 </div>
@@ -638,7 +730,7 @@ export default function HotelForm() {
                       <label className="block text-sm font-semibold text-gray-500 mb-3">Main Image *</label>
                       {!mainImagePreview ? (
                         <label className="block w-full cursor-pointer">
-                          <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-highlights hover:bg-gray-50 transition-all h-72">
+                          <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sec hover:bg-gray-50 transition-all h-72">
                             <LuImagePlus className="w-12 h-12 text-gray-400 mx-auto mt-10" />
                             <p className="text-lg font-medium text-gray-600 mb-1 font-playfair">Click to upload main image</p>
                             <p className="text-sm text-gray-500">PNG, JPG, AVIF up to 10MB</p>
@@ -665,7 +757,7 @@ export default function HotelForm() {
                               <button
                                 type="button"
                                 onClick={removeMainImage}
-                                className="w-10 h-10 bg-highlights text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors shadow-lg opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100"
+                                className="w-10 h-10 bg-sec text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors shadow-lg opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100"
                               >
                                 <X className="w-5 h-5" />
                               </button>
@@ -687,250 +779,191 @@ export default function HotelForm() {
                       )}
                     </div>
 
-                {/* Additional Images */}
-            <div className=" bg-gray-50 rounded-xl p-2">
-                  <label className="block text-sm font-semibold text-gray-500 mb-3">Additional Images</label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
-                    {images.map((img, index) => (
-                      <div key={index} className="relative group">
-                        <Image 
-                        src={img.url} alt={`Preview ${index + 1}`}  
-                        width={150}
-                        height={150}
-                        className="w-full h-24 object-cover rounded-lg" />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute -top-2 -right-2 w-6 h-6 bg-highlights text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-secondary"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                    <label className="cursor-pointer">
-                      <div className="w-full h-24 border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50 rounded-lg flex items-center justify-center hover:border-highlights transition-colors">
-                        <Plus className="w-6 h-6 text-gray-400" />
-                      </div>
-                      <input
-                        type="file"
-                        multiple
-                        accept="image/avif,image/png,image/jpeg,image/webp"
-                        onChange={handleImageChange}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                  {images.length > 0 && (
-                    <p className="text-sm text-gray-500">{images.length} additional image(s) selected</p>
-                  )}
-                </div>
-              </div>
-<div className='my-2'></div>
+                   
 
-
-
-
-                    {/* Receipt Image */}
-                    <div className="mb-2 bg-gray-50 rounded-xl p-2 mt-1">
-                      <label className="block text-sm font-semibold text-gray-500 mb-3"> Upload your receipt to post a trusted, verified review *</label>
-                      <p className="text-sm font-medium text-gray-600 mb-1 font-playfair">To ensure our reviews are authentic and only come from real customers, we verify visits using receipts</p>
-                      {!recieptPreview ? (
-                        <label className="block w-full cursor-pointer">
-                          <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-highlights hover:bg-gray-50 transition-all h-72">
-                            <LuImagePlus className="w-12 h-12 text-gray-400 mx-auto mt-10" />
-                            <p className="text-lg font-medium text-gray-600 mb-1 font-playfair">Click to upload Receipt image</p>
-                            <p className="text-sm text-gray-500">PNG, JPG, AVIF up to 10MB</p>
+                    {/* Additional Images */}
+                    <div className="bg-gray-50 rounded-xl p-2">
+                      <label className="block text-sm font-semibold text-gray-500 mb-3">Additional Images</label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
+                        {images.map((img, index) => (
+                          <div key={index} className="relative group">
+                            <Image 
+                              src={img.url} 
+                              alt={`Preview ${index + 1}`}  
+                              width={150}
+                              height={150}
+                              className="w-full h-24 object-cover rounded-lg" 
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              className="absolute -top-2 -right-2 w-6 h-6 bg-sec text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-secondary"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
                           </div>
-                          {errorreciept && <p className="text-sm mt-2 text-accent">{errorreciept}</p>}
+                        ))}
+                        <label className="cursor-pointer">
+                          <div className="w-full h-24 border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50 rounded-lg flex items-center justify-center hover:border-sec transition-colors">
+                            <Plus className="w-6 h-6 text-gray-400" />
+                          </div>
                           <input
                             type="file"
+                            multiple
                             accept="image/avif,image/png,image/jpeg,image/webp"
-                            onChange={handleReciepChange}
+                            onChange={handleImageChange}
                             className="hidden"
                           />
                         </label>
-                      ) : (
-                        <div className="relative inline-block">
-                          <div className="relative group">
-                            <Image
-                              src={recieptPreview}
-                              alt="Main preview"
-                              width={150}
-                              height={150}
-                              className="object-cover h-full w-full rounded-xl shadow-lg border-2 border-gray-200"
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-xl transition-all duration-200 flex items-center justify-center">
-                              <button
-                                type="button"
-                                onClick={removeRecieptImage}
-                                className="w-10 h-10 bg-highlights text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors shadow-lg opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100"
-                              >
-                                <X className="w-5 h-5" />
-                              </button>
-                            </div>
-                          </div>
-                          <div className="mt-3 text-center">
-                            <label className="inline-flex items-center gap-2 px-3 py-1 text-gray-800 rounded-3xl hover:bg-gray-100 border border-1 border-secondary transition-colors cursor-pointer font-medium">
-                              <Upload className="w-4 h-4" />
-                              Change Image
-                              <input
-                                type="file"
-                                accept="image/avif,image/png,image/jpeg,image/webp"
-                                onChange={removeRecieptImage}
-                                className="hidden"
-                              />
-                            </label>
-                          </div>
-                        </div>
+                      </div>
+                      {images.length > 0 && (
+                        <p className="text-sm text-gray-500">{images.length} additional image(s) selected</p>
                       )}
                     </div>
+                  </div>
 
+                  <div className='my-2'></div>
 
-<div className='my-2'></div>
-
-
-              {/* Nearby Attractions */}
-              <div className="bg-gray-50 rounded-xl p-6">
-                <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-                  <h2 className="font-semibold text-gray-800 flex items-center gap-1 font-playfair">
-                    
-                      <MapPin className="w-5 h-5 text-gray-500" />
-                  
-                    Nearby Attractions
-                  </h2>
-                  <button
-                    type="button"
-                    onClick={addNearbyAttraction}
-                    className="flex items-center gap-2 px-3 py-1  text-gray-600 rounded-3xl hover:bg-gray-100 border border-1 border-secondary transition-colors font-medium"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Attraction
-                  </button>
-                </div>
-                
-                <div className="space-y-4">
-                  {nearbyAttractions.map((attraction, index) => (
-                    <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-500 mb-2">Attraction Name</label>
-                          <input
-                            type="text"
-                            name="name"
-                            value={attraction.name}
-                            onChange={(e) => handleNearbyChange(index, e)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:highlights focus:border-highlights"
-                            placeholder="e.g., Central Park"
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-500 mb-2">Distance</label>
-                            <input
-                              type="text"
-                              name="distance"
-                              value={attraction.distance}
-                              onChange={(e) => handleNearbyChange(index, e)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:highlights focus:border-highlights"
-                              placeholder="e.g., 5 min walk"
-                            />
-                          </div>
-                          {nearbyAttractions.length > 1 && (
-                            <div className="flex items-end">
-                              <button
-                                type="button"
-                                onClick={() => removeNearbyAttraction(index)}
-                                className="p-2 text-highlights hover:bg-gray-50 rounded-lg transition-colors"
-                              >
-                                <Trash2 className="w-5 h-5" />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                  {/* Nearby Attractions */}
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                      <h2 className="font-semibold text-gray-800 flex items-center gap-1 font-playfair">
+                        <MapPin className="w-5 h-5 text-gray-500" />
+                        Nearby Attractions
+                      </h2>
+                      <button
+                        type="button"
+                        onClick={addNearbyAttraction}
+                        className="flex items-center gap-2 px-3 py-1 text-gray-600 rounded-3xl hover:bg-gray-100 border border-1 border-secondary transition-colors font-medium"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Add Attraction
+                      </button>
                     </div>
-                  ))}
+                    
+                    <div className="space-y-4">
+                      {nearbyAttractions.map((attraction, index) => (
+                        <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-500 mb-2">Attraction Name</label>
+                              <input
+                                type="text"
+                                name="name"
+                                value={attraction.name}
+                                onChange={(e) => handleNearbyChange(index, e)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:sec focus:border-sec"
+                                placeholder="e.g., Central Park"
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <div className="flex-1">
+                                <label className="block text-sm font-medium text-gray-500 mb-2">Distance</label>
+                                <input
+                                  type="text"
+                                  name="distance"
+                                  value={attraction.distance}
+                                  onChange={(e) => handleNearbyChange(index, e)}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:sec focus:border-sec"
+                                  placeholder="e.g., 5 min walk"
+                                />
+                              </div>
+                              {nearbyAttractions.length > 1 && (
+                                <div className="flex items-end">
+                                  <button
+                                    type="button"
+                                    onClick={() => removeNearbyAttraction(index)}
+                                    className="p-2 text-sec hover:bg-gray-50 rounded-lg transition-colors"
+                                  >
+                                    <Trash2 className="w-5 h-5" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className='my-2'></div>
+
+                  {/* Awards */}
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                      <h2 className="font-semibold text-gray-800 flex items-center gap-1 font-playfair">
+                        <Award className="w-5 h-5 text-gray-500" />
+                        Awards & Recognition
+                      </h2>
+                      <button
+                        type="button"
+                        onClick={addAward}
+                        className="flex items-center gap-2 px-3 py-1 text-gray-600 rounded-3xl hover:bg-gray-100 border border-1 border-secondary transition-colors font-medium"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Add Award
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {awards.map((award, index) => (
+                        <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-500 mb-2">Award Name</label>
+                              <input
+                                type="text"
+                                name="name"
+                                value={award.name}
+                                onChange={(e) => handleAwardChange(index, e)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-sec focus:border-sec"
+                                placeholder="e.g., Best Hotel 2024"
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <div className="flex-1">
+                                <label className="block text-sm font-medium text-gray-500 mb-2">Year</label>
+                                <input
+                                  type="number"
+                                  name="year"
+                                  value={award.year}
+                                  onChange={(e) => handleAwardChange(index, e)}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-sec focus:border-sec"
+                                  placeholder="2024"
+                                />
+                              </div>
+                              {awards.length > 1 && (
+                                <div className="flex items-end">
+                                  <button
+                                    type="button"
+                                    onClick={() => removeAward(index)}
+                                    className="p-2 text-sec hover:bg-gray-50 rounded-lg transition-colors"
+                                  >
+                                    <Trash2 className="w-5 h-5" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-<div className='my-2'></div>
-              {/* Awards */}
-              <div className="bg-gray-50 rounded-xl p-6">
-               <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-                  <h2 className="font-semibold text-gray-800 flex items-center gap-1 font-playfair">
-                 
-                      <Award className="w-5 h-5 text-gray-500" />
-                 
-                    Awards & Recognition
-                  </h2>
-                  <button
-                    type="button"
-                    onClick={addAward}
-                    className="flex items-center gap-2 px-3 py-1  text-gray-600 rounded-3xl hover:bg-gray-100 border border-1 border-secondary transition-colors font-medium"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Award
-                  </button>
-                </div>
-                
-                <div className="space-y-4">
-                  {awards.map((award, index) => (
-                    <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-500 mb-2">Award Name</label>
-                          <input
-                            type="text"
-                            name="name"
-                            value={award.name}
-                            onChange={(e) => handleAwardChange(index, e)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-highlights focus:border-highlights"
-                            placeholder="e.g., Best Hotel 2024"
-                          />
-                        </div>
-                        <div className="flex gap-2">
-                          <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-500 mb-2">Year</label>
-                            <input
-                              type="number"
-                              name="year"
-                              value={award.year}
-                              onChange={(e) => handleAwardChange(index, e)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-highlights focus:border-highlights"
-                              placeholder="2024"
-                            />
-                          </div>
-                          {awards.length > 1 && (
-                            <div className="flex items-end">
-                              <button
-                                type="button"
-                                onClick={() => removeAward(index)}
-                                className="p-2 text-highlights hover:bg-gray-50 rounded-lg transition-colors"
-                              >
-                                <Trash2 className="w-5 h-5" />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-               </div>
-            
-
+ 
               {/* Submit Button */}
               <div className="flex justify-center pt-6">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`px-4 py-2 bg-highlights w-full text-white font-semibold rounded-xl ${
+                  className={`px-4 py-2 bg-sec w-full text-white font-semibold rounded-xl ${
                     isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-secondary'
                   }`}
                 >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2 justify-center">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin "></div>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       Creating Listing...
                     </span>
                   ) : (
@@ -939,19 +972,15 @@ export default function HotelForm() {
                 </button>
               </div>  
 
-                <div className="flex justify-center pt-6 mb-6">
-                 
+              <div className="flex justify-center pt-6 mb-6">
                 <button
-                  type="submit"
-                  className="px-4 py-2 bg-white w-full text-gray-600 border border-1 font-semibold rounded-xl hover:bg-highlights hover:text-white" 
-                     onClick={()=>router.push('/en/account/listings')} 
+                  type="button"
+                  className="px-4 py-2 bg-white w-full text-gray-600 border border-1 font-semibold rounded-xl hover:bg-sec hover:text-white" 
+                  onClick={() => router.push('/en/account/listings')} 
                 >
                   Cancel
                 </button>
-              
               </div>  
-              </div>
-                 </div>
             </form>
           </div>
         </div>

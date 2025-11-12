@@ -42,7 +42,7 @@ export default function Preloader() {
 
         .flipping div {
           animation: flipping-18i5bq 1.5s calc(var(--delay) * 1s) infinite backwards;
-          background-color: #E4E95B;
+          background-color: #D9AA52;
         }
 
         .flipping div:nth-child(1) {

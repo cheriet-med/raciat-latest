@@ -132,7 +132,7 @@ export default function Calendar() {
         if (booking.status === 'Completed') {
           color = booking.category === 'Restaurant' ? '#82A7A6' : '#9ED0E6'; // Green for restaurant, blue for hotel
         } else if (booking.status === 'Pending') {
-          color = '#F59E0B'; // Yellow
+          color = '#D9AA52';
         } else if (booking.status === 'Cancelled') {
           color = '#EF4444'; // Red
         }
@@ -209,9 +209,9 @@ export default function Calendar() {
   };
 
   const getStatusColor = (status: string) => {
-    const colors = {
+      const colors = {
       Completed: 'bg-green-100 text-green-800',
-      Pending: 'bg-yellow-100 text-yellow-800',
+      Pending: 'bg-[#D9AA52] text-white',
       Cancelled: 'bg-red-100 text-red-800'
     };
     return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
@@ -262,7 +262,7 @@ export default function Calendar() {
                   <span>Restaurant Bookings</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded bg-yellow-500"></div>
+                  <div className="w-3 h-3 rounded bg-[#D9AA52]"></div>
                   <span>Pending</span>
                 </div>
                 <div className="flex items-center gap-1">

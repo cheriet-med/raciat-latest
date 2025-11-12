@@ -6,7 +6,7 @@ import DashboardUser from "@/components/user-dashboard/dashboarduser";
 import DashboardPartner from "@/components/partner-dashboard/partner-dashboard";
 import MessagesUser from "@/components/user-dashboard/messagesPage";
 import InformationsUser from "@/components/user-dashboard/personalInformations";
-
+import AccountInfo from "@/components/admin-dashboard/accountinfo";
 
 export default function ProtectedPage() {
   const { data: session, status } = useSession({ required: true });
@@ -24,5 +24,5 @@ export default function ProtectedPage() {
     </div>  
     </div>);
   }
-  return session?.user?.is_superuser? <DashboardAdmin/> :  ( session?.user?.is_staff? <DashboardPartner/>:<InformationsUser/>)
+  return session?.user?.is_superuser? <AccountInfo/> :  ( session?.user?.is_staff? <DashboardPartner/>:<InformationsUser/>)
 }

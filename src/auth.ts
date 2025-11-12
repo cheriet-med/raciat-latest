@@ -52,7 +52,7 @@ declare module "next-auth/jwt" {
   }
 }
 
-// Token refresh function - FIXED: Removed duplicate declaration
+// Token refresh function
 async function refreshAccessToken(token: any) {
   try {
     console.log("Attempting to refresh token...");
@@ -68,29 +68,27 @@ async function refreshAccessToken(token: any) {
       body: JSON.stringify({ refresh: token.refreshToken }),
     });
 
-    const refreshedTokens = await response.json();
-
     if (!response.ok) {
-      console.error("Failed to refresh token:", refreshedTokens);
-      throw refreshedTokens;
+      console.error("Failed to refresh token:", response.status);
+      throw new Error("RefreshAccessTokenError");
     }
 
+    const refreshedTokens = await response.json();
     console.log("Token refreshed successfully");
     
     return {
       ...token,
       accessToken: refreshedTokens.access,
-      accessTokenExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
+      // Set expiration to 23 hours (just before session expires)
+      accessTokenExpires: Date.now() + 23 * 60 * 60 * 1000,
       refreshToken: refreshedTokens.refresh ?? token.refreshToken,
-      error: undefined, // Clear any previous errors
+      error: undefined,
     };
   } catch (error) {
     console.error("Error refreshing access token:", error);
     return { 
       ...token, 
       error: "RefreshAccessTokenError",
-      // Keep the user logged in even if refresh fails
-      // The error will be available in the session for handling
     };
   }
 }
@@ -195,7 +193,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   basePath: "/api/auth",
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 24 hours - Keep session alive longer
+    maxAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
     async signIn({ user, account, profile }) {
@@ -228,7 +226,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: "Token 330d2cc652deab44dc0146abb2565ae24046b027",
+                Authorization: "Token 01cd78564b89c883bfa1e55bc3f890d6bb6f916b",
               },
               body: JSON.stringify({ email: user?.email || data?.email })
             } 
@@ -321,13 +319,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     
     async jwt({ token, user, trigger }) {
-      // If user is available (sign in), update token
+      // Initial sign in - store user data
       if (user) {
-        console.log("JWT callback - storing user data:", {
-          hasAccessToken: !!user.access_token,
-          hasRefreshToken: !!user.refresh_token,
-          userId: user.id
-        });
+        console.log("JWT callback - initial sign in, storing user data");
 
         token.id = user.id;
         token.email = user.email;
@@ -343,44 +337,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.phoneNumber = user.phoneNumber;
         token.accessToken = user.access_token;
         token.refreshToken = user.refresh_token;
-        token.accessTokenExpires = Date.now() + 10 * 60 * 1000; // 10 minutes from now
-        token.error = undefined; // Clear any errors on fresh login
+        // Set token to expire in 23 hours (before session expires)
+        token.accessTokenExpires = Date.now() + 23 * 60 * 60 * 1000;
+        token.error = undefined;
         
-        console.log("JWT token updated:", {
-          hasAccessToken: !!token.accessToken,
-          hasRefreshToken: !!token.refreshToken,
-          expiresAt: new Date(token.accessTokenExpires || 0).toISOString()
-        });
-      }
-
-      // Check if we have a refresh token before attempting refresh
-      if (!token.refreshToken) {
-        console.log("No refresh token available, keeping existing session");
         return token;
       }
 
-      // Return previous token if the access token has not expired yet
-      if (Date.now() < (token.accessTokenExpires || 0)) {
+      // Check if we have necessary tokens
+      if (!token.refreshToken || !token.accessToken) {
+        console.log("Missing tokens, keeping existing session");
         return token;
       }
 
-      console.log("Access token expired, attempting refresh...");
-      // Access token has expired, try to refresh it
-      const refreshedToken = await refreshAccessToken(token);
-      
-      // If refresh failed but we still have user data, keep the session alive
-      // The error will be handled at the application level
-      if (refreshedToken.error && token.id) {
-        console.log("Refresh failed but keeping user logged in:", refreshedToken.error);
-        // Keep the user data but mark the token as expired/errored
-        return {
-          ...token,
-          error: refreshedToken.error,
-          accessToken: undefined, // Clear invalid access token
-        };
+      // If access token hasn't expired yet, return existing token
+      const timeUntilExpiry = (token.accessTokenExpires || 0) - Date.now();
+      if (timeUntilExpiry > 5 * 60 * 1000) { // More than 5 minutes left
+        return token;
       }
-      
-      return refreshedToken;
+
+      // Access token is about to expire or has expired, refresh it
+      console.log("Access token expiring soon, refreshing...");
+      return await refreshAccessToken(token);
     },
     
     async session({ session, token }) {
@@ -401,16 +379,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         phoneNumber: token.phoneNumber as string | null,
       };
       
-      // Make accessToken and error available at session level
       session.accessToken = token.accessToken as string;
       session.refreshToken = token.refreshToken as string;
       session.error = token.error as string;
-      
-      console.log("Session callback:", {
-        hasUser: !!session.user?.id,
-        hasAccessToken: !!session.accessToken,
-        hasError: !!session.error
-      });
       
       return session;
     },

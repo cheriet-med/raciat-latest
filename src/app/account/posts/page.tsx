@@ -6,8 +6,9 @@ import DashboardUser from "@/components/user-dashboard/dashboarduser";
 import DashboardPartner from "@/components/partner-dashboard/partner-dashboard";
 import MessagesUser from "@/components/user-dashboard/messagesPage";
 import CalendarDashboardPartner from "@/components/partner-dashboard/calendar";
-import EmailsAdmin from "@/components/admin-dashboard/emails";
-import Emails from "@/components/admin-dashboard/emails";
+import ListingsPartnerDashboard from "@/components/partner-dashboard/listings";
+import ProductDashboard from "@/components/admin-dashboard/listings";
+import AddPost from "@/components/admin-dashboard/add-post";
 
 export default function ProtectedPage() {
   const { data: session, status } = useSession({ required: true });
@@ -25,5 +26,5 @@ export default function ProtectedPage() {
     </div>  
     </div>);
   }
-  return session?.user?.is_superuser? <Emails/> :  ( session?.user?.is_staff? <CalendarDashboardPartner/>:<MessagesUser/>)
+  return session?.user?.is_superuser? <AddPost/> :  ( session?.user?.is_staff? <AddPost/>:"hello")
 }

@@ -9,6 +9,7 @@ import { MdOutlineAttachEmail } from "react-icons/md";
 import { 
   X,
 } from 'lucide-react';
+import HotelForm from '../requests/addHotelListing';
 import { MdDashboard } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
 import { FaRegHeart } from "react-icons/fa";
@@ -57,7 +58,7 @@ interface Conversation {
 
 
 
-export default function DashboardUser() {
+export default function AddProduct() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
     
@@ -200,7 +201,7 @@ export default function DashboardUser() {
       {/* Main Content Area */}
       <div className="min-h-screen flex flex-col lg:mr-96 pt-16 lg:pt-0">
         <main className="flex-grow p-4 md:p-6">
-          <AnalyticsAdmin />
+          <HotelForm />
         </main>
       
         {/* Footer */}

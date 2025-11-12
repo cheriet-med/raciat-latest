@@ -7,7 +7,7 @@ import DashboardPartner from "@/components/partner-dashboard/partner-dashboard";
 import MessagesUser from "@/components/user-dashboard/messagesPage";
 import CalendarDashboardPartner from "@/components/partner-dashboard/calendar";
 import ListingsPartnerDashboard from "@/components/partner-dashboard/listings";
-
+import ProductDashboard from "@/components/admin-dashboard/listings";
 
 export default function ProtectedPage() {
   const { data: session, status } = useSession({ required: true });
@@ -25,5 +25,5 @@ export default function ProtectedPage() {
     </div>  
     </div>);
   }
-  return session?.user?.is_superuser? <DashboardAdmin/> :  ( session?.user?.is_staff? <ListingsPartnerDashboard/>:<MessagesUser/>)
+  return session?.user?.is_superuser? <ProductDashboard/> :  ( session?.user?.is_staff? <ListingsPartnerDashboard/>:<ProductDashboard/>)
 }

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { signOut } from "next-auth/react";
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { useLocale } from "next-intl";
+
 import { 
   Search,
   X,
@@ -68,7 +68,7 @@ export default function DashboardUser() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-  const locale = useLocale(); // Get the current locale
+
   const { data: session, status } = useSession({ required: true });
   const {Users}  =useFetchUser(session?.user?.id)
  

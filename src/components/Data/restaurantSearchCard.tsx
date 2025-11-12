@@ -268,7 +268,7 @@ const handlePrevious = () => {
              <PropertyCard
                 id={res.id || `restaurant-${index}`} // Use restaurant ID or fallback
                 name={res.name}
-                price={res.average_cost || res.price_range}
+                price=""
                 address={res.location || ''}
                 imageUrl={`${process.env.NEXT_PUBLIC_IMAGE}/${res.image}`}
                 averageRating={4}

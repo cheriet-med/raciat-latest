@@ -12,18 +12,37 @@ import ReservationChartAdmin from "./reservationChartAdmin";
 import UsersTable from "./tableUsersAdmin";
 import ReportReviews from "./reposrtReviewsTableAdmin";
 import Verification from "./tableVerificationAdmin";
+
+
+
+
 export default function AnalyticsAdmin() {
 
 
   return (
     <>
-    <ReservationChartAdmin/>
-    <ReservationsTable/><Verification/>
-    <div className="flex gap-2 flex-wrap md:flex-nowrap">
-      <UsersTable/>
-  <ReportReviews/>
-    </div>
     
+   <div className="grid grid-cols-1 xl:grid-cols-3">
+  
+
+    <div className="grid xl:col-span-2 gap-4">
+      <UsersTable/>
+ 
+    </div>
+      <div className="grid xl:col-span-1">
+        <NewsletterTable/>
+    </div>
+
+   </div>
+  
     </>
   );
 }
+
+/**
+ * 
+ * <ReservationsTable/>
+ * <ReservationChartAdmin/>
+ * 
+ * <ReportReviews/>
+ */ 

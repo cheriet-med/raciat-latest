@@ -14,6 +14,8 @@ import { FaPlus } from "react-icons/fa6";
 import useFetchListing from '@/components/requests/fetchListings';
 import { FaBuildingCircleArrowRight } from "react-icons/fa6";
 import ManageListing from "@/components/Data/manageListing";
+import { RiArticleFill } from "react-icons/ri";
+
 
 // Skeleton Components
 const PropertyCardSkeleton = () => {
@@ -156,7 +158,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   );
 };
 
-export default function ListinPartnerCard() {
+export default function PostListings() {
 
   const { listings, isLoading, error, mutate } = useFetchListing(); 
   const [currentPage, setCurrentPage] = useState(1);
@@ -193,12 +195,12 @@ export default function ListinPartnerCard() {
   return (
     <div className="flex flex-col gap-4 mx-2 custom:mx-6 mt-6">
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-        <Link href="/account/add-hotel-listing">
+        <Link href="/account/add-restaurant-listing">
         <div className='h-16 px-8 border border-1 rounded-xl shaddow-sm w-fit bg-sec flex justify-around items-center gap-4 text-white cursor-pointer hover:bg-secondary'>
-         <LiaHotelSolid size={20}/> 
+         <RiArticleFill size={20}/> 
             
             <h1 className="text-2xl font-playfair font-semibold text-white">
-             إضافة عقار جديد
+             إضافة مقال جديد
             </h1>
           
           <FaPlus size={18}/>
@@ -210,9 +212,9 @@ export default function ListinPartnerCard() {
         <div className="flex items-center justify-center h-[700px]  bg-gray-50">
               <div className="text-center">
                 <div className="w-32 h-32 bg-sec rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FaBuildingCircleArrowRight className="w-20 h-20 text-white" />
+                  <RiArticleFill className="w-20 h-20 text-white" />
                 </div>
-                <h3 className="text-3xl font-medium text-gray-900 mb-2 font-playfair">لايوجد عقارات حاليا يرجى إضافة عقار جديد</h3>
+                <h3 className="text-3xl font-medium text-gray-900 mb-2 font-playfair">لايوجد مقالات حاليا يرجى إضافة مقال جديد</h3>
            
               </div>
             </div>:
