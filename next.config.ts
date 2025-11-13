@@ -17,7 +17,10 @@ const nextConfig: NextConfig = {
         hostname: 'res.cloudinary.com',
         pathname: '/dhnn7xish/**',
       },
+
     ],
+formats: ['image/webp', 'image/avif'],
+    unoptimized: true,
   },
 };
 

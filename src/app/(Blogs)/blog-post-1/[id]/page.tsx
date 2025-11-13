@@ -1,7 +1,7 @@
+// app/blog/[id]/page.tsx
 import Layout from "@/components/layouts/Layout-defaul";
-import React from "react";
+import BlogPostClient from "@/components/blogs/BlogPostClient";
 import { allBlogs } from "@/data/blog";
-import BlogPost1 from "@/components/blogs/BlogPost1";
 
 type PageProps = {
   params: Promise<{
@@ -9,33 +9,31 @@ type PageProps = {
   }>;
 };
 
-
 export default async function Page({ params }: PageProps) {
   const { id } = await params;
-  const foundBlog = allBlogs.find((elm) => String(elm.id) === id) || allBlogs[0];
   
-  // Đảm bảo authorDesc luôn có giá trị
-  const blogItem = {
-    ...foundBlog,
-    authorDesc: foundBlog.authorDesc || ""
-  };
-
   return (
     <Layout>
-      <BlogPost1
-        blogItem={{
-          ...blogItem,
-          authorName: blogItem.authorName ?? "",
-          authorFlow: blogItem.authorFlow ?? 0,
-          description: blogItem.description ?? "",
-        }}
-      />
+      <BlogPostClient id={id} />
     </Layout>
   );
 }
 
+// Optional: Keep generateStaticParams for pre-rendering popular posts
 export async function generateStaticParams() {
-  return allBlogs.map((property) => ({
+  // You can pre-render some popular posts
+  // Or return an empty array if you want fully dynamic rendering
+  return allBlogs.slice(0, 5).map((property) => ({
     id: String(property.id),
   }));
+}
+
+// Optional: Add dynamic metadata
+export async function generateMetadata({ params }: PageProps) {
+  const { id } = await params;
+  
+  return {
+    title: `مقال ${id}`,
+    description: `تفاصيل المقال رقم ${id}`,
+  };
 }

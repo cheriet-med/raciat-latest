@@ -2,6 +2,9 @@ import React from "react";
 import { recentPost } from "@/data/blog";
 import Image from "next/image";
 import Link from "next/link";
+import useFetchPostListing from "../requests/fetchPostsListings";
+import moment from 'moment';
+import 'moment/locale/ar'
 
 
 type SideBar2Props = {
@@ -15,14 +18,15 @@ export default function SideBar2({
    
 }: SideBar2Props) {
 
-
+      const { listings, isLoading, error, mutate } = useFetchPostListing();
+        moment.locale('ar');
     return (
         <div className="tf-sidebar">
 
             <div className="sidebar-item sidebar-recent-post">
                 <h5 className="sidebar-title mb_17">المشاركات الاخيرة</h5>
                 <ul>
-                    {recentPost.map((post) => (
+                    {listings?.slice(0, 4).map((post) => (
                         <li
                             className="recent-post hover-image-rotate"
                             key={post.id}
@@ -32,10 +36,10 @@ export default function SideBar2({
                                 className="img-style"
                             >
                                 <Image
-                                    src={post.imgSrc}
+                                    src={`${process.env.NEXT_PUBLIC_IMAGE}/${post.image}`}
                                     width={100}
                                     height={100}
-                                    alt={post.alt}
+                                    alt={post.title}
                                 />
                             </Link>
                             <div className="content">
@@ -45,11 +49,11 @@ export default function SideBar2({
                                             href="#"
                                             className="link text_primary-color"
                                         >
-                                            {post.author}
+                                              <p> {post.image_owner == "undefined"? "راسيات" : post.image_owner}</p>
                                         </Link>
                                     </div>
                                     <div className="item text_secondary-color text-caption-2 ">
-                                        {post.date}
+                                          {moment(post.created_at_meta).format('MMMM Do YYYY, h:mm:ss a')}
                                     </div>
                                 </div>
                                 <div className="text-title title text_primary-color fw-6">

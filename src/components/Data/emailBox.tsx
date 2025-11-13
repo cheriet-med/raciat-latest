@@ -483,7 +483,7 @@ const EmailClient: React.FC = () => {
     <>
       <div className="flex h-screen bg-gray-50 font-montserrat" dir="rtl">
         {/* Right Sidebar (was Left) */}
-        <div className={`${isMobileView ? 'hidden md:block' : 'block'} w-32 sm:w-80 bg-white border-l border-gray-200 flex flex-col`}>
+        <div className={`${isMobileView ? 'hidden md:block' : 'block'} w-32 sm:w-80 bg-gray-100 border-l border-gray-200 flex flex-col`}>
           {/* Header */}
           <div className="p-4 border-b border-gray-200">
             <h1 className="text-2xl font-bold text-gray-900 mb-4 font-playfair">البريد</h1>

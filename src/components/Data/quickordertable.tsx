@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Download } from 'lucide-react';
 import useFetchAllNewsLetterEmails from '../requests/fetchAllNewsletters';
 
-const NewsletterTable = () => {
+const QuikeOrderTable = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [lastUpdated, setLastUpdated] = useState('');
   const { AllNewsLetters } = useFetchAllNewsLetterEmails();
@@ -56,7 +56,7 @@ const NewsletterTable = () => {
     <div dir="rtl" className="w-full max-w-4xl mx-auto pt-6 px-2 rounded-xl bg-gray-50">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-sec mb-4 font-playfair text-right">
-          المشتركين في النشرة البريدية
+         طلبات من صفحة العقار
         </h1>
 
         {/* أدوات البحث والتصدير */}
@@ -95,7 +95,7 @@ const NewsletterTable = () => {
       البريد الإلكتروني
     </th>
     <th className="px-6 py-3 text-xl font-bold text-sec uppercase tracking-wider text-right">
-      تاريخ ووقت الاشتراك
+      تاريخ ووقت الطلب
     </th>
   </tr>
 </thead>
@@ -117,7 +117,7 @@ const NewsletterTable = () => {
   ) : (
     <tr>
       <td colSpan={2} className="px-6 py-8 text-center text-white text-xl">
-        لم يتم العثور على مشتركين .
+        لم يتم العثور على نتائج .
       </td>
     </tr>
   )}
@@ -136,4 +136,4 @@ const NewsletterTable = () => {
   );
 };
 
-export default NewsletterTable;
+export default QuikeOrderTable;

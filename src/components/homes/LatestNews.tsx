@@ -4,9 +4,14 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import Image from "next/image";
 import { latestNews } from "@/data/blog";
+import useFetchPostListing from "../requests/fetchPostsListings";
 import Link from "next/link";
+import moment from 'moment';
+import 'moment/locale/ar'
 
 export default function LatestNews() {
+      const { listings, isLoading, error, mutate } = useFetchPostListing();
+        moment.locale('ar');
     return (
         <div className="sw-layout tf-spacing-1">
             <div className="tf-container">
@@ -39,7 +44,7 @@ export default function LatestNews() {
                     modules={[Pagination]}
                     pagination={{ clickable: true, el: ".spb7" }}
                 >
-                    {latestNews.slice(0, 3).map((item, ind) => (
+                    {listings?.slice(0, 3).map((item, ind) => (
                         <SwiperSlide className="swiper-slide" key={ind}>
                             <div
                                 className="blog-article-item style-default hover-image-translate loadItem"
@@ -48,10 +53,10 @@ export default function LatestNews() {
                                 <div className="article-thumb image-wrap mb_24">
                                     <Image
                                         loading="lazy"
-                                        src={item.imgSrc}
+                                        src={`${process.env.NEXT_PUBLIC_IMAGE}/${item.image}`}
                                         width={850}
                                         height={478}
-                                        alt={item.alt}
+                                        alt={item.title}
                                     />
                                     <Link
                                         href={`/blog-post-1/${item.id}`}
@@ -70,13 +75,15 @@ export default function LatestNews() {
                                             نشر من طرف{" "}
                                             <Link
                                                 href="#"
-                                                className="link text_primary-color"
+                                                className="link "
                                             >
-                                                {item.author}
+                                                <p> {item.image_owner == "undefined"? "راسيات" : item.image_owner}</p>
+                                               
                                             </Link>
                                         </div>
                                         <div className="item text_secondary-color text-caption-1">
-                                            {item.date}
+                                             {moment(item.created_at_meta).format('MMMM Do YYYY, h:mm:ss a')}
+                                          
                                         </div>
                                     </div>
                                     <h5 className="title mb_12">

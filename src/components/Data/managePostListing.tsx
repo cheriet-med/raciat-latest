@@ -65,7 +65,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     <div className={`relative inline-block text-left ${className}`} ref={dropdownRef}>
       <button
         type="button"
-        className={`inline-flex justify-between items-center w-full rounded-2xl border border-secondary shadow-xs px-3 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 ${
+        className={`inline-flex justify-between items-center w-full gap-3 rounded-2xl border border-secondary shadow-xs px-2 py-2 bg-white text-xl font-bold text-gray-700 hover:bg-gray-50 ${
           isOpen ? 'ring-1 ring-secondary' : ''
         } ${buttonClassName}`}
         onClick={toggleDropdown}
@@ -73,14 +73,14 @@ const Dropdown: React.FC<DropdownProps> = ({
         aria-haspopup="true"
       >
         <IoSettingsOutline
-          className={` mr-2 h-5 w-5 transition-transform duration-200 ${
+          className={` mr-2 h-6 w-6 transition-transform duration-200 ${
             isOpen ? 'transform rotate-180' : ''
           }`}
           aria-hidden="true"
         />
         {children}
         <AiOutlineDownCircle
-          className={`-mr-1 ml-2 h-5 w-5 transition-transform duration-200 ${
+          className={`-mr-1 ml-2 h-6 w-6 transition-transform duration-200 ${
             isOpen ? 'transform rotate-180' : ''
           }`}
           aria-hidden="true"
@@ -100,7 +100,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                 {item.type === 'button' || !item.href ? (
                   <button
                     onClick={item.onClick}
-                    className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-highlights hover:text-white transition-colors duration-150"
+                    className="flex items-center w-full text-left px-4 py-2 gap-3 text-2xl text-gray-700 hover:bg-sec hover:text-white transition-colors duration-150"
                     role="menuitem"
                   >
                     {item.icon && <span className="mr-2">{item.icon}</span>}
@@ -109,7 +109,7 @@ const Dropdown: React.FC<DropdownProps> = ({
                 ) : (
                   <Link
                     href={item.href}
-                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-highlights hover:text-white transition-colors duration-150"
+                    className="flex items-center px-4 py-2 text-2xl gap-3  text-gray-700 hover:bg-sec hover:text-white transition-colors duration-150"
                     role="menuitem"
                     onClick={() => setIsOpen(false)}
                   >
@@ -126,7 +126,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   );
 };
 
-const ManageListing = ({ id, category, mutate }: { id: string; category: string | null, mutate?: () => Promise<any> }) => {
+const ManagePostListing = ({ id, category, mutate }: { id: string; category: string | null, mutate?: () => Promise<any> }) => {
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -134,7 +134,7 @@ const ManageListing = ({ id, category, mutate }: { id: string; category: string 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}productid/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}postid/${id}`, {
           method: "DELETE",
           headers: {
             "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
@@ -143,14 +143,12 @@ const ManageListing = ({ id, category, mutate }: { id: string; category: string 
         });
 
       if (response.ok) {
-        // Handle successful deletion
         if (mutate) await mutate();
-        // Alternatively: router.push('/some-success-page');
       } else {
-        console.error('Failed to delete listing');
+        console.error('فشل في حذف الإعلان');
       }
     } catch (error) {
-      console.error('Error deleting listing:', error);
+      console.error('حدث خطأ أثناء حذف الإعلان:', error);
     } finally {
       setIsDeleting(false);
       setShowDeleteModal(false);
@@ -159,22 +157,22 @@ const ManageListing = ({ id, category, mutate }: { id: string; category: string 
 
   const dropdownItems: DropdownItem[] = [
     { 
-      label: 'Edit', 
-      href: category == 'Hotel'? `/en/account/edit-hotel-listing?q=${id}` : `/en/account/edit-restaurant-listing?q=${id}`, 
+      label: 'تعديل', 
+      href: `/account/edit-restaurant-listing?q=${id}`, 
       type: 'link',
-      icon: <IoCreateOutline className="h-4 w-4" />
+      icon: <IoCreateOutline className="h-6 w-6" />
     },
     { 
-      label: 'Delete', 
+      label: 'حذف', 
       onClick: () => setShowDeleteModal(true), 
       type: 'button',
-      icon: <IoTrashOutline className="h-4 w-4" />
+      icon: <IoTrashOutline className="h-6 w-6" />
     },
     { 
-      label: 'View', 
-      href: `/en/booking/${id}`, 
+      label: 'عرض', 
+      href: `/blog-post-1/${id}`, 
       type: 'link',
-      icon: <IoEyeOutline className="h-4 w-4" />
+      icon: <IoEyeOutline className="h-6 w-6" />
     },
   ];
 
@@ -185,30 +183,30 @@ const ManageListing = ({ id, category, mutate }: { id: string; category: string 
         buttonClassName="px-3 py-1 text-base"
         menuClassName="shadow-xs"
       >
-        Manage Your Listing
+        إدارة المقال
       </Dropdown>
 
-      {/* Delete Confirmation Modal */}
+      {/* نافذة تأكيد الحذف */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full">
-            <h3 className="text-lg font-medium mb-4 font-playfair">Confirm Deletion</h3>
-            <p className="mb-6 text-gray-600">Are you sure you want to delete this listing? This action cannot be undone.</p>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="rounded-2xl p-6 max-w-5xl mx-auto bg-white ">
+            <h3 className="text-3xl font-bold text-sec mb-4 font-playfair">تأكيد الحذف</h3>
+            <p className="mb-6 text-gray-600">هل أنت متأكد أنك تريد حذف هذا المقال هذا الإجراء لا يمكن التراجع عنه.</p>
             
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end space-x-3 gap-2">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 rounded-md text-2xl font-medium text-gray-700 hover:bg-gray-50"
                 disabled={isDeleting}
               >
-                Cancel
+                إلغاء
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-1 bg-secondary rounded-md text-sm font-medium text-white hover:bg-highlihts disabled:bg-highlihts"
+                className="px-4 py-2 bg-sec rounded-md text-2xl font-medium text-white hover:bg-prim disabled:bg-sec"
                 disabled={isDeleting}
               >
-                {isDeleting ? 'Deleting...' : 'Delete'}
+                {isDeleting ? 'جاري الحذف...' : 'حذف'}
               </button>
             </div>
           </div>
@@ -218,4 +216,4 @@ const ManageListing = ({ id, category, mutate }: { id: string; category: string 
   );
 };
 
-export default ManageListing;
+export default ManagePostListing;

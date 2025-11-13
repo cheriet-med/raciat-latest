@@ -117,7 +117,7 @@ const UserAccordionDisplay = () => {
   }
 
   return (
-    <div className="w-full p-6 bg-gray-50 min-h-screen" dir="rtl">
+    <div className="w-full p-6 bg-gray-50 " dir="rtl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-sec font-playfair mb-6">إدارة المستخدمين</h1>
   <div className='flex gap-4 w-full items-center'>
