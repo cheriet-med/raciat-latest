@@ -371,64 +371,61 @@ console.log(mainImagePreview)
 
                 {/* العمود الأيمن - تحميل الصورة */}
                 <div className="lg:col-span-1">
-                  <div className="mb-2 bg-gray-50 rounded-xl p-2 mt-1">
-                    <label className="block text-xl font-semibold text-gray-500 mb-3">
-                      الصورة الرئيسية {!query && '*'}
-                    </label>
-                    {!mainImagePreview ? (
-                      <label className="block w-full cursor-pointer">
-                        <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sec hover:bg-gray-50 transition-all h-72">
-                          <LuImagePlus className="w-12 h-12 text-gray-400 mx-auto mt-10" />
-                          <p className="text-lg font-medium text-gray-600 mb-1">انقر لتحميل الصورة الرئيسية</p>
-                          <p className="text-xl text-gray-500">PNG, JPG, AVIF حتى 10 ميغابايت</p>
-                        </div>
-                        {errorimage && <p className="text-xl mt-2 text-red-600">{errorimage}</p>}
-                        <input
-                          type="file"
-                          accept="image/avif,image/png,image/jpeg,image/webp"
-                          onChange={handleMainImageChange}
-                          className="hidden"
-                        />
-                      </label>
-                    ) : (
-                      <div className="relative inline-block">
-                        <div className="relative group">
-                          <img
-                         
-                            src={`${process.env.NEXT_PUBLIC_IMAGE}/${mainImagePreview}`}
-                            alt="عرض الصورة"
-                            className="object-cover h-full w-full rounded-xl shadow-lg border-2 border-gray-200"
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-xl transition-all duration-200 flex items-center justify-center">
-                            <button
-                              type="button"
-                              onClick={removeMainImage}
-                              className="w-10 h-10 bg-sec text-white rounded-full flex items-center justify-center hover:bg-prim transition-colors shadow-lg opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100"
-                            >
-                              <X className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </div>
-                        <div className="mt-3 text-center">
-                          <label className="inline-flex items-center gap-2 px-3 py-1 text-gray-800 rounded-3xl hover:bg-gray-100 border border-gray-300 transition-colors cursor-pointer font-medium">
-                            <Upload className="w-4 h-4" />
-                            تغيير الصورة
-                            <input
-                              type="file"
-                              accept="image/avif,image/png,image/jpeg,image/webp"
-                              onChange={handleMainImageChange}
-                              className="hidden"
-                            />
-                          </label>
-                        </div>
-                      </div>
-                    )}
-                    {query && !product.image && (
-                      <p className="text-sm text-gray-500 mt-2 text-center">
-                        إذا لم تقم بتحميل صورة جديدة، سيتم الاحتفاظ بالصورة الحالية
-                      </p>
-                    )}
-                  </div>
+<div className="mb-2 bg-gray-50 rounded-xl p-2 mt-1">
+  <label className="block text-xl font-semibold text-gray-500 mb-3">
+    الصورة الرئيسية {!query && '*'}
+  </label>
+  {!mainImagePreview ? (
+    <label className="block w-full cursor-pointer">
+      <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sec hover:bg-gray-50 transition-all h-72">
+        <LuImagePlus className="w-12 h-12 text-gray-400 mx-auto mt-10" />
+        <p className="text-lg font-medium text-gray-600 mb-1">انقر لتحميل الصورة الرئيسية</p>
+        <p className="text-xl text-gray-500">PNG, JPG, AVIF حتى 10 ميغابايت</p>
+      </div>
+      {errorimage && <p className="text-xl mt-2 text-red-600">{errorimage}</p>}
+      <input
+        type="file"
+        accept="image/avif,image/png,image/jpeg,image/webp"
+        onChange={handleMainImageChange}
+        className="hidden"
+      />
+    </label>
+  ) : (
+    <div className="relative inline-block">
+      <div className="relative group">
+        <img
+          src={`${process.env.NEXT_PUBLIC_IMAGE}/${mainImagePreview}`}
+          alt="عرض الصورة"
+          className="object-cover h-full w-full rounded-xl shadow-lg border-2 border-gray-200"
+        />
+        <button
+          type="button"
+          onClick={removeMainImage}
+          className="absolute -top-2 -right-2 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100 border-2 border-white"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+      <div className="mt-3 text-center">
+        <label className="inline-flex items-center gap-2 px-3 py-3 text-sec rounded-3xl hover:bg-gray-100 border border-sec transition-colors cursor-pointer font-bold">
+          <Upload className="w-6 h-6" />
+          تغيير الصورة
+          <input
+            type="file"
+            accept="image/avif,image/png,image/jpeg,image/webp"
+            onChange={handleMainImageChange}
+            className="hidden"
+          />
+        </label>
+      </div>
+    </div>
+  )}
+  {query && !product.image && (
+    <p className="text-2xl text-sec mt-2 text-center">
+      إذا لم تقم بتحميل صورة جديدة، سيتم الاحتفاظ بالصورة الحالية
+    </p>
+  )}
+</div>
                 </div>
               </div>
 

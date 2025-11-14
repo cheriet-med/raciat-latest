@@ -4,9 +4,12 @@ import { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { TiDeleteOutline } from "react-icons/ti";
 import { IoAddOutline } from "react-icons/io5";
+import useFetchAmenities from './fetchAmenities';
+import { useRouter } from 'next/navigation'; 
 import { IoCloseCircleOutline } from "react-icons/io5";
+import { KeyedMutator } from 'swr';
 
-// Icon mapping for each amenity
+// Icon mapping for each amenity (keeping your existing icons)
 import { 
   FaWifi, FaParking, FaDumbbell, FaGlassMartiniAlt, FaChild, FaTaxi, 
   FaBaby, FaCoffee, FaBath, FaSnowflake, FaDesktop, FaBroom, 
@@ -20,21 +23,6 @@ import {
 } from 'react-icons/fa';
 import { PiElevatorFill } from "react-icons/pi";
 import { FaHandsAslInterpreting } from "react-icons/fa6";
-
-// TypeScript Interfaces
-interface Amenity {
-  id: number;
-  name: string;
-  name_ar?: string;
-  category: string;
-  selected: boolean;
-}
-
-interface AmenitiesSelectorProps {
-  initialAmenities: Amenity[];
-  language?: 'en' | 'ar';
-  onAmenitiesChange?: (selectedAmenities: Amenity[]) => void;
-}
 
 interface AmenityIconMap {
   [key: string]: any;
@@ -192,15 +180,59 @@ const amenityIcons: AmenityIconMap = {
   'Cars': <FaCar className="text-lg text-sec h-8 w-8" />
 };
 
-const AmenitiesSelector: React.FC<AmenitiesSelectorProps> = ({ 
+interface Amenity {
+  id: number;
+  name: string;
+  category: string;
+  selected: boolean;
+}
+
+interface UserAmenity {
+  id: number;
+  amenitie: number;
+  name: string;
+  product?: number; // Add product field
+}
+
+interface AmenitiesSelectorProps {
+  initialAmenities: Array<{
+    id: number;
+    name: string;
+    category: string;
+    selected: boolean;
+  }>;
+  user: any;
+  product?: any; // Add product prop
+  language?: 'en' | 'ar';
+  mutate?: KeyedMutator<any>;
+}
+
+// Skeleton component for loading state
+const AmenitySkeleton = () => (
+  <div className="flex justify-between items-center gap-4 py-1 px-3 rounded-full border border-gray-200 bg-gray-50 animate-pulse">
+    <div className="flex items-center gap-3">
+      <div className="w-4 h-4 bg-gray-300 rounded"></div>
+      <div className="w-20 h-4 bg-gray-300 rounded"></div>
+    </div>
+    <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+  </div>
+);
+
+const AmenitiesSelectorUpdate: React.FC<AmenitiesSelectorProps> = ({ 
   initialAmenities, 
-  language = 'en',
-  onAmenitiesChange 
+  user, 
+  product, // Add product to props
+  language = 'en', // Default to English
+  mutate 
 }) => {
   const [amenities, setAmenities] = useState<Amenity[]>(initialAmenities);
-  const [selectedAmenities, setSelectedAmenities] = useState<Amenity[]>([]);
-  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingg, setIsLoadingg] = useState(false);
+  const [isDeletingId, setIsDeletingId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCount, setSelectedCount] = useState(0);
+  const [userAmenities, setUserAmenities] = useState<UserAmenity[]>([]);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const router = useRouter();
 
   // Translations
   const translations = {
@@ -213,7 +245,9 @@ const AmenitiesSelector: React.FC<AmenitiesSelectorProps> = ({
       done: "Done",
       addAmenitiesPlaceholder: "ADD AMENITIES",
       noAmenitiesSelected: "No amenities selected yet",
-      remove: "Remove"
+      remove: "Remove",
+      loading: "Loading amenities...",
+      errorLoading: "Failed to load amenities"
     },
     ar: {
       pickInterests: "اختر المرافق للمنشأة الخاصة بك",
@@ -224,70 +258,182 @@ const AmenitiesSelector: React.FC<AmenitiesSelectorProps> = ({
       done: "تم",
       addAmenitiesPlaceholder: "إضافة مرافق",
       noAmenitiesSelected: "لم يتم اختيار أي مرافق بعد",
-      remove: "إزالة"
+      remove: "إزالة",
+      loading: "جاري تحميل المرافق...",
+      errorLoading: "فشل في تحميل المرافق"
     }
   };
 
   const t = translations[language];
 
-  // Initialize selected amenities from initialAmenities
+  // Use the custom hook with product filter
+  const { Amenitie, isLoading, error: amenitiesError } = useFetchAmenities(product);
+
+  // Update state when Amenitie data changes
   useEffect(() => {
-    const initiallySelected = initialAmenities.filter(amenity => amenity.selected);
-    setSelectedAmenities(initiallySelected);
-  }, [initialAmenities]);
+    if (Amenitie) {
+      setUserAmenities(Amenitie);
+      
+      // Update amenities with selected state from API
+      setAmenities(prevAmenities => {
+        const updatedAmenities = prevAmenities.map(amenity => {
+          const isSelected = Amenitie.some(ua => ua.amenitie === amenity.id);
+          return {
+            ...amenity,
+            selected: isSelected
+          };
+        });
+       
+        return updatedAmenities;
+      });
+    }
+  }, [Amenitie]);
 
-  const handleAmenityToggle = (amenityId: number): void => {
-    setAmenities(prev => prev.map(amenity => 
-      amenity.id === amenityId 
-        ? { ...amenity, selected: !amenity.selected }
-        : amenity
-    ));
+  // Handle loading and error states from the hook
+  useEffect(() => {
+    if (amenitiesError) {
+      setError(t.errorLoading);
+    }
+  }, [amenitiesError, t.errorLoading]);
 
-    const amenity = amenities.find(a => a.id === amenityId);
-    if (amenity) {
-      if (amenity.selected) {
-        // Remove from selected
-        setSelectedAmenities(prev => prev.filter(a => a.id !== amenityId));
-      } else {
-        // Add to selected
-        setSelectedAmenities(prev => [...prev, { ...amenity, selected: true }]);
+  // Update selected count when amenities change
+  useEffect(() => {
+    setSelectedCount(amenities.filter(a => a.selected).length);
+  }, [amenities]);
+
+  const handledelet = async (amenityId: number) => {
+    setIsDeletingId(amenityId);
+    setError(null);
+
+    try {
+      const deleteResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}tamenitiesid/${amenityId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+        },
+      });
+
+      if (!deleteResponse.ok) {
+        throw new Error('Failed to delete amenity');
       }
+
+      // Update local state immediately for better UX
+      setUserAmenities(prev => prev.filter(amenity => amenity.id !== amenityId));
+      
+      // Update amenities selected state
+      setAmenities(prev => prev.map(amenity => {
+        const userAmenity = userAmenities.find(ua => ua.id === amenityId);
+        if (userAmenity && userAmenity.amenitie === amenity.id) {
+          return { ...amenity, selected: false };
+        }
+        return amenity;
+      }));
+
+      // Refresh data if mutate function is provided
+      if (mutate) {
+        mutate();
+      }
+    } catch (err) {
+      setError('Error deleting amenity');
+      console.error('Error deleting amenity:', err);
+    } finally {
+      setIsDeletingId(null);
     }
   };
 
-  const handleRemoveAmenity = (amenityId: number): void => {
-    setSelectedAmenities(prev => prev.filter(a => a.id !== amenityId));
-    setAmenities(prev => prev.map(amenity => 
-      amenity.id === amenityId 
-        ? { ...amenity, selected: false }
-        : amenity
+  // Handle amenity toggle with product ID
+  const handleAmenityToggle = async (amenityId: number) => {
+    const amenity = amenities.find(a => a.id === amenityId);
+    if (!amenity || amenity.selected) return;
+
+    // Optimistic UI update
+    setAmenities(prev => prev.map(a => 
+      a.id === amenityId ? { ...a, selected: true } : a
     ));
-  };
 
-  const handleDone = (): void => {
-    // Notify parent with final selection only when Done is clicked
-    if (onAmenitiesChange) {
-      onAmenitiesChange(selectedAmenities);
+    setIsLoadingg(true);
+    setError(null);
+
+    try {
+      const requestBody: any = { 
+        user, 
+        amenitie: amenityId, 
+        name: amenity.name, 
+        categoty: amenity.category 
+      };
+
+      // Add product to request body if provided
+      if (product) {
+        requestBody.product = product;
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}amenities/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add amenity');
+      }
+
+      const newUserAmenity = await response.json();
+      setUserAmenities(prev => [...prev, newUserAmenity]);
+
+      // Refresh data if mutate function is provided
+      if (mutate) {
+        mutate();
+      }
+    } catch (err) {
+      setError('Error adding amenity');
+      console.error('Error adding amenity:', err);
+      // Revert the change if API call fails
+      setAmenities(prev => prev.map(a => 
+        a.id === amenityId ? { ...a, selected: false } : a
+      ));
+    } finally {
+      setIsLoadingg(false);
     }
-    setIsPopupOpen(false);
   };
 
   // Get display name based on language
-  const getDisplayName = (amenity: Amenity): string => {
-    if (language === 'ar' && amenity.name_ar) {
-      return amenity.name_ar;
-    }
+  const getDisplayName = (amenity: Amenity) => {
+    // You can add logic here to handle different languages
+    // For now, we'll use the name as is
     return amenity.name;
   };
 
-  // Group amenities by category for better organization in popup
-  const groupedAmenities = amenities.reduce((acc, amenity) => {
-    if (!acc[amenity.category]) {
-      acc[amenity.category] = [];
-    }
-    acc[amenity.category].push(amenity);
-    return acc;
-  }, {} as Record<string, Amenity[]>);
+  // Initial loading state
+  if (isLoading && userAmenities.length === 0) {
+    return (
+      <div className={`${language === 'ar' ? 'rtl' : 'ltr'}`}>
+        <div className='flex justify-between items-center gap-4 flex-wrap mb-8'>
+          <div>
+            <p className="text-gray-600 text-sm">{t.pickInterests}</p>
+          </div>
+          <button
+            disabled
+            className="flex items-center gap-2 px-3 py-1 h-8 w-48 text-sm border-secondary rounded-3xl border border-1 opacity-50 cursor-not-allowed"
+          >
+            <FaHandsAslInterpreting size={24} className='text-gray-400'/>
+            {t.addAmenities}
+            <IoAddOutline size={24} className='text-gray-400'/>
+          </button>
+        </div>
+        
+        {/* Skeleton loading for amenities */}
+        <div className='flex gap-2 flex-wrap'>
+          {Array.from({ length: 6 }, (_, index) => (
+            <AmenitySkeleton key={index} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex flex-col justify-between ${language === 'ar' ? 'rtl' : 'ltr'}`}>
@@ -295,14 +441,21 @@ const AmenitiesSelector: React.FC<AmenitiesSelectorProps> = ({
         <div className='flex justify-between items-center gap-4 flex-wrap mb-4'>
           <div>
             <p className="text-sec text-2xl font-bold">{t.pickInterests}</p>
+
+            {error && (
+              <div className="text-red-700 px-4 py-3 rounded mb-4">
+                {error}
+              </div>
+            )}
           </div>
 
+          {/* Button to open popup */}
           <button
-            type="button"
+            type="button" 
             onClick={() => setIsPopupOpen(true)}
             className="flex items-center gap-3 px-3 py-2 text-xl font-bold border-sec rounded-full hover:bg-gray-50 border border-1 transition-colors text-sec"
           >
-             <IoAddOutline size={24} className='text-sec'/>
+            <IoAddOutline size={24} className='text-sec'/>
             {t.addAmenities}
           </button>
         </div>
@@ -311,10 +464,10 @@ const AmenitiesSelector: React.FC<AmenitiesSelectorProps> = ({
         {isPopupOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="rounded-2xl bg-prim p-6 max-w-5xl mx-auto max-h-[80vh] overflow-y-auto">
+              {/* Popup Header */}
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold text-sec">{t.selectAmenities}</h2>
+                <h2 className="text-3xl font-bold font-playfair text-sec">{t.selectAmenities}</h2>
                 <button
-                  type="button"
                   onClick={() => setIsPopupOpen(false)}
                   className="text-sec hover:text-white transition-colors"
                 >
@@ -322,50 +475,42 @@ const AmenitiesSelector: React.FC<AmenitiesSelectorProps> = ({
                 </button>
               </div>
 
-              <div className="space-y-6">
-                {Object.entries(groupedAmenities).map(([category, categoryAmenities]) => (
-                  <div key={category}>
-                    <h3 className="text-2xl font-bold mb-3 text-white border-b pb-2">
-                      {category}
-                    </h3>
-                    <div className='flex gap-2 flex-wrap'>
-                      {categoryAmenities.map((amenity) => (
-                        <button
-                          type="button"
-                          key={amenity.id}
-                          onClick={() => handleAmenityToggle(amenity.id)}
-                          className={`flex gap-4 py-1 px-3 justify-between items-center rounded-full border border-1 transition-colors ${
-                            amenity.selected 
-                              ? 'border-black bg-gray-100 text-black' 
-                              : 'border-gray-200 hover:border-gray-400 text-white'
-                          }`}
-                        >
-                          <div className='flex gap-3 items-center'>
-                            {amenityIcons[getDisplayName(amenity)] || amenityIcons[amenity.name] || <FaCampground className="text-xl w-8 h-8 text-sec" />}
-                            <span className="font-medium">{getDisplayName(amenity)}</span>
-                          </div>
-                          
-                          {amenity.selected ? (
-                            <span className="text-lg bg-sec text-white px-2 py-1 rounded-full">
-                              {t.added}
-                            </span>
-                          ) : (
-                            <IoAddOutline size={28} className='text-sec'/>
-                          )}
-                        </button>
-                      ))}
+              {/* All amenities in a simple grid - POPUP VERSION */}
+              <div className='flex gap-2 flex-wrap'>
+                {amenities.map((amenity) => (
+                  <button
+                    key={amenity.id}
+                    onClick={() => handleAmenityToggle(amenity.id)}
+                    className={`flex gap-4 py-1 px-3 justify-between items-center rounded-full border border-1 transition-colors ${
+                      amenity.selected 
+                        ? 'border-black bg-gray-100 text-black cursor-not-allowed opacity-50' 
+                        : 'border-gray-200 hover:border-gray-400 text-white'
+                    }`}
+                    disabled={isLoadingg || amenity.selected}
+                  >
+                    <div className='flex gap-3 items-center'>
+                      {amenityIcons[getDisplayName(amenity)] || <FaCampground className="text-xl h-8 w-8 text-sec" />}
+                      <span className="font-medium">{getDisplayName(amenity)}</span>
                     </div>
-                  </div>
+                    
+                    {amenity.selected ? (
+                      <span className="text-lg bg-sec text-prim px-2 py-1 rounded-full">
+                        {t.added}
+                      </span>
+                    ) : (
+                      <IoAddOutline size={28} className='text-sec'/>
+                    )}
+                  </button>
                 ))}
               </div>
 
+              {/* Popup Footer */}
               <div className="flex justify-between items-center mt-6 pt-4 border-t">
                 <span className="text-sec text-xl font-bold">
-                  {selectedAmenities.length}/20 {t.selected}
+                  {selectedCount}/20 {t.selected}
                 </span>
                 <button
-                  type="button"
-                  onClick={handleDone}
+                  onClick={() => setIsPopupOpen(false)}
                   className="bg-sec text-white px-6 py-3 rounded-lg hover:bg-black transition-colors"
                 >
                   {t.done}
@@ -375,31 +520,37 @@ const AmenitiesSelector: React.FC<AmenitiesSelectorProps> = ({
           </div>
         )}
 
-        {/* Selected Amenities Display */}
-        {selectedAmenities.length === 0 ? (
+        {/* Display user amenities */}
+        {userAmenities.length === 0 ? (
           <div className="flex items-center justify-center h-48 border-2 border-dashed border-gray-300 rounded-xl">
-            <p className="text-2xl md:text-4xl text-gray-300 uppercase font-extrabold">
+            <p className="text-2xl md:text-4xl text-gray-300 uppercase font-playfair font-extrabold">
               {t.addAmenitiesPlaceholder}
             </p> 
           </div>
         ) : (
           <div className='flex gap-2 flex-wrap mt-4 p-4 bg-gray-50 rounded-xl'>
-            {selectedAmenities.map((amenity) => (
+            {userAmenities.map((amenity) => (
               <div
                 key={amenity.id}
-                className="flex justify-between items-center gap-4 py-1 px-3 rounded-full border border-1 border-gray-300 bg-white shadow-sm"
+                className="flex justify-between items-center gap-4 py-1 px-3 rounded-full border border-1 border-secondary bg-white shadow-sm"
               >
                 <div className="flex items-center gap-3">
-                  {amenityIcons[getDisplayName(amenity)] || amenityIcons[amenity.name] || <FaCampground className="text-xl h-8 w-8 text-sec"  />}
-                  <span className="font-medium text-gray-600">{getDisplayName(amenity)}</span> 
+                  {amenityIcons[amenity.name] || <FaCampground className="text-xl h-8 w-8 text-sec" />}
+                  <span className="font-medium text-gray-600">{amenity.name}</span> 
                 </div>
                 
-                <IoCloseCircleOutline 
-                  size={32} 
-                  className='hover:text-sec text-gray-400 cursor-pointer transition-colors' 
-                  onClick={() => handleRemoveAmenity(amenity.id)}
-                  title={t.remove}
-                />
+                {isDeletingId === amenity.id ? (
+                  <div className="w-8 h-8 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-sec"></div>
+                  </div>
+                ) : (
+                  <IoCloseCircleOutline 
+                    size={32} 
+                    className='hover:text-sec text-gray-400 cursor-pointer transition-colors' 
+                    onClick={() => handledelet(amenity.id)}
+                    title={t.remove}
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -409,4 +560,4 @@ const AmenitiesSelector: React.FC<AmenitiesSelectorProps> = ({
   );
 };
 
-export default AmenitiesSelector;
+export default AmenitiesSelectorUpdate;

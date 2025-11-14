@@ -13,10 +13,14 @@ import useFetchAllBookings from "@/components/requests/fetchAllBookings";
 import { useSession } from "next-auth/react";
 import moment from "moment";
 import ReservationsTable from "./reservationsTableAdmin";
-
+import { FaBuilding } from "react-icons/fa";
 import { FaGlobeEurope } from "react-icons/fa";
 import { MdPendingActions } from "react-icons/md";
 import { RiPassValidLine } from "react-icons/ri";
+import { RiArticleFill } from "react-icons/ri";
+import { LiaFirstOrder } from "react-icons/lia";
+import { FaUsers } from "react-icons/fa";
+
 
 // Skeleton Components
 const MetricCardSkeleton = () => (
@@ -81,7 +85,7 @@ export default function AnalyticsAdmin() {
                   <p className="text-2xl text-white">عدد العقارات المتوفرة</p>
                   <p className="text-2xl font-medium text-white">{0}</p>
                 </div>
-                <LuCalendarDays size={32} className="text-sec"/>
+                <FaBuilding size={32} className="text-sec"/>
               </div>
             </article>
             <article className="rounded-xl border border-gray-100 bg-prim p-6 w-full shadow-sm">
@@ -90,7 +94,7 @@ export default function AnalyticsAdmin() {
                   <p className="text-2xl text-white">عدد المقالات</p>
                   <p className="text-2xl font-medium text-white">{0}</p>
                 </div>
-                <MdPendingActions size={32} className="text-sec"/>
+                <RiArticleFill size={32} className="text-sec"/>
               </div>
             </article>
             <article className="rounded-xl border border-gray-100 bg-prim p-6 w-full shadow-sm">
@@ -99,7 +103,7 @@ export default function AnalyticsAdmin() {
                   <p className="text-2xl text-white">عدد الطلبات</p>
                   <p className="text-2xl font-medium text-white">{0}</p>
                 </div>
-                <RiPassValidLine size={32} className="text-sec"/>
+                <LiaFirstOrder size={32} className="text-sec"/>
               </div>
             </article>
             <article className="rounded-xl border border-gray-100 bg-prim p-6 w-full shadow-sm">
@@ -108,7 +112,7 @@ export default function AnalyticsAdmin() {
                   <p className="text-2xl text-white">عدد المستخدمين</p>
                   <p className="text-2xl font-medium text-white">{0}</p>
                 </div>
-                <TbCalendarCancel size={32} className="text-sec"/>
+                <FaUsers size={32} className="text-sec"/>
               </div>
             </article>
           </>

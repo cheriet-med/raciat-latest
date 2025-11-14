@@ -7,7 +7,6 @@ import { CiCircleChevRight } from "react-icons/ci";
 import StarRating from "../starsComponent";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { CiForkAndKnife } from "react-icons/ci";
-import { useWishlist } from "../cart";
 import { useSession} from "next-auth/react";
 import LoginButton from "../header/loginButton";
 import { Hotels } from "./hotels";
@@ -87,10 +86,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     return intPart + roundedFirst / 10;
   }
 
-  const { wishlist, addItemToWishlist, removeItemFromWishlist, isItemInWishlist } = useWishlist();
   const { data: session, status } = useSession();
   // Check if current item is in wishlist
-  const isInWishlist = isItemInWishlist(id);
   const {Review} = useFetchReviews(id)
   const totalReviews = Review && Review.length > 0? Review.reduce((sum, r) => sum + +r.rating_global, 0) / Review.length: 0
 
@@ -133,28 +130,6 @@ const toggle = async () => {
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent the anchor tag from navigating
     e.stopPropagation(); // Stop event bubbling
-    
-    if (isInWishlist) {
-      removeItemFromWishlist(id);
-    } else {
-      // Create wishlist item with simplified structure
-      const wishlistItem = {
-        id: id,
-        image: imageUrl,
-        title: name || 'no title',
-        dateAdded: "",
-        category:"",
-        cuisine:"",
-        price_range:"",
-        rating:averageRating,
-        name:address,
-        price: price,
-        location:address,
-        lengtReviews:lengtReviews,
-        // Add other required fields if needed for your wishlist context
-      };
-      addItemToWishlist(wishlistItem);
-    }
   };
 
   return (

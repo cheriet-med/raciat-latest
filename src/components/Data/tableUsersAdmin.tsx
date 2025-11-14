@@ -249,12 +249,12 @@ const UserAccordionDisplay = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     {/* المعلومات الشخصية */}
-                    <div className="bg-white p-4 rounded-lg shadow-sm ">
+                    <div className="bg-prim p-4 rounded-lg shadow-sm ">
                       <h6 className="font-playfair font-medium text-sec mb-3 flex items-center">
                         <FaUserAstronaut className="h-8 w-8 ml-2 text-sec" />
                         المعلومات الشخصية
                       </h6>
-                      <div className="space-y-3 text-2xl text-gray-600">
+                      <div className="space-y-3 text-2xl text-white">
                         <div>الاسم الكامل: {user.full_name || 'غير متوفر'}</div>
                         <div>اسم المستخدم: {user.username || 'غير متوفر'}</div>
                         <div>تاريخ الميلاد: {user.born || 'غير متوفر'}</div>
@@ -264,25 +264,25 @@ const UserAccordionDisplay = () => {
                     </div>
 
                     {/* معلومات التواصل */}
-                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <div className="bg-prim p-4 rounded-lg shadow-sm">
                       <h6 className="font-playfair font-medium text-sec mb-3 flex items-center">
                         <MdContactEmergency className="h-8 w-8 ml-2 text-sec" />
                         معلومات التواصل
                       </h6>
-                      <div className="space-y-3 text-2xl text-gray-600">
+                      <div className="space-y-3 text-2xl text-white">
                         <div>البريد الإلكتروني: {user.email}</div>
                         <div>رقم الهاتف: {user.phoneNumber || 'غير متوفر'}</div>
                         <div>الموقع الإلكتروني: {user.website || 'غير متوفر'}</div>
                         <div className="flex items-center space-x-2 ">
                           تم التحقق:
                           <span className={`px-2 py-1 rounded text-2xl flex gap-2 items-center${
-                            user.is_email_verified ? ' text-green-800' : ' text-red-800'
+                            user.is_email_verified ? ' text-green-400' : ' text-red-400'
                           }`}>
                             البريد اﻹلكتروني {user.is_email_verified ? <MdVerified className='h-7 w-7'/> : <VscUnverified className='h-7 w-7'/>}
                           </span>
                           |
                           <span className={`px-2 py-1 rounded text-2xl flex gap-2 items-center${
-                            user.is_phone_number_verified ? ' text-green-800' : ' text-red-800'
+                            user.is_phone_number_verified ? ' text-green-400' : ' text-red-400'
                           }`}>
                             الهاتف {user.is_phone_number_verified ? <MdVerified className='h-7 w-7'/>: <VscUnverified className='h-7 w-7'/>}
                           </span>
@@ -291,12 +291,12 @@ const UserAccordionDisplay = () => {
                     </div>
 
                     {/* معلومات الموقع */}
-                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <div className="bg-prim p-4 rounded-lg shadow-sm">
                       <h6 className="font-playfair font-medium text-sec mb-3 flex items-center">
                         <FaMapLocationDot className="h-8 w-8 ml-2 text-sec" />
                         معلومات الموقع
                       </h6>
-                      <div className="space-y-3 text-2xl text-gray-600">
+                      <div className="space-y-3 text-2xl text-white">
                         <div>العنوان 1: {user.address_line_1 || 'غير متوفر'}</div>
                         <div>العنوان 2: {user.address_line_2 || 'غير متوفر'}</div>
                         <div>المدينة: {user.city || 'غير متوفر'}</div>
@@ -312,12 +312,12 @@ const UserAccordionDisplay = () => {
                     </div>
 
                     {/* معلومات الحساب */}
-                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <div className="bg-prim p-4 rounded-lg shadow-sm">
                       <h6 className="font-playfair font-medium text-sec mb-3 flex items-center">
                         <RiAccountPinBoxFill className="h-8 w-8 ml-2 text-sec" />
                         معلومات الحساب
                       </h6>
-                      <div className="space-y-3 text-2xl text-gray-600">
+                      <div className="space-y-3 text-2xl text-white">
                         <div>الحالة: {user.status || 'غير متوفر'}</div>
                         <div>الخطة: {user.premium_plan && "بريميوم" || 'مجاني'}</div>
                         <div>انضم: {formatDate(user.joined)}</div>
@@ -331,12 +331,12 @@ const UserAccordionDisplay = () => {
 
 
                     {/* معلومات إضافية */}
-                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <div className="bg-prim p-4 rounded-lg shadow-sm">
                       <h6 className="font-playfair font-medium text-sec mb-3 flex items-center">
                         <FaCircleInfo className="h-8 w-8 ml-2 text-sec" />
                         معلومات إضافية
                       </h6>
-                      <div className="space-y-3 text-2xl text-gray-600">
+                      <div className="space-y-3 text-2xl text-white">
                         <div>الموقع: {user.location || 'غير متوفر'}</div>
                         <div>يريد الذهاب: {user.want_to_go || 'غير متوفر'}</div>
                         <div>مهووس: {user.obsessed || 'غير متوفر'}</div>

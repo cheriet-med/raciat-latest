@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import React from 'react';
-import { useWishlist } from '@/components/cart';
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,24 +10,34 @@ import { RiArticleFill } from "react-icons/ri";
 import useFetchPostListing from "../requests/fetchPostsListings";
 import ManageListing from "@/components/Data/manageListing";
 import ManagePostListing from "./managePostListing";
+
 // Skeletons
 const PropertyCardSkeleton = () => (
-  <div className="block rounded-lg p-2 shadow-xs shadow-black border font-montserrat text-secondary bg-white lg:flex lg:gap-8 animate-pulse">
+  <div className="block rounded-xl p-3 shadow-xs shadow-black border bg-white animate-pulse">
+    {/* Image Skeleton */}
     <div className="relative">
-      <div className="h-80 lg:h-60 lg:w-96 rounded-md bg-gray-300"></div>
+      <div className="h-80 lg:h-96 rounded-md bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite]"></div>
     </div>
-    <div className="mt-2 flex flex-col gap-1 flex-1">
-      <div className="flex justify-end">
-        <div className="h-6 w-20 bg-gray-300 rounded"></div>
+    
+    {/* Content Skeleton */}
+    <div className="mt-2 flex flex-col gap-1">
+      {/* Category and Action Buttons */}
+      <div className="flex justify-between w-full items-center flex-wrap">
+        <div className="h-8 w-24 rounded-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite]"></div>
+        <div className="h-8 w-8 rounded-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite]"></div>
       </div>
-      <div>
-        <div className="h-6 w-3/4 bg-gray-300 rounded"></div>
+      
+      {/* Title Skeleton */}
+      <div className="mt-3">
+        <div className="h-7 w-4/5 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite] rounded mb-2"></div>
+        <div className="h-6 w-3/4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite] rounded"></div>
       </div>
-      <hr className='my-2 text-secondary'/>
-      <div className='text-sm text-gray-500 space-y-2'>
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-4 bg-gray-300 rounded w-[90%]"></div>
-        ))}
+
+      <hr className='my-2 border-gray-300'/>
+      
+      {/* ID Skeleton */}
+      <div className='space-y-2'>
+        <div className="h-4 w-1/3 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite] rounded"></div>
       </div>
     </div>
   </div>
@@ -36,8 +45,7 @@ const PropertyCardSkeleton = () => (
 
 const AddServiceSkeleton = () => (
   <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-    <div className='h-16 border rounded-xl bg-gray-300 animate-pulse'></div>
-    <div className='h-16 border rounded-xl bg-gray-300 animate-pulse'></div>
+    <div className='h-16 border rounded-xl bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite]'></div>
   </div>
 );
 
@@ -88,7 +96,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                   <dd className="font-medium text-2xl text-gray-200 font-playfair">{description}</dd>
         </div>
 
-        <hr className='my-2 text-secondary'/>
+        <hr className='my-2 border-sec text-sec'/>
         <div className='text-sm text-gray-200 space-y-2'>
           <p><span className='font-bold'>ID:</span> {id}</p>
          
@@ -116,7 +124,7 @@ export default function PostListings() {
     return (
       <div className="flex flex-col gap-4 mx-2 custom:mx-6 mt-6">
         <AddServiceSkeleton />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {Array.from({ length: itemsPerPage }).map((_, i) => (
             <PropertyCardSkeleton key={i} />
           ))}

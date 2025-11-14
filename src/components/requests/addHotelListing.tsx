@@ -11,8 +11,8 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import { MdOutlineBedroomChild } from "react-icons/md";
-import AmenitiesSelector from './amenities';
 
+import AmenitiesSelector from './amenities';
 // TypeScript interfaces
 interface Product {
   name: string;
@@ -21,30 +21,20 @@ interface Product {
   capacity: string;
   category: string;
   size: string;
-  cancellation_policy: string;
   established: string;
   image: File | null;
-  receipt: File | null;
   type: string;
   longitude: string;
+  rooms_number: string;
   location: any;
   latitude: any;
-  chef: string;
-  opening_hours_monday: string;
-  opening_hours_tuesday: string;
-  opening_hours_wednesday: string;
-  opening_hours_thursday: string;
-  opening_hours_friday: string;
-  opening_hours_saturday: string;
-  opening_hours_sunday: string;
-  organic_ingredients: boolean;
-  sustainable_seafood: boolean;
   user: any;
   currency: string;
   video_link: string;
   badrooms_number: string;
   garages: string;
   region: string;
+
 }
 
 interface NearbyAttraction {
@@ -53,8 +43,9 @@ interface NearbyAttraction {
 }
 
 interface Award {
-  name: string;
-  year: string;
+  rooms: string;
+  badrbadroomes: string;
+  image: File | null;
 }
 
 interface ApiError {
@@ -65,6 +56,23 @@ interface ImagePreview {
   file: File;
   url: string;
 }
+
+interface Amenity {
+  id: number;
+  name: string;
+  name_ar?: string;
+  category: string;
+  selected: boolean;
+}
+
+interface AwardImagePreview {
+  file: File;
+  url: string;
+  index: number;
+}
+
+type ValuePiece = Date | string | null;
+type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 export default function HotelForm() {
   const router = useRouter();
@@ -77,36 +85,27 @@ export default function HotelForm() {
     capacity: '',
     size: '',
     type: '',
-    cancellation_policy: '',
+    rooms_number: '',
     established: '',
     image: null,
-    receipt: null,
     latitude: '',
     longitude: '',
     location: '',
-    chef: '',
-    opening_hours_monday: '',
-    opening_hours_tuesday: '',
-    opening_hours_wednesday: '',
-    opening_hours_thursday: '',
-    opening_hours_friday: '',
-    opening_hours_saturday: '',
-    opening_hours_sunday: '',
-    organic_ingredients: false,
-    sustainable_seafood: false,
     user: session?.user?.id,
     currency: '',
     video_link: '',
     badrooms_number: '',
     garages: '',
     region: '',
+
   });
   
   const [images, setImages] = useState<ImagePreview[]>([]);
   const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
   const [recieptPreview, setRecieptPreview] = useState<string | null>(null);
   const [nearbyAttractions, setNearbyAttractions] = useState<NearbyAttraction[]>([{ name: '', distance: '' }]);
-  const [awards, setAwards] = useState<Award[]>([{ name: '', year: '' }]);
+  const [awards, setAwards] = useState<Award[]>([{ rooms: '', badrbadroomes: '', image: null }]);
+  const [awardImagePreviews, setAwardImagePreviews] = useState<AwardImagePreview[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -121,7 +120,17 @@ export default function HotelForm() {
   const [errorlongtitude, setErrorlongtitude] = useState('');
   const [errorreciept, setErrorreciept] = useState('');
 
-  const handleProductChange = (e: ChangeEvent<HTMLInputElement>) => {
+const [selectedAmenities, setSelectedAmenities] = useState<Amenity[]>([]);
+
+// Handle amenities change
+ const handleAmenitiesChange = (amenities: Amenity[]) => {
+    setSelectedAmenities(amenities);
+    // This will only be called when user clicks "Done" in the amenities popup
+    console.log('Final amenities selection:', amenities);
+  };
+
+
+  const handleProductChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setProduct(prev => ({ ...prev, [name]: value }));
   };
@@ -139,7 +148,7 @@ export default function HotelForm() {
     setProduct(prev => ({ ...prev, cancellation_policy: content }));
   };
 
-  const handleTimeRangeChange = (dayKey: string, value: string | null) => {
+  const handleTimeRangeChange = (dayKey: string, value: Value) => {
     setProduct(prev => ({ 
       ...prev, 
       [dayKey]: value || '' 
@@ -214,6 +223,40 @@ export default function HotelForm() {
     setAwards(updated);
   };
 
+  const handleAwardImageChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const updated = [...awards];
+      updated[index] = { ...updated[index], image: file };
+      setAwards(updated);
+
+      // Create preview
+      const url = URL.createObjectURL(file);
+      setAwardImagePreviews(prev => {
+        const filtered = prev.filter(preview => preview.index !== index);
+        return [...filtered, { file, url, index }];
+      });
+    }
+  };
+
+  const removeAwardImage = (index: number) => {
+    const updated = [...awards];
+    updated[index] = { ...updated[index], image: null };
+    setAwards(updated);
+
+    // Remove preview
+    setAwardImagePreviews(prev => {
+      const filtered = prev.filter(preview => {
+        if (preview.index === index) {
+          URL.revokeObjectURL(preview.url);
+          return false;
+        }
+        return true;
+      });
+      return filtered;
+    });
+  };
+
   const addNearbyAttraction = () => {
     setNearbyAttractions([...nearbyAttractions, { name: '', distance: '' }]);
   };
@@ -226,213 +269,272 @@ export default function HotelForm() {
   };
 
   const addAward = () => {
-    setAwards([...awards, { name: '', year: '' }]);
+    setAwards([...awards, { rooms: '', badrbadroomes: '', image: null }]);
   };
 
   const removeAward = (index: number) => {
     if (awards.length > 1) {
+      // Remove the award image preview first
+      const awardPreview = awardImagePreviews.find(preview => preview.index === index);
+      if (awardPreview) {
+        URL.revokeObjectURL(awardPreview.url);
+        setAwardImagePreviews(prev => prev.filter(preview => preview.index !== index));
+      }
+
+      // Remove the award from the array
       const updated = awards.filter((_, i) => i !== index);
+      
+      // Update indices for remaining award image previews
+      setAwardImagePreviews(prev => 
+        prev.map(preview => {
+          if (preview.index > index) {
+            return { ...preview, index: preview.index - 1 };
+          }
+          return preview;
+        }).filter(preview => preview.index !== index)
+      );
+      
       setAwards(updated);
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setErrorname('');
-    setErrordescription('');
-    setErrorimage('');
-    setErrorprice('');
-    setErrortype('');
-    setErrorcancelation('');
-    setErrorMessage('');
-    setErrorlocation('');
-    setErrorlatitude('');
-    setErrorlongtitude('');
-    setErrorreciept('');
 
-    if (!product.name.trim()) {
-      setErrorname('Enter Listing Name Please');
-      return;
+
+const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault();
+  
+  // Prevent multiple submissions
+  if (isSubmitting) {
+    return;
+  }
+
+  // Reset all error messages
+  setErrorname('');
+  setErrordescription('');
+  setErrorimage('');
+  setErrorprice('');
+  setErrortype('');
+  setErrorcancelation('');
+  setErrorMessage('');
+  setErrorlocation('');
+  setErrorlatitude('');
+  setErrorlongtitude('');
+  setErrorreciept('');
+
+  // Validate required fields
+  if (!product.name.trim()) {
+    setErrorname('يرجى إدخال اسم الإعلان');
+    return;
+  }
+
+  if (!product.description.trim()) {
+    setErrordescription('يرجى إدخال وصف الإعلان');
+    return;
+  }
+
+  if (!product.image) {
+    setErrorimage('يرجى إضافة صورة للإعلان');
+    return;
+  }
+
+  if (!product.price.trim()) {
+    setErrorprice('يرجى إدخال سعر الإعلان');
+    return;
+  }
+
+  if (!product.type.trim()) {
+    setErrortype('يرجى إدخال نوع الإعلان');
+    return;
+  }
+
+  if (!product.location.trim()) {
+    setErrorlocation('يرجى إدخال موقع الإعلان');
+    return;
+  }
+
+  if (!product.latitude.trim()) {
+    setErrorlatitude('يرجى إدخال خط العرض');
+    return;
+  }
+
+  if (!product.longitude.trim()) {
+    setErrorlongtitude('يرجى إدخال خط الطول');
+    return;
+  }
+
+  setIsSubmitting(true);
+  setSuccessMessage('');
+  setErrorMessage('');
+
+  try {
+    // Create product with FormData
+    const productFormData = new FormData();
+    productFormData.append('user', product.user);
+    productFormData.append('name', product.name);
+    productFormData.append('description', product.description);
+    productFormData.append('types', product.type);
+    productFormData.append('price', product.price);
+    productFormData.append('capacity', product.capacity);
+    productFormData.append('size', product.size);
+    productFormData.append('established', product.established);
+    productFormData.append('category', product.category);
+    productFormData.append('latitude', product.latitude);
+    productFormData.append('longtitude', product.longitude);
+    productFormData.append('location', product.location);
+    productFormData.append('rooms_number', product.rooms_number);
+    productFormData.append('currency', product.currency);
+    productFormData.append('video_link', product.video_link);
+    productFormData.append('badrooms_number', product.badrooms_number);
+    productFormData.append('garages', product.garages);
+    productFormData.append('region', product.region);
+
+    if (product.image) {
+      productFormData.append('image', product.image);
     }
 
-    if (!product.description.trim()) {
-      setErrordescription('Enter Listing description Please');
-      return;
+    console.log('Submitting product...');
+
+    const productResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}product/`, {
+      method: 'POST',
+      headers: {
+        "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+      },
+      body: productFormData,
+    });
+
+    if (!productResponse.ok) {
+      const errorData: ApiError = await productResponse.json();
+      throw new Error(errorData.message || 'Failed to create product');
     }
 
-    if (!product.image) {
-      setErrorimage('Enter Listing image Please');
-      return;
-    }
-    if (!product.receipt) {
-      setErrorreciept('Enter Listing reciept Please');
-      return;
-    }
-    if (!product.price.trim()) {
-      setErrorprice('Enter Listing price Please');
-      return;
-    }
+    const productData = await productResponse.json();
+    const productId = productData.id;
 
-    if (!product.type.trim()) {
-      setErrortype('Enter Listing type Please');
-      return;
-    }
-    if (!product.location.trim()) {
-      setErrorlocation('Enter Listing Location Please');
-      return;
-    }  
-    if (!product.latitude.trim()) {
-      setErrorlatitude('Enter Listing latitude Please');
-      return;
-    }  
-    if (!product.longitude.trim()) {
-      setErrorlongtitude('Enter Listing longitude Please');
-      return;
-    }  
-    if (!product.cancellation_policy.trim()) {
-      setErrorcancelation('Enter Listing Cancellation policy Please');
-      return;
-    }
+    console.log('Product created with ID:', productId);
 
-    setIsSubmitting(true);
-    setSuccessMessage('');
+    // Submit additional images
+    if (images.length > 0) {
+      console.log('Submitting additional images...');
+      for (let i = 0; i < images.length; i++) {
+        const imageFormData = new FormData();
+        imageFormData.append('image', images[i].file);
+        imageFormData.append('product', productId);
 
-    try {
-      // Create product with FormData
-      const productFormData = new FormData();
-      productFormData.append('user', product.user);
-      productFormData.append('name', product.name);
-      productFormData.append('description', product.description);
-      productFormData.append('types', product.type);
-      productFormData.append('price', product.price);
-      productFormData.append('capacity', product.capacity);
-      productFormData.append('size', product.size);
-      productFormData.append('cancellation_policy', product.cancellation_policy);
-      productFormData.append('established', product.established);
-      productFormData.append('category', product.category);
-      productFormData.append('latitude', product.latitude);
-      productFormData.append('longtitude', product.longitude);
-      productFormData.append('location', product.location);
-      productFormData.append('rooms_number', product.chef);
-      productFormData.append('currency', product.currency);
-      productFormData.append('video_link', product.video_link);
-      productFormData.append('badrooms_number', product.badrooms_number);
-      productFormData.append('garages', product.garages);
-      productFormData.append('region', product.region);
+        const imageResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}productimage/`, {
+          method: 'POST',
+          headers: {
+            "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+          },
+          body: imageFormData,
+        });
 
-      if (product.image) {
-        productFormData.append('image', product.image);
+        if (!imageResponse.ok) {
+          throw new Error(`Failed to upload image ${i + 1}`);
+        }
       }
+    }
 
-      if (product.receipt) {
-        productFormData.append('receipt', product.receipt);
-      }
+    // Submit amenities
+    if (selectedAmenities.length > 0) {
+      console.log('Submitting amenities...');
+      await Promise.all(
+        selectedAmenities.map(async (amenity) => {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_URL}amenities/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+            },
+            body: JSON.stringify({ 
+              user: product.user, 
+              amenitie: amenity.id, 
+              name: amenity.name, 
+              categoty: amenity.category,
+              product: productId
+            }),
+          });
+          if (!response.ok) throw new Error('Failed to add amenity');
+        })
+      );
+    }
 
-      const productResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}product/`, {
-        method: 'POST',
-        headers: {
-          "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
-        },
-        body: productFormData,
-      });
+    // Submit nearby attractions and awards
+    console.log('Submitting nearby attractions and awards...');
+    await Promise.all([
+      ...nearbyAttractions.map(async (attraction) => {
+        if (attraction.name.trim() && attraction.distance.trim()) {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_URL}nearbyattractions/`, {
+            method: 'POST',
+            headers: {
+              "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              product: productId,
+              name: attraction.name,
+              distance: attraction.distance,
+            }),
+          });
+          if (!response.ok) throw new Error('Failed to add nearby attractions');
+        }
+      }),
+      ...awards.map(async (award, index) => {
+        if (award.rooms.trim() || award.badrbadroomes.trim() || award.image) {
+          const awardFormData = new FormData();
+          awardFormData.append('product', productId);
+          awardFormData.append('rooms', award.rooms);
+          awardFormData.append('badrbadroomes', award.badrbadroomes);
+          
+          if (award.image) {
+            awardFormData.append('image', award.image);
+          }
 
-      if (!productResponse.ok) {
-        const errorData: ApiError = await productResponse.json();
-        throw new Error(errorData.message || 'Failed to create product');
-      }
-
-      const productData = await productResponse.json();
-      const productId = productData.id;
-
-      // Submit additional images
-      if (images.length > 0) {
-        for (let i = 0; i < images.length; i++) {
-          const imageFormData = new FormData();
-          imageFormData.append('image', images[i].file);
-          imageFormData.append('product', productId);
-
-          const imageResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}productimage/`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_URL}awards/`, {
             method: 'POST',
             headers: {
               "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
             },
-            body: imageFormData,
+            body: awardFormData,
           });
-
-          if (!imageResponse.ok) {
-            throw new Error(`Failed to upload image ${i + 1}`);
-          }
+          if (!response.ok) throw new Error('Failed to add awards');
         }
-      }
-
-      // Submit nearby attractions and awards
-      await Promise.all([
-        ...nearbyAttractions.map(async (attraction) => {
-          if (attraction.name.trim() && attraction.distance.trim()) {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_URL}nearbyattractions/`, {
-              method: 'POST',
-              headers: {
-                "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                product: productId,
-                name: attraction.name,
-                distance: attraction.distance,
-              }),
-            });
-            if (!response.ok) throw new Error('Failed to add nearby attractions');
-          }
-        }),
-        ...awards.map(async (award) => {
-          if (award.name.trim()) {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_URL}awards/`, {
-              method: 'POST',
-              headers: {
-                "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                product: productId,
-                name: award.name,
-                year: award.year,
-              }),
-            });
-            if (!response.ok) throw new Error('Failed to add awards');
-          }
-        })
-      ]);
-      
-    } catch (error) {
-      console.error('Submission error:', error);
-      setErrorMessage(
-        error instanceof Error ? error.message : 'Error creating Listing. Please try again.'
-      );
-    } finally {
-      setIsSubmitting(false);
-      router.push('/account/listings');  
-    }
-  };
-
-
+      })
+    ]);
+    
+    console.log('All submissions completed successfully');
+    setSuccessMessage('تم إنشاء القائمة بنجاح!');
+    
+    // Only redirect on successful submission after a short delay
+    setTimeout(() => {
+      router.push('/account/listings');
+    }, 2000);
+    
+  } catch (error) {
+    console.error('Submission error:', error);
+    setErrorMessage(
+      error instanceof Error ? error.message : 'خطأ في إنشاء القائمة. يرجى المحاولة مرة أخرى.'
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="py-4">
       <div className="px-4">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Header */}
-<div className="bg-sec px-8 py-6 text-right">
-  <h1 className="text-3xl font-bold text-white font-playfair">إضافة عقار جديد</h1>
-  <p className="text-white mt-2">
-    يرجى ملء جميع الحقول المطلوبة والمميزة بعلامة النجمة. لتحسين منشورك، أكمل جميع الحقول. للحصول على أفضل النتائج، استخدم صورة عالية الجودة بحجم 160 × 30.
-  </p>
-</div>
-
+          <div className="bg-sec px-8 py-6 text-right">
+            <h1 className="text-3xl font-bold text-white font-playfair">إضافة عقار جديد</h1>
+            <p className="text-white mt-2">
+              يرجى ملء جميع الحقول المطلوبة والمميزة بعلامة النجمة. لتحسين منشورك، أكمل جميع الحقول. للحصول على أفضل النتائج، استخدم صورة عالية الجودة بحجم 160 × 30.
+            </p>
+          </div>
 
           <div className="p-1">
             {/* Status Messages */}
             {successMessage && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+              <div className="mb-6 p-4  border border-green-200 rounded-xl flex items-center gap-3">
                 <div className="w-6 h-6 bg-sec rounded-full flex items-center justify-center">
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -455,168 +557,173 @@ export default function HotelForm() {
               {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className='mt-1'>
-                  <div className="bg-gray-50 rounded-xl p-2">
+                  <div className="bg-gray-50 rounded-xl p-6">
                     <div>
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-semibold text-gray-500 mb-2">Listing Name *</label>
+                        <label className="block text-xl font-semibold text-gray-500 mb-2">إسم العقار *</label>
                         <input
                           type="text"
                           name="name"
                           value={product.name}
                           onChange={handleProductChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
-                          placeholder="Enter Listing name"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                          placeholder="أدخل إسم العقار"
                         />
-                        {errorname && <p className="text-sm mt-2 text-accent">{errorname}</p>}
+                        {errorname && <p className="text-xl mt-2 text-sec">{errorname}</p>}
                       </div>
 
                       <div className="mt-6">
-                        <label className="block text-sm font-semibold text-gray-500 mb-2">Description *</label>
+                        <label className="block text-xl font-semibold text-gray-500 mb-2">الوصف *</label>
                         <TiptapEditor
                           content={product.description}
                           onChange={handleDescriptionChange}
                         />
-                        {errordescription && <p className="text-sm mt-2 text-accent">{errordescription}</p>}
+                        {errordescription && <p className="text-xl mt-2 text-sec">{errordescription}</p>}
                       </div>
 
-                      <div className="flex gap-2 mt-6 flex-wrap">
-                        <div className='flex-1 min-w-[200px]'>
-                         <label className="block text-sm font-semibold text-gray-500 mb-2 text-right">السعر *</label>
 
+                      <div className="flex gap-4 mt-6 flex-wrap">
+                        <div className='flex-1 min-w-[200px]'>
+                          <label className="block text-xl font-semibold text-gray-500 mb-2">السعر *</label>
                           <div className="relative">
-                            
                             <input
                               type="number"
-                              name="السعر"
+                              name="price"
                               value={product.price}
                               onChange={handleProductChange}
-                              className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                              className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
                               placeholder="0.00"
                             />
                           </div>
-                          {errorprice && <p className="text-sm mt-2 text-accent">{errorprice}</p>}
+                          {errorprice && <p className="text-xl mt-2 text-sec">{errorprice}</p>}
                         </div>
 
                         <div className='flex-1 min-w-[200px]'>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Currency</label>
-                          <input
-                            type="text"
+                          <label className="block text-xl font-semibold text-gray-500 mb-2">العملة</label>
+                          <select
                             name="currency"
                             value={product.currency}
                             onChange={handleProductChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
-                            placeholder="e.g., USD, EUR, GBP"
-                          />
+                            className="w-full px-4 py-2.5 h-18 border border-gray-300 rounded-xl bg-white focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                          >
+                            <option value="" >إختر عملة</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="GBP">GBP</option>
+                            <option value="SAR">SAR</option>
+                            <option value="AED">AED</option>
+                          </select>
                         </div>
 
                         <div className='flex-1 min-w-[200px]'>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Type *</label>
-                          <input
-                            type="text"
+                          <label className="block text-xl font-semibold text-gray-500 mb-2">النوع *</label>
+                          <select
                             name="type"
                             value={product.type}
                             onChange={handleProductChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
-                            placeholder="e.g., Luxury, Budget, Boutique"
-                          />
-                          {errortype && <p className="text-sm mt-2 text-accent">{errortype}</p>}
+                            className="w-full px-4 py-2.5 h-18 border bg-white border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                          >
+                            <option value="">إختر النوع</option>
+                            <option value="Luxury">فلة</option>
+                            <option value="Budget">شقة</option>
+                            <option value="Boutique">بناء</option>
+                            <option value="Business">مكتب</option>
+                          </select>
+                          {errortype && <p className="text-xl mt-2 text-sec">{errortype}</p>}
                         </div>
-
                       </div>
 
-                      <div className="flex gap-2 mt-4 flex-wrap">
-                        <div className="flex gap-2 w-full">
+                      <div className="flex gap-4 mt-4 flex-wrap">
+                        <div className="flex gap-4 w-full">
                           <div className='w-full'>
-                            <label className="block text-sm font-semibold text-gray-500 mb-2">Capacity</label>
+                            <label className="block text-xl font-semibold text-gray-500 mb-2">مساحة البناء</label>
                             <div className="relative">
-                              <AiOutlineFieldNumber className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+                           
                               <input
-                                type="number"
+                                type="text"
                                 name="capacity"
                                 value={product.capacity}
                                 onChange={handleProductChange}
-                                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
-                                placeholder="Max guests"
+                                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                                placeholder="مثلا: 120 متر مربع"
                               />
                             </div>
                           </div>
 
                           <div className='w-full'>
-                            <label className="block text-sm font-semibold text-gray-500 mb-2">Size</label>
+                            <label className="block text-xl font-semibold text-gray-500 mb-2">المساخة اﻹجمالية</label>
                             <input
                               type="text"
                               name="size"
                               value={product.size}
                               onChange={handleProductChange}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
-                              placeholder="e.g., 2500 sq ft"
+                              className="w-full px-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                              placeholder="مثلا: 200 متر مربع"
                             />
                           </div>
                         </div>
 
-                       
-                          <div className="flex gap-2 w-full">
-                                            <div className='flex-1'>
-                                              <label className="block text-sm font-semibold text-gray-500 mb-2">Established Year</label>
-
-                           
+                        <div className="flex gap-4 w-full">
+                          <div className='flex-1'>
+                            <label className="block text-xl font-semibold text-gray-500 mb-2">سنة اﻹنشاء</label>
                             <input
                               type="number"
                               name="established"
-                              placeholder='e.g., 1993'
+                              placeholder='مثلا: 1993'
                               value={product.established}
                               onChange={handleProductChange}
-                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                              min="0"
+                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
                             />
                           </div>
 
-<div className='flex-1'>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">category *</label>
-                          <select
-                            name="category"
-                            value={product.category}
-                            onChange={(e) => setProduct(prev => ({ ...prev, category: e.target.value }))}
-                            className="w-full px-4 py-2.5 h-18 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all bg-white"
-                          >
-                            <option value="">إختر توع</option>
-                            <option value="شقق">شقق</option>
-                            <option value="بناء">بناء</option>
-                            <option value="فلل">فلل</option>
-                          </select>
-                          {errortype && <p className="text-sm mt-2 text-accent">{errortype}</p>}
-                        </div>
+                          <div className='flex-1'>
+                            <label className="block text-xl font-semibold text-gray-500 mb-2">الغرض *</label>
+                            <select
+                              name="category"
+                              value={product.category}
+                              onChange={handleProductChange}
+                              className="w-full px-4 py-2.5 h-18 border border-gray-300 rounded-xl  focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all bg-white"
+                            >
+                              <option value="">إختر الغرض</option>
+                              <option value="شقق">بيع</option>
+                              <option value="بناء">إيجار</option>
+                              <option value="فلل">تموويل</option>
+                            </select>
+                            {errortype && <p className="text-xl mt-2 text-sec">{errortype}</p>}
+                          </div>
                         </div>
                       </div>
 
                       {/* Location and Region Section */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Location *</label>
+                          <label className="block text-xl font-semibold text-gray-500 mb-2">العنوان *</label>
                           <div className="relative">
-                            <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                          
                             <input
                               type="text"
                               name="location"
                               value={product.location}
                               onChange={handleProductChange}
-                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
-                              placeholder="e.g., Downtown, Manhattan"
+                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                              placeholder="مثلا: ساحة الشهداء ، المدينة ... إلخ"
                             />
                           </div>
-                          {errorlocation && <p className="text-sm mt-2 text-accent">{errorlocation}</p>}
+                          {errorlocation && <p className="text-xl mt-2 text-sec">{errorlocation}</p>}
                         </div>
 
                         <div>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Region</label>
+                          <label className="block text-xl font-semibold text-gray-500 mb-2">المنطقة</label>
                           <div className="relative">
-                            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                           
                             <input
                               type="text"
                               name="region"
                               value={product.region}
                               onChange={handleProductChange}
-                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
-                              placeholder="e.g., New York State, California"
+                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                              placeholder="مثلا: جدة"
                             />
                           </div>
                         </div>
@@ -624,46 +731,46 @@ export default function HotelForm() {
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Number of Rooms</label>
+                          <label className="block text-xl font-semibold text-gray-500 mb-2">عدد الغرف</label>
                           <div className="relative">
-                            <MdOutlineBedroomChild className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                            
                             <input
                               type="number"
-                              name="chef"
-                              value={product.chef}
+                              name="rooms_number"
+                              value={product.rooms_number}
                               onChange={handleProductChange}
-                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
-                              placeholder="Total rooms"
+                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                              placeholder="عدد الغرف"
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Number of Bedrooms</label>
+                          <label className="block text-xl font-semibold text-gray-500 mb-2">عدد الحمامات</label>
                           <div className="relative">
-                            <MdOutlineBedroomChild className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                          
                             <input
                               type="number"
                               name="badrooms_number"
                               value={product.badrooms_number}
                               onChange={handleProductChange}
-                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
-                              placeholder="Number of bedrooms"
+                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                              placeholder="عدد الحمامات"
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Garages</label>
+                          <label className="block text-xl font-semibold text-gray-500 mb-2">عدد المرائب</label>
                           <div className="relative">
-                            <AiOutlineFieldNumber className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+                          
                             <input
                               type="number"
                               name="garages"
                               value={product.garages}
                               onChange={handleProductChange}
-                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
-                              placeholder="Parking spaces"
+                              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                              placeholder="عدد المرائب"
                             />
                           </div>
                         </div>
@@ -672,51 +779,46 @@ export default function HotelForm() {
                       {/* GPS Coordinates */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Latitude *</label>
+                          <label className="block text-xl font-semibold text-gray-500 mb-2">Latitude *</label>
                           <input
                             type="number"
                             step="any"
                             name="latitude"
                             value={product.latitude}
                             onChange={handleProductChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
-                            placeholder="e.g., 40.7128"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                            placeholder="مثلا: 40.7128"
                           />
-                          {errorlatitude && <p className="text-sm mt-2 text-accent">{errorlatitude}</p>}
+                          {errorlatitude && <p className="text-xl mt-2 text-sec">{errorlatitude}</p>}
                         </div>
 
                         <div>
-                          <label className="block text-sm font-semibold text-gray-500 mb-2">Longitude *</label>
+                          <label className="block text-xl font-semibold text-gray-500 mb-2">Longitude *</label>
                           <input
                             type="number"
                             step="any"
                             name="longitude"
                             value={product.longitude}
                             onChange={handleProductChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
-                            placeholder="e.g., -74.0060"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                            placeholder="مثلا: -74.0060"
                           />
-                          {errorlongtitude && <p className="text-sm mt-2 text-accent">{errorlongtitude}</p>}
+                          {errorlongtitude && <p className="text-xl mt-2 text-sec">{errorlongtitude}</p>}
                         </div>
                       </div>
 
                       {/* Video Link */}
                       <div className="mt-4">
-                        <label className="block text-sm font-semibold text-gray-500 mb-2">Video Link</label>
+                        <label className="block text-xl font-semibold text-gray-500 mb-2">رابط الفيديو</label>
                         <input
                           type="url"
                           name="video_link"
                           value={product.video_link}
                           onChange={handleProductChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
                           placeholder="e.g., https://youtube.com/watch?v=..."
                         />
                       </div>
-
-
-
-     
-
 
                     </div>
                   </div>
@@ -726,118 +828,127 @@ export default function HotelForm() {
                   {/* Images Section */}
                   <div>
                     {/* Main Image */}
-                    <div className="mb-2 bg-gray-50 rounded-xl p-2 mt-1">
-                      <label className="block text-sm font-semibold text-gray-500 mb-3">Main Image *</label>
-                      {!mainImagePreview ? (
-                        <label className="block w-full cursor-pointer">
-                          <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sec hover:bg-gray-50 transition-all h-72">
-                            <LuImagePlus className="w-12 h-12 text-gray-400 mx-auto mt-10" />
-                            <p className="text-lg font-medium text-gray-600 mb-1 font-playfair">Click to upload main image</p>
-                            <p className="text-sm text-gray-500">PNG, JPG, AVIF up to 10MB</p>
-                          </div>
-                          {errorimage && <p className="text-sm mt-2 text-accent">{errorimage}</p>}
-                          <input
-                            type="file"
-                            accept="image/avif,image/png,image/jpeg,image/webp"
-                            onChange={handleMainImageChange}
-                            className="hidden"
-                          />
-                        </label>
-                      ) : (
-                        <div className="relative inline-block">
-                          <div className="relative group">
-                            <Image
-                              src={mainImagePreview}
-                              alt="Main preview"
-                              width={150}
-                              height={150}
-                              className="object-cover h-full w-full rounded-xl shadow-lg border-2 border-gray-200"
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-xl transition-all duration-200 flex items-center justify-center">
-                              <button
-                                type="button"
-                                onClick={removeMainImage}
-                                className="w-10 h-10 bg-sec text-white rounded-full flex items-center justify-center hover:bg-secondary transition-colors shadow-lg opacity-0 group-hover:opacity-100 transform scale-90 group-hover:scale-100"
-                              >
-                                <X className="w-5 h-5" />
-                              </button>
-                            </div>
-                          </div>
-                          <div className="mt-3 text-center">
-                            <label className="inline-flex items-center gap-2 px-3 py-1 text-gray-800 rounded-3xl hover:bg-gray-100 border border-1 border-secondary transition-colors cursor-pointer font-medium">
-                              <Upload className="w-4 h-4" />
-                              Change Image
-                              <input
-                                type="file"
-                                accept="image/avif,image/png,image/jpeg,image/webp"
-                                onChange={handleMainImageChange}
-                                className="hidden"
-                              />
-                            </label>
-                          </div>
-                        </div>
-                      )}
-                    </div>
+<div className="mb-2 bg-gray-50 rounded-xl p-6 mt-1">
+  <label className="block text-xl font-semibold text-gray-500 mb-3">الصورة الرئيسية *</label>
+  {!mainImagePreview ? (
+    <label className="block w-full cursor-pointer">
+      <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sec hover:bg-gray-50 transition-all h-72">
+        <LuImagePlus className="w-12 h-12 text-gray-400 mx-auto mt-10" />
+        <p className="text-xl font-medium text-gray-600 mb-1 font-playfair">إضغط هنا لتحميل الصورة</p>
+        <p className="text-xl text-gray-500">PNG, JPG, AVIF الحجم اﻷقصى  10MB</p>
+      </div>
+      {errorimage && <p className="text-xl mt-2 text-sec">{errorimage}</p>}
+      <input
+        type="file"
+        accept="image/avif,image/png,image/jpeg,image/webp"
+        onChange={handleMainImageChange}
+        className="hidden"
+      />
+    </label>
+  ) : (
+    <div className="relative inline-block">
+      <div className="relative group">
+        <Image
+          src={mainImagePreview}
+          alt="Main preview"
+          width={150}
+          height={150}
+          className="object-cover h-full w-full rounded-xl shadow-lg border-2 border-gray-200"
+        />
+        <button
+          type="button"
+          onClick={removeMainImage}
+          className="absolute -top-2 -right-2 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100 border-2 border-white"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+      <div className="mt-3 text-center">
+        <label className="inline-flex items-center gap-4 px-3 py-3 text-sec rounded-3xl hover:bg-gray-100 border border-1 border-sec transition-colors cursor-pointer font-bold">
+          <Upload className="w-6 h-6" />
+          غير الصورة
+          <input
+            type="file"
+            accept="image/avif,image/png,image/jpeg,image/webp"
+            onChange={handleMainImageChange}
+            className="hidden"
+          />
+        </label>
+      </div>
+    </div>
+  )}
+</div>
 
-                   
-
-                    {/* Additional Images */}
-                    <div className="bg-gray-50 rounded-xl p-2">
-                      <label className="block text-sm font-semibold text-gray-500 mb-3">Additional Images</label>
-                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
-                        {images.map((img, index) => (
-                          <div key={index} className="relative group">
-                            <Image 
-                              src={img.url} 
-                              alt={`Preview ${index + 1}`}  
-                              width={150}
-                              height={150}
-                              className="w-full h-24 object-cover rounded-lg" 
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="absolute -top-2 -right-2 w-6 h-6 bg-sec text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-secondary"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
-                        <label className="cursor-pointer">
-                          <div className="w-full h-24 border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50 rounded-lg flex items-center justify-center hover:border-sec transition-colors">
-                            <Plus className="w-6 h-6 text-gray-400" />
-                          </div>
-                          <input
-                            type="file"
-                            multiple
-                            accept="image/avif,image/png,image/jpeg,image/webp"
-                            onChange={handleImageChange}
-                            className="hidden"
-                          />
-                        </label>
-                      </div>
-                      {images.length > 0 && (
-                        <p className="text-sm text-gray-500">{images.length} additional image(s) selected</p>
-                      )}
-                    </div>
+                   {/* Additional Images */}
+{/* Additional Images */}
+<div className="bg-gray-50 rounded-xl p-6">
+  <label className="block text-xl font-semibold text-gray-500 mb-3">صور إضافية</label>
+  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
+    {images.map((img, index) => (
+      <div key={index} className="relative group">
+        <Image 
+          src={img.url} 
+          alt={`Preview ${index + 1}`}  
+          width={150}
+          height={150}
+          className="w-full h-24 object-cover rounded-lg" 
+        />
+        <button
+          type="button"
+          onClick={() => removeImage(index)}
+          className="absolute -top-2 -right-2 w-8 h-8 bg-sec text-white rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 hover:bg-prim shadow-lg border border-white"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    ))}
+    <label className="cursor-pointer">
+      <div className="w-full h-24 border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50 rounded-lg flex items-center justify-center hover:border-sec transition-colors">
+        <Plus className="w-6 h-6 text-gray-400" />
+      </div>
+      <input
+        type="file"
+        multiple
+        accept="image/avif,image/png,image/jpeg,image/webp"
+        onChange={handleImageChange}
+        className="hidden"
+      />
+    </label>
+  </div>
+  {images.length > 0 && (
+    <p className="text-xl text-gray-500">{images.length} صورة إضافية مختارة</p>
+  )}
+</div>
                   </div>
 
                   <div className='my-2'></div>
 
+
+
+
+
+  {/*AmenitiesSelector */}
+   <AmenitiesSelector
+  initialAmenities={initialAmenities}
+  onAmenitiesChange={handleAmenitiesChange}
+  language="ar"
+/>
+
+
                   {/* Nearby Attractions */}
                   <div className="bg-gray-50 rounded-xl p-6">
                     <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-                      <h2 className="font-semibold text-gray-800 flex items-center gap-1 font-playfair">
-                        <MapPin className="w-5 h-5 text-gray-500" />
-                        Nearby Attractions
+                      <h2 className="font-semibold text-2xl text-sec flex items-center gap-1 font-playfair">
+                      
+                        المعالم القريبة
                       </h2>
                       <button
                         type="button"
                         onClick={addNearbyAttraction}
-                        className="flex items-center gap-2 px-3 py-1 text-gray-600 rounded-3xl hover:bg-gray-100 border border-1 border-secondary transition-colors font-medium"
+                        className="flex items-center gap-4 px-3 py-3 text-sec rounded-3xl hover:bg-gray-100 border border-1 font-bold border-sec transition-colors "
                       >
-                        <Plus className="w-4 h-4" />
-                        Add Attraction
+                        <Plus className="w-6 h-6" />
+                        أضف معلم
                       </button>
                     </div>
                     
@@ -846,26 +957,26 @@ export default function HotelForm() {
                         <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-sm font-medium text-gray-500 mb-2">Attraction Name</label>
+                              <label className="block text-xl font-medium text-gray-500 mb-2">إسم المعلم</label>
                               <input
                                 type="text"
                                 name="name"
                                 value={attraction.name}
                                 onChange={(e) => handleNearbyChange(index, e)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:sec focus:border-sec"
-                                placeholder="e.g., Central Park"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-1 focus:sec focus:border-sec"
+                                placeholder="مثال: سنترال بارك"
                               />
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-4">
                               <div className="flex-1">
-                                <label className="block text-sm font-medium text-gray-500 mb-2">Distance</label>
+                                <label className="block text-xl font-medium text-gray-500 mb-2">المسافة</label>
                                 <input
                                   type="text"
                                   name="distance"
                                   value={attraction.distance}
                                   onChange={(e) => handleNearbyChange(index, e)}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:sec focus:border-sec"
-                                  placeholder="e.g., 5 min walk"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-1 focus:sec focus:border-sec"
+                                  placeholder="مثال: 5 دقائق سيرًا على الأقداإو 5 كم"
                                 />
                               </div>
                               {nearbyAttractions.length > 1 && (
@@ -888,99 +999,150 @@ export default function HotelForm() {
 
                   <div className='my-2'></div>
 
-                  {/* Awards */}
+                  {/* Awards - FIXED SECTION */}
                   <div className="bg-gray-50 rounded-xl p-6">
                     <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-                      <h2 className="font-semibold text-gray-800 flex items-center gap-1 font-playfair">
-                        <Award className="w-5 h-5 text-gray-500" />
-                        Awards & Recognition
+                      <h2 className="font-semibold text-2xl text-sec flex items-center gap-1 font-playfair">
+                       
+                        عدد الغرف والحمامات وصورة المخطط في كل طابق
                       </h2>
                       <button
                         type="button"
                         onClick={addAward}
-                        className="flex items-center gap-2 px-3 py-1 text-gray-600 rounded-3xl hover:bg-gray-100 border border-1 border-secondary transition-colors font-medium"
+                        className="flex items-center gap-4 px-3 py-3 text-sec rounded-3xl hover:bg-gray-100 border border-1 font-bold border-sec transition-colors "
                       >
-                        <Plus className="w-4 h-4" />
-                        Add Award
+                        <Plus className="w-6 h-6" />
+                        أضف طابق
                       </button>
                     </div>
                     
                     <div className="space-y-4">
-                      {awards.map((award, index) => (
-                        <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-500 mb-2">Award Name</label>
-                              <input
-                                type="text"
-                                name="name"
-                                value={award.name}
-                                onChange={(e) => handleAwardChange(index, e)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-sec focus:border-sec"
-                                placeholder="e.g., Best Hotel 2024"
-                              />
-                            </div>
-                            <div className="flex gap-2">
-                              <div className="flex-1">
-                                <label className="block text-sm font-medium text-gray-500 mb-2">Year</label>
-                                <input
-                                  type="number"
-                                  name="year"
-                                  value={award.year}
-                                  onChange={(e) => handleAwardChange(index, e)}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-sec focus:border-sec"
-                                  placeholder="2024"
-                                />
+                      {awards.map((award, index) => {
+                        const awardPreview = awardImagePreviews.find(preview => preview.index === index);
+                        
+                        return (
+                          <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
+                            <div className="grid grid-cols-1 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-xl font-medium text-gray-500 mb-2">عدد الغرف</label>
+                                  <input
+                                    type="text"
+                                    name="rooms"
+                                    value={award.rooms}
+                                    onChange={(e) => handleAwardChange(index, e)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-1 focus:ring-sec focus:border-sec"
+                                    placeholder="مثلا: 6 غرف"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xl font-medium text-gray-500 mb-2">عدد</label>
+                                  <input
+                                    type="text"
+                                    name="badrbadroomes"
+                                    value={award.badrbadroomes}
+                                    onChange={(e) => handleAwardChange(index, e)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-1 focus:ring-sec focus:border-sec"
+                                    placeholder="مثلا: 4 حمامات"
+                                  />
+                                </div>
                               </div>
-                              {awards.length > 1 && (
-                                <div className="flex items-end">
+                              
+                              {/* Award Image Upload */}
+                              <div>
+                                <label className="block text-xl font-medium text-gray-500 mb-2">صورة المخطط</label>
+                                {!awardPreview ? (
+                                  <label className="block cursor-pointer">
+                                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-sec hover:bg-gray-50 transition-all">
+                                      <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+                                      <p className="text-xl text-gray-600">إضغط هنا لتحميل صورة المخطط</p>
+                                      <p className="text-xl text-gray-500">PNG, JPG, AVIF الحد اﻷقصى 10MB</p>
+                                    </div>
+                                    <input
+                                      type="file"
+                                      accept="image/avif,image/png,image/jpeg,image/webp"
+                                      onChange={(e) => handleAwardImageChange(index, e)}
+                                      className="hidden"
+                                    />
+                                  </label>
+                                ) : (
+<div className="relative mt-2 flex justify-center">
+  <div className="relative">
+    <Image
+      src={awardPreview.url}
+      alt="Award preview"
+      width={150}
+      height={100}
+      className="object-cover h-full w-full rounded-lg border border-gray-200"
+    />
+    {/* Always visible remove button */}
+    <button
+      type="button"
+      onClick={() => removeAwardImage(index)}
+      className="absolute -top-2 -right-2 w-8 h-8 bg-sec text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg border-2 border-white"
+      title="Remove image"
+    >
+      <X className="w-4 h-4" />
+    </button>
+  </div>
+</div>
+                                )}
+                              </div>
+
+                              <div className="flex justify-between items-center">
+                                <div></div>
+                                {awards.length > 1 && (
                                   <button
                                     type="button"
                                     onClick={() => removeAward(index)}
-                                    className="p-2 text-sec hover:bg-gray-50 rounded-lg transition-colors"
+                                    className="flex items-center gap-4 px-3 py-1 text-sec hover:bg-red-50 rounded-lg transition-colors"
                                   >
-                                    <Trash2 className="w-5 h-5" />
+                                    <Trash2 className="w-6 h-6" />
+                                    إزالة الطابق
                                   </button>
-                                </div>
-                              )}
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
               </div>
  
               {/* Submit Button */}
-              <div className="flex justify-center pt-6">
+              <div className='flex gap-4'>
+                  <div className="flex justify-center  w-full">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`px-4 py-2 bg-sec w-full text-white font-semibold rounded-xl ${
+                  className={`px-4 py-3 bg-sec hover:bg-prim w-full text-white font-semibold rounded-xl ${
                     isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-secondary'
                   }`}
                 >
                   {isSubmitting ? (
-                    <span className="flex items-center gap-2 justify-center">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Creating Listing...
+                    <span className="flex items-center gap-4 justify-center">
+                      <div className=" border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      إنشاء القائمة...
                     </span>
                   ) : (
-                    'Create Listing'
+                    'إنشاء القائمة'
                   )}
                 </button>
               </div>  
 
-              <div className="flex justify-center pt-6 mb-6">
+              <div className="flex justify-center ">
                 <button
                   type="button"
-                  className="px-4 py-2 bg-white w-full text-gray-600 border border-1 font-semibold rounded-xl hover:bg-sec hover:text-white" 
-                  onClick={() => router.push('/en/account/listings')} 
+                  className="px-4 py-3 bg-prim w-32 h-16 text-white border border-1 font-semibold rounded-xl hover:bg-sec" 
+                  onClick={() => router.push('/account/listings')} 
                 >
-                  Cancel
+                  إلغاء
                 </button>
               </div>  
+              </div>
+            
             </form>
           </div>
         </div>
@@ -988,3 +1150,92 @@ export default function HotelForm() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+const initialAmenities = [
+    // الإنترنت والاتصال
+    { id: 1, name: 'إنترنت مجاني', category: 'الإنترنت والاتصال', selected: false },
+    
+    // مواقف السيارات والنقل
+    { id: 2, name: 'خدمة ركن السيارات', category: 'مواقف السيارات والنقل', selected: false },
+    { id: 6, name: 'خدمة سيارات الأجرة', category: 'مواقف السيارات والنقل', selected: false },
+    { id: 24, name: 'مصعد', category: 'مواقف السيارات والنقل', selected: false },
+    
+    // اللياقة والترفيه
+    { id: 3, name: 'صالة ألعاب رياضية', category: 'اللياقة والترفيه', selected: false },
+    { id: 48, name: 'يوغا', category: 'اللياقة والترفيه', selected: false },
+    { id: 21, name: 'سبا', category: 'اللياقة والترفيه', selected: false },
+    
+    // الطعام والشراب
+    { id: 4, name: 'بار / صالة', category: 'الطعام والشراب', selected: false },
+    { id: 8, name: 'آلة صنع القهوة / الشاي', category: 'الطعام والشراب', selected: false },
+    { id: 16, name: 'جلسات خارجية', category: 'الطعام والشراب', selected: false },
+    { id: 17, name: 'طعام خاص', category: 'الطعام والشراب', selected: false },
+    { id: 20, name: 'توصيل الطلبات', category: 'الطعام والشراب', selected: false },
+    { id: 26, name: 'مطاعم فاخرة', category: 'الطعام والشراب', selected: false },
+    { id: 27, name: 'نباتي', category: 'الطعام والشراب', selected: false },
+    { id: 28, name: 'نباتي بالكامل (فيغن)', category: 'الطعام والشراب', selected: false },
+    { id: 29, name: 'من المزرعة إلى المائدة', category: 'الطعام والشراب', selected: false },
+    { id: 30, name: 'تذوق النبيذ', category: 'الطعام والشراب', selected: false },
+    { id: 31, name: 'مأكولات بحرية', category: 'الطعام والشراب', selected: false },
+    { id: 32, name: 'بار كوكتيل', category: 'الطعام والشراب', selected: false },
+    { id: 33, name: 'حلويات', category: 'الطعام والشراب', selected: false },
+    { id: 34, name: 'برانش', category: 'الطعام والشراب', selected: false },
+    { id: 35, name: 'مأكولات الشارع', category: 'الطعام والشراب', selected: false },
+    
+    // العائلة والأطفال
+    { id: 5, name: 'أنشطة للأطفال', category: 'العائلة والأطفال', selected: false },
+    { id: 7, name: 'رعاية أطفال', category: 'العائلة والأطفال', selected: false },
+    
+    // وسائل الراحة في الغرف
+    { id: 9, name: 'أرواب حمام', category: 'وسائل الراحة في الغرف', selected: false },
+    { id: 10, name: 'تكييف هواء', category: 'وسائل الراحة في الغرف', selected: false },
+    { id: 11, name: 'مكتب', category: 'وسائل الراحة في الغرف', selected: false },
+    { id: 13, name: 'غرف متصلة', category: 'وسائل الراحة في الغرف', selected: false },
+    { id: 14, name: 'تلفاز بشاشة مسطحة', category: 'وسائل الراحة في الغرف', selected: false },
+    { id: 15, name: 'حمام / دش', category: 'وسائل الراحة في الغرف', selected: false },
+    
+    // الخدمات
+    { id: 12, name: 'تنظيف الغرف', category: 'الخدمات', selected: false },
+    { id: 22, name: 'مركز أعمال', category: 'الخدمات', selected: false },
+    { id: 25, name: 'مغسلة', category: 'الخدمات', selected: false },
+    
+    // إمكانية الوصول
+    { id: 18, name: 'يمكن الوصول إليه بواسطة الكراسي المتحركة', category: 'إمكانية الوصول', selected: false },
+    
+    // الترفيه
+    { id: 19, name: 'موسيقى حية', category: 'الترفيه', selected: false },
+    { id: 47, name: 'موسيقى حية', category: 'الترفيه', selected: false },
+    
+    // الحيوانات الأليفة
+    { id: 23, name: 'مسموح باصطحاب الحيوانات الأليفة', category: 'الحيوانات الأليفة', selected: false },
+    { id: 50, name: 'أماكن صديقة للحيوانات الأليفة', category: 'الحيوانات الأليفة', selected: false },
+    
+    // أنواع الإقامة
+    { id: 36, name: 'فنادق فاخرة', category: 'أنواع الإقامة', selected: false },
+    { id: 37, name: 'إقامات بوتيكية', category: 'أنواع الإقامة', selected: false },
+    { id: 38, name: 'منتجعات شاطئية', category: 'أنواع الإقامة', selected: false },
+    { id: 39, name: 'منتجعات تزلج', category: 'أنواع الإقامة', selected: false },
+    
+    // السفر والسياحة
+    { id: 40, name: 'سياحة بيئية', category: 'السفر والسياحة', selected: false },
+    { id: 41, name: 'عطلات المدن', category: 'السفر والسياحة', selected: false },
+    { id: 42, name: 'جولات ثقافية', category: 'السفر والسياحة', selected: false },
+    { id: 43, name: 'سفر المغامرات', category: 'السفر والسياحة', selected: false },
+    
+    // الفنون والثقافة
+    { id: 44, name: 'تصوير فوتوغرافي', category: 'الفنون والثقافة', selected: false },
+    { id: 46, name: 'معارض فنية', category: 'الفنون والثقافة', selected: false },
+    
+    // التكنولوجيا
+    { id: 45, name: 'تصميم مواقع ويب', category: 'التكنولوجيا', selected: false },
+    
+    // أسلوب الحياة
+    { id: 49, name: 'الاستدامة', category: 'أسلوب الحياة', selected: false }
+];

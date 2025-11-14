@@ -20,7 +20,7 @@ import AmenitiesSelector from '@/components/requests/amenities';
 import useFetchUser from '@/components/requests/fetchUser';
 import useFetchAllReviews from '../requests/fetchAllReviews';
 import StarRating from '../starsComponent';
-
+import AmenitiesSelectorUpdate from '../requests/amenitesUpdates';
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 const Chart = dynamic(() => import('react-apexcharts'), {
@@ -813,9 +813,10 @@ const initialAmenities = [
 
     <h1 className="mt-4 mb-4 font-medium font-playfair text-lg">Features</h1>
    
-    <AmenitiesSelector  initialAmenities={initialAmenities}
+    <AmenitiesSelectorUpdate  initialAmenities={initialAmenities}
       user={userId} 
       mutate={mutate}
+      language={"en"}
   />
   </div>
 

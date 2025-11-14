@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import React from 'react';
-import { useWishlist } from '@/components/cart';
+
 import { useSession} from "next-auth/react";
 import Image from "next/image";
 import { LiaHotelSolid } from "react-icons/lia";
@@ -18,32 +18,37 @@ import ManageListing from "@/components/Data/manageListing";
 // Skeleton Components
 const PropertyCardSkeleton = () => {
   return (
-    <div className="block rounded-lg p-2 shadow-xs shadow-black border border-1 font-montserrat text-secondary bg-white lg:flex lg:gap-8 animate-pulse">
+    <div className="flex flex-col rounded-lg p-4 shadow-xs shadow-black border border-1 bg-white animate-pulse">
+      {/* Image Skeleton */}
       <div className="relative">
-        <div className="h-80 lg:h-60 lg:w-96 rounded-md bg-gray-300"></div>
+        <div className="h-80 lg:h-96 rounded-md bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite]"></div>
       </div>
-      <div className="mt-2 flex flex-col gap-1 flex-1">
-        <div className="flex justify-end">
-          <div className="h-6 w-20 bg-gray-300 rounded"></div>
+      
+      {/* Content Skeleton */}
+      <div className="mt-2">
+        {/* Category and Action Buttons */}
+        <div className="flex justify-between items-start">
+          <div className="h-12 w-32 rounded-2xl bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite] mt-4"></div>
+          <div className="h-8 w-8 rounded-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite] mt-4"></div>
         </div>
         
-        <div>
-          <div className="h-6 w-3/4 bg-gray-300 rounded"></div>
-        </div>
+        {/* Price Skeleton */}
+        <div className="mt-3 h-8 w-2/3 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite] rounded"></div>
         
-        <hr className='my-2 text-secondary'/>
+        {/* Address Skeleton */}
+        <div className="mt-3 h-7 w-4/5 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite] rounded"></div>
         
-        <div className='text-sm text-gray-500 space-y-2'>
-          <div className="h-4 w-full bg-gray-300 rounded"></div>
-          <div className="h-4 w-5/6 bg-gray-300 rounded"></div>
-          <div className="h-4 w-4/5 bg-gray-300 rounded"></div>
-          <div className="h-4 w-3/4 bg-gray-300 rounded"></div>
-          <div className="h-4 w-2/3 bg-gray-300 rounded"></div>
+        <hr className='my-2 border-gray-300'/>
+        
+        {/* ID Skeleton */}
+        <div className="space-y-1 mt-2">
+          <div className="h-5 w-1/2 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] animate-[shimmer_2s_infinite] rounded"></div>
         </div>
       </div>
     </div>
   );
 };
+
 
 const AddServiceSkeleton = () => {
   return (
@@ -90,66 +95,43 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     return intPart + roundedFirst / 10;
   }
 
-  const { wishlist, addItemToWishlist, removeItemFromWishlist, isItemInWishlist } = useWishlist();
-  const { data: session, status } = useSession();
-  // Check if current item is in wishlist
-  const isInWishlist = isItemInWishlist(id);
+ 
+
 
   // Handle heart icon click
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent the anchor tag from navigating
     e.stopPropagation(); // Stop event bubbling
     
-    if (isInWishlist) {
-      removeItemFromWishlist(id);
-    } else {
-      // Create wishlist item with simplified structure
-      const wishlistItem = {
-        id: id,
-        image: imageUrl,
-        title: address,
-        dateAdded: "",
-        category:"",
-        cuisine:"",
-        price_range:"",
-        rating:averageRating,
-        name:address,
-        price:price,
-        location:location,
-        lengtReviews:lengtReviews
-        // Add other required fields if needed for your wishlist context
-      };
-      addItemToWishlist(wishlistItem);
-    }
+   
   };
 
   return (
-    <div className="block rounded-lg p-2 shadow-xs shadow-black border border-1  font-montserrat text-secondary bg-white lg:flex lg:gap-8 ">
+    <div className="flex flex-col rounded-lg p-4 shadow-xs shadow-black border border-1  font-montserrat text-secondary bg-sec text-prim ">
       <div className="relative">
      <Image
           alt="Property"
           src={imageUrl}
           height={500}
           width={500}
-          className="h-80 lg:h-60 lg:w-96 rounded-md object-cover"
+          className="h-80 lg:h-96  rounded-md object-cover"
         />
       </div>
-      <div className="mt-2 flex flex-col gap-1 ">
-     <div className="flex justify-end">
-    <ManageListing id={id} category={category} mutate={mutate}/>
+      <div className="mt-2  ">
+     <div className="flex justify-between "> 
+      <p className="px-4 py-2  h-12 rounded-2xl bg-prim text-white text-2xl font-bold mt-4">{category}</p>
+    <ManageListing id={id} category={category} mutate={mutate}/>  
+  
 </div>
-
+  <p className='font-bold text-4xl text-prim'><span className="text-2xl">السعر:</span>{price} </p>
        
-        <div>
-          <dd className="font-medium font-playfair ">{address}</dd>
+        <div className='mt-3'>
+          <dd className="font-bold font-playfair text-3xl text-prim">{address}</dd>
         </div>  
-        <hr className='my-2 text-secondary'/>
-<div className='text-sm text-gray-500 space-y-2'>
-  <p><span className='font-bold'>listin ID:</span> {id}</p>
-  <p><span className='font-bold'>Service Booked:</span> {category}</p>
-  <p><span className='font-bold'>Total Price:</span> ${price} (incl. taxes & fees)</p>
-  <p><span className='font-bold'>Payment Method:</span> Credit Card </p>
-  <p className="text-green-500"><span className='font-bold text-gray-500'>Status:</span> Active</p>
+               <hr className='my-2 border-prim text-prim'/>
+<div className=' space-y-1'>
+
+   <p className="text-prim"><span className='font-bold text-prim'>ID:</span> {id}</p>
 </div>      
 </div>
     </div>
@@ -194,7 +176,7 @@ export default function ListinPartnerCard() {
     <div className="flex flex-col gap-4 mx-2 custom:mx-6 mt-6">
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
         <Link href="/account/add-hotel-listing">
-        <div className='h-16 px-8 border border-1 rounded-xl shaddow-sm w-fit bg-sec flex justify-around items-center gap-4 text-white cursor-pointer hover:bg-secondary'>
+        <div className='h-16 px-8 border border-1 rounded-xl shaddow-sm w-fit bg-sec hover:bg-prim flex justify-around items-center gap-4 text-white cursor-pointer hover:bg-secondary'>
          <LiaHotelSolid size={20}/> 
             
             <h1 className="text-2xl font-playfair font-semibold text-white">
@@ -216,13 +198,13 @@ export default function ListinPartnerCard() {
            
               </div>
             </div>:
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {currentItems.map((listin, index) => (
           <div key={listin.id || index}>
             <PropertyCard
               id={listin.id}
               location={listin.location || "Unknown location"}
-              price={listin.price || "0" }
+              price={`${listin.currency} ${listin.price || "0"}`}
               address={listin.name || "Unnamed listin"}
               imageUrl={`${process.env.NEXT_PUBLIC_IMAGE}/${listin.image}`}
               averageRating={4.5}

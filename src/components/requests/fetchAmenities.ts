@@ -39,7 +39,7 @@ interface Amenitie {
 
 const useFetchAmenities = (id:any) => {
   const { data, error, isLoading } = useSWR<Amenitie[]>(
-    `${process.env.NEXT_PUBLIC_URL}amenities/?user=${id}`,
+    `${process.env.NEXT_PUBLIC_URL}amenities/?product=${id}`,
     fetcher // No need to explicitly pass generic here
   );
 

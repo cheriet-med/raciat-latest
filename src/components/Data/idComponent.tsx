@@ -11,7 +11,7 @@ import { GoPencil } from "react-icons/go";
 import { LuShare } from "react-icons/lu";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { CiForkAndKnife } from "react-icons/ci";
-import { useWishlist } from '@/components/cart';
+
 import { useSession } from 'next-auth/react';
 import LoginButton from '@/components/header/loginButton';
 import ShareButton from '@/components/Data/shareSocial';
@@ -158,9 +158,9 @@ const toggle = async () => {
   const centerPosition = 
     [dat.data.latitude || 51.505, dat.data.longtitude || -0.09] as [number, number];
 
-  const { wishlist, addItemToWishlist, removeItemFromWishlist, isItemInWishlist } = useWishlist();
+
   const { data: session, status } = useSession();
-  const isInWishlist = isItemInWishlist(dat.data.id);
+
   const [showGalleryModal, setShowGalleryModal] = useState(false);
   const router = useRouter();
 
@@ -168,25 +168,7 @@ const toggle = async () => {
     e.preventDefault();
     e.stopPropagation();
     
-    if (isInWishlist) {
-      removeItemFromWishlist(dat.data.id);
-    } else {
-      const wishlistItem = {
-       id: dat.data.id,
-        image: dat.data.image,
-        title: dat.data.title,
-        dateAdded: "",
-        category:"string",
-        cuisine:"string",
-        price_range:"string",
-        rating:4.5,
-        name:dat.data.name,
-        price:"price",
-        location:"location",
-        lengtReviews:"lengtReviews"
-      };
-      addItemToWishlist(wishlistItem);
-    }
+   
   };
 
   useEffect(() => {
