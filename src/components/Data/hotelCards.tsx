@@ -1,274 +1,275 @@
-'use client'
-
-import { Restaurants } from "./restaurants"
+"use client";
+import React from "react";
 import { useState, useEffect } from "react";
-import React from 'react';
-import { CiCircleChevRight } from "react-icons/ci";
-import StarRating from "../starsComponent";
-import { FaRegHeart, FaHeart } from "react-icons/fa";
-import { CiForkAndKnife } from "react-icons/ci";
-
-import { useSession} from "next-auth/react";
-import LoginButton from "../header/loginButton";
-import { Hotels } from "./hotels";
-import Link from "next/link";
-import useFetchListing from "../requests/fetchListings";
-import useFetchReviews from "../requests/fetchReviews";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import { properties } from "@/data/properties";
 import Image from "next/image";
-import useWishlistCheck from "../requests/fetchWishlistCheck";
+import Link from "next/link";
+import useFetchListing from "@/components/requests/fetchListings";
+import { useSession } from "next-auth/react";
+import LoginButton from "@/components/header/loginButton";
+import { FaRegHeart, FaHeart } from "react-icons/fa";
 
-
-interface PropertyCardProps {
-  id: string | number | any;
-  price: string | number;
-  address: string | null;
-  imageUrl: string;
-  averageRating: number;
-  lengtReviews: string;
-  location:string | null;
-}
-
-// Skeleton component for individual property card
-const PropertyCardSkeleton: React.FC = () => {
-  return (
-    <div className="block rounded-lg p-2 shadow-xs shadow-black border border-1 font-montserrat text-secondary bg-white animate-pulse">
-      <div className="relative">
-        {/* Image skeleton */}
-        <div className="h-80 w-full rounded-md bg-gray-300"></div>
-        {/* Heart icon skeleton */}
-        <div className="absolute right-4 top-4 z-10 p-1 rounded-full bg-white/80">
-          <div className="w-6 h-6 bg-gray-300 rounded"></div>
-        </div>
-      </div>
-      
-      <div className="mt-2 flex flex-col gap-1">
-        {/* Location tag skeleton */}
-        <div className="flex">
-          <div className="h-6 bg-gray-300 rounded-xl w-20"></div>
-        </div>
-        
-        {/* Address skeleton */}
-        <div className="h-5 bg-gray-300 rounded w-3/4"></div>
-        
-        {/* Rating skeleton */}
-        <div className="flex gap-1 items-center">
-          <div className="h-4 bg-gray-300 rounded w-8"></div>
-          <div className="flex gap-1">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="w-4 h-4 bg-gray-300 rounded"></div>
-            ))}
-          </div>
-          <div className="h-4 bg-gray-300 rounded w-12"></div>
-        </div>
-        
-        {/* Price skeleton */}
-        <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-      </div>
-    </div>
-  );
-};
-
-const PropertyCard: React.FC<PropertyCardProps> = ({
-  id,
-  price,
-  address,
-  averageRating,
-  imageUrl,
-  lengtReviews,
-  location,
-}) => {
-
-  const roundFirstDecimalDigit = (num: number) => {
-    const intPart = Math.floor(num);
-    const decimal = num - intPart;
-  
-    // Shift decimal left to isolate the first two digits
-    const shifted = decimal * 10;
-    const roundedFirst = Math.round(shifted);
-  
-    // Recombine with integer part
-    return intPart + roundedFirst / 10;
-  }
-
-  const { data: session, status } = useSession();
-  // Check if current item is in wishlist
-
-   const {Review} = useFetchReviews(id)
-const totalReviews = Review && Review.length > 0? Review.reduce((sum, r) => sum + +r.rating_global, 0) / Review.length: 0
-
-const { wishlistStatus, isLoading, error, mutate } = useWishlistCheck(id, session?.user?.id);
-
-
-
-
-const toggle = async () => {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}wishlist/${id}/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Token ${process.env.NEXT_PUBLIC_TOKEN}`,
-      },
-      body: JSON.stringify({ user_id: session?.user?.id }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-     // Trigger SWR revalidation to refresh the data
-      if (mutate) {
-        await mutate();
-      }
-
-    return (await response.json());
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw new Error("Failed to fetch data. Please try again later.");
-  } 
-};
-
-
-
-
-
-
-  // Handle heart icon click
-  const handleWishlistToggle = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent the anchor tag from navigating
-    e.stopPropagation(); // Stop event bubbling
+export default function Properties() {
+    const [isMobile, setIsMobile] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState("الكل");
+    const [wishlistItems, setWishlistItems] = useState<Record<number, boolean>>({});
     
-  
-  };
+    const { listings } = useFetchListing(); 
+    const { data: session, status } = useSession();
 
-  return (
-    <div className="relative block rounded-lg p-2 shadow-xs shadow-black  border-2  font-montserrat text-secondary bg-white">
-      <div className="relative hover:bg-white group">
-          {
-            status === "authenticated" ?    
- (
-             wishlistStatus?.is_in_wishlist == true ? <button 
-          onClick={toggle}
-          className="absolute right-4 top-4 z-10 p-1 rounded-full bg-white/80 hover:bg-white transition-colors group"
-        >
-               <FaHeart size={24} className="text-secondary" />
-            </button> : 
-             <button 
-          onClick={toggle}
-          className="absolute right-4 top-4 z-10 p-1 rounded-full bg-white/80 hover:bg-white transition-colors group"
-        >
-                <FaRegHeart size={24} className="text-gray-600 group-hover:text-accent transition-colors" />
-           </button>
-          )   
-         :
-           (
-            <LoginButton />
-          )}
-     <Link href={`/en/booking/${id}`}>
-         <Image
-      alt="Property"
-      src={imageUrl}
-      width={400} // Set appropriate width
-      height={320} // Set appropriate height (maintaining 5:4 aspect ratio)
-      className="h-60 w-full rounded-md object-cover transition-all duration-300 ease-out
-           group-hover:scale-95 group-hover:brightness-90"
-      placeholder="blur" // Optional: add blur placeholder
-      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaUMk9SQ2Tv6JauWg===" // Optional: small base64 placeholder
-    />
-     </Link>
-      </div>
- <Link href={`/en/booking/${id}`}>
-      <div className="mt-2 flex flex-col gap-1">   
-     <div className="flex">
-  <p className="text-sm bg-gray-800 text-white rounded-md font-medium  px-2 w-fit">{location}</p>
-</div>
-        <div>
-          <dd className="font-bold text-lg text-gray-800 font-montserrat">{address?.slice(0,45)}</dd>
-        </div>  
-        <div className='flex gap-1'>
-         
-          <StarRating rating={totalReviews} />      
-         {totalReviews == 0 ? "" : <p className=' text-sm'>{"("}{Review.length}{")"}</p>} 
-        </div>
-          <dd className="text-sm text-gray-800">{price}</dd>
-      </div>
-      </Link>
-      <div className="absolute bottom-3 right-3 p-1 bg-accent rounded-full text-white">
-         {totalReviews == 0 ? <p className="font-bold w-6 ">0.0</p> : <p className="font-bold w-6 ">{totalReviews}</p>} 
-      </div>
-      
-    </div>
-  );
-};
+    // Fetch wishlist status for all properties
+    useEffect(() => {
+        const fetchWishlistStatus = async () => {
+            if (status === "authenticated" && listings) {
+                try {
+                    const response = await fetch(
+                        `${process.env.NEXT_PUBLIC_URL}wishlist/?user=${session?.user?.id}`,
+                        {
+                            headers: {
+                                Authorization: `Token ${process.env.NEXT_PUBLIC_TOKEN}`,
+                            },
+                        }
+                    );
+                    if (response.ok) {
+                        const data = await response.json();
+                        // Create a map of product IDs that are in wishlist
+                        const wishlistMap: Record<number, boolean> = {};
+                        data.forEach((item: any) => {
+                            // item.product should contain the product ID
+                            const productId = typeof item.product === 'object' ? item.product.id : item.product;
+                            wishlistMap[productId] = true;
+                        });
+                        setWishlistItems(wishlistMap);
+                    }
+                } catch (error) {
+                    console.error("Error fetching wishlist:", error);
+                }
+            }
+        };
+        fetchWishlistStatus();
+    }, [status, session?.user?.id, listings]);
 
-export default function HotelCards() {
+    const toggleWishlist = async (propertyId: number) => {
+        if (status !== "authenticated") return;
 
-  const { listings, isLoading, error } = useFetchListing();
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
-  const userListing = listings?.filter(post => post.category == 'Hotel');
-  const totalPages = Math.ceil((userListing?.length || 0)/ itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = userListing?.slice(startIndex, endIndex) || [];
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_URL}wishlist/${propertyId}/`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Token ${process.env.NEXT_PUBLIC_TOKEN}`,
+                    },
+                    body: JSON.stringify({ 
+                        user_id: session?.user?.id
+                    }),
+                }
+            );
 
-  const handlePageChange = (page: number) => setCurrentPage(page);
-  const handleNext = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
-  const handlePrevious = () => currentPage > 1 && setCurrentPage(currentPage - 1);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
 
-  // Show error state
-  if (error) {
-    return (
-      <div className="flex flex-col gap-4 mx-2 custom:mx-40">
-        <h1 className="text-4xl font-playfair font-bold">Hotels</h1>
-        <div className="text-center py-8">
-          <p className="text-red-500">Error loading hotels. Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
+            const data = await response.json();
+            
+            // Update local state based on server response
+            setWishlistItems(prev => ({
+                ...prev,
+                [propertyId]: data.is_in_wishlist
+            }));
+            
+            return data;
+        } catch (error) {
+            console.error("Error toggling wishlist:", error);
+            throw new Error("Failed to toggle wishlist. Please try again later.");
+        }
+    };
 
-  return (
-    <div className="flex flex-col gap-4 mx-2 custom:mx-40">
-      <h1 className="text-4xl font-playfair font-bold">
-        Hotels
-      </h1>
+    useEffect(() => {
+        const checkScreen = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        checkScreen();
+        window.addEventListener("resize", checkScreen);
+        return () => window.removeEventListener("resize", checkScreen);
+    }, []);
+
+    const filteredListings = selectedCategory === "الكل" 
+        ? listings 
+        : listings?.filter(property => property.types === selectedCategory);
+
+    const categories = [
+        { name: "الكل", label: "الكل" },
+        { name: "شقة", label: "شقق" },
+        { name: "فلة", label: "فلل" },
+        { name: "بناء", label: "بناء" },
+        { name: "مكتب", label: "مكاتب" }
+    ];
+
+    const WishlistButton = ({ propertyId }: { propertyId: number }) => {
+        const isInWishlist = wishlistItems[propertyId];
         
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 ">
-        {isLoading ? (
-          // Show skeleton loading cards
-          [...Array(itemsPerPage)].map((_, index) => (
-            <PropertyCardSkeleton key={index} />
-          ))
-        ) : (
-          // Show actual data
-          currentItems.map((res, index) => (
-            <div key={index}>
-              <PropertyCard
-                id={res.id} // Use restaurant ID or fallback
-                location={res.location}
-                price=""
-                address={res.name}
-                imageUrl={`${process.env.NEXT_PUBLIC_IMAGE}/${res.image}`}
-                averageRating={4}
-                lengtReviews={"170"}
-              />
-            </div>
-          ))
-        )}
-      </div>
-      
-      {/* Pagination - only show if not loading and has items */}
-      {!isLoading && currentItems.length > 0 && totalPages > 1 && (
-        <div className="flex justify-end items-center gap-1 flex-wrap">
-          <button disabled={currentPage === 1} onClick={handlePrevious} className="text-gray-500 hover:text-accent flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
-            <CiCircleChevRight size={40} className="rotate-180 "/>
-          </button>
+        if (status !== "authenticated") {
+            return <LoginButton />;
+        }
 
-          <button disabled={currentPage === totalPages} onClick={handleNext} className="text-gray-500 hover:text-accent flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
-            <CiCircleChevRight size={40}/>
-          </button>
+        return (
+            <div 
+                className="wishlist cursor-pointer" 
+                onClick={(e) => {
+                    e.preventDefault();
+                    toggleWishlist(propertyId);
+                }}
+            >
+                <div className="hover-tooltip tooltip-left box-icon">
+                    {isInWishlist ? (
+                        <FaHeart className="text-red-500 text-xl" />
+                    ) : (
+                        <FaRegHeart className="text-xl" />
+                    )}
+                    <span className="tooltip">
+                        {isInWishlist ? "إزالة من قائمة الرغبات" : "أضف إلى قائمة الرغبات"}
+                    </span>
+                </div>
+            </div>
+        );
+    };
+
+    const PropertyCard = ({ property }: { property: any }) => (
+        <div
+            className="card-house style-default hover-image"
+            data-id={property.id}
+        >
+            <div className="img-style mb_20">
+                <Image
+                    src={`${process.env.NEXT_PUBLIC_IMAGE}/${property.image}`}
+                    width={410}
+                    height={308}
+                    alt="home"
+                />
+                <div className="wrap-tag d-flex gap_8 mb_12">
+                    <div
+                        className="tag text-button-small fw-6 text_primary-color"
+                        style={{
+                            backgroundColor: property.category === "بيع" ? "#dc3545" : "#28a745",
+                            color: "#fff"
+                        }}
+                    >
+                        {property.category}
+                    </div>
+                    <div className="tag categoreis text-button-small fw-6 text_primary-color">
+                        {property.types}
+                    </div>
+                </div>
+                <Link
+                    href={`/property-details-1/${property.id}`}
+                    className="overlay-link"
+                ></Link>
+                <WishlistButton propertyId={property.id} />
+            </div>
+            <div className="content">
+                <h4
+                    className="price mb_12 text-4xl font-bold"
+                    suppressHydrationWarning
+                >
+                    {property.currency} {property.price}
+                </h4>
+                <Link
+                    href={`/property-details-1/${property.id}`}
+                    className="title mb_8 h5 link text_primary-color"
+                >
+                    {property.name}
+                </Link>
+                <p>{property.location}، {property.region}</p>
+                <ul className="info d-flex">
+                    <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
+                        <i className="icon-Bed"></i>
+                        {property.rooms_number} غرف
+                    </li>
+                    <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
+                        <i className="icon-Bathtub"></i>
+                        {property.badrooms_number} حمام
+                    </li>
+                    <li
+                        className="d-flex align-items-center gap_8 text-title text_primary-color fw-6"
+                        suppressHydrationWarning
+                    >
+                        <i className="icon-Ruler"></i>
+                        {property.size} قدم مربع
+                    </li>
+                </ul>
+            </div>
         </div>
-      )}
-    </div>
-  )
+    );
+
+    return (
+        <div className="section-features-property-4 tf-spacing-1 pt-0">
+            <div className="tf-container">
+                <div className="flex justify-between mb_46 flex-wrap gap-5">
+                    <h2 className="split-text effect-blur-fade text-5xl lg:text-7xl font-extrabold">
+                        إكتشف منزل أحلامك
+                    </h2>              
+                    <div className="flex gap-2 flex-wrap">
+                        {categories.map((category) => (
+                            <button 
+                                key={category.name}
+                                onClick={() => setSelectedCategory(category.name)}
+                                className={`px-8 py-4 w-36 rounded-lg font-bold text-white transition-colors ${
+                                    selectedCategory === category.name 
+                                        ? "bg-sec" 
+                                        : "bg-prim hover:bg-sec"
+                                }`}
+                            >
+                                {category.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {!listings ? (
+                    <div className="text-center py-10">جاري التحميل...</div>
+                ) : filteredListings?.length === 0 ? (
+                    <div className="text-center py-10">لا توجد عقارات في هذه الفئة</div>
+                ) : isMobile ? (
+                    <Swiper
+                        modules={[Pagination]}
+                        spaceBetween={15}
+                        slidesPerView={1}
+                        pagination={{ clickable: true, el: ".sw-dots" }}
+                        className="tf-sw-mobile bg_1"
+                        key={selectedCategory}
+                    >
+                        {filteredListings?.slice(0, 6).map((property, idx) => (
+                            <SwiperSlide key={idx}>
+                                <PropertyCard property={property} />
+                            </SwiperSlide>
+                        ))}
+                        <div className="sw-dots style-1 sw-pagination-mb mt_24 justify-content-center d-flex d-md-none"></div>
+                    </Swiper>
+                ) : (
+                    <div className="tf-sw-mobile bg_1">
+                        <div className="tf-grid-layout-md lg-col-3 md-col-2">
+                            {filteredListings?.slice(0, 6).map((property, idx) => (
+                                <div className="swiper-slide" key={idx}>
+                                    <PropertyCard property={property} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                <Link
+                    href={'/listing-topmap-grid'}
+                    className="tf-btn btn-bg-1 mx-auto btn-px-32 scrolling-effect effectBottom"
+                >
+                    <span>عرض جميع العقارات</span>
+                    <span className="bg-effect"></span>
+                </Link>
+            </div>
+        </div>
+    );
 }

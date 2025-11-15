@@ -566,8 +566,9 @@ export default function Properties1() {
                                     payload: value,
                                 })
                             }
-                            itemLength={sorted.length}
+                            
                             itemPerPage={itemPerPage}
+                            itemLength={sorted.length}
                         />
                     </div>
                 </div>

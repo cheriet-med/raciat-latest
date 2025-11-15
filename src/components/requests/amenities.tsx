@@ -346,7 +346,7 @@ const AmenitiesSelector: React.FC<AmenitiesSelectorProps> = ({
                           </div>
                           
                           {amenity.selected ? (
-                            <span className="text-lg bg-sec text-white px-2 py-1 rounded-full">
+                            <span className="text-lg bg-sec text-white px-2 py-3 rounded-full">
                               {t.added}
                             </span>
                           ) : (
@@ -366,7 +366,7 @@ const AmenitiesSelector: React.FC<AmenitiesSelectorProps> = ({
                 <button
                   type="button"
                   onClick={handleDone}
-                  className="bg-sec text-white px-6 py-3 rounded-lg hover:bg-black transition-colors"
+                  className="bg-sec text-white px-6 my-3 rounded-lg hover:bg-black transition-colors"
                 >
                   {t.done}
                 </button>

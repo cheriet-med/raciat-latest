@@ -71,9 +71,9 @@ export default function Pagination({
     return (
         <ul className="wg-pagination">
             {/* Previous button */}
-            <li onClick={handlePreviousClick}>
+    <li onClick={handlePreviousClick}>
                 <a className="nav-item">
-                    <i className="icon-CaretLeft" />
+                    <i className="icon-CaretRight" />
                 </a>
             </li>
             {/* First page and leading ellipsis */}
@@ -130,11 +130,12 @@ export default function Pagination({
                 </>
             )}
             {/* Next button */}
-            <li onClick={handleNextClick}>
+                        <li onClick={handleNextClick}>
                 <a className="nav-item">
-                    <i className="icon-CaretRight" />
+                    <i className="icon-CaretLeft" />
                 </a>
             </li>
+        
         </ul>
     );
 }

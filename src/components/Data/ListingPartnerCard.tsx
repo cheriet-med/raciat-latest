@@ -67,6 +67,7 @@ interface PropertyCardProps {
   averageRating: number;
   lengtReviews: string;
   location:string;
+  description: string;
   category:string | null,
   mutate?: () => Promise<any>;
 }
@@ -77,6 +78,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   address,
   averageRating,
   imageUrl,
+  description,
   lengtReviews,
   location,
   category,
@@ -125,8 +127,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 </div>
   <p className='font-bold text-4xl text-prim'><span className="text-2xl">السعر:</span>{price} </p>
        
-        <div className='mt-3'>
-          <dd className="font-bold font-playfair text-3xl text-prim">{address}</dd>
+        <div className='my-3'>
+          <dd className="font-bold font-playfair text-4xl text-white">{address}</dd>
+               <div
+              className="font-bold font-playfair text-xl text-white"
+              style={{ direction: 'rtl' }}
+              dangerouslySetInnerHTML={{ __html: description.slice(0,140) + "..." || '' }}
+            />
+       
         </div>  
                <hr className='my-2 border-prim text-prim'/>
 <div className=' space-y-1'>
@@ -209,7 +217,8 @@ export default function ListinPartnerCard() {
               imageUrl={`${process.env.NEXT_PUBLIC_IMAGE}/${listin.image}`}
               averageRating={4.5}
               lengtReviews={"0"} // You might want to add this to your API
-              category={listin.category}
+              category={listin.types}
+              description={listin.description || "Undescripted" }
               mutate={mutate}
             />
           </div>

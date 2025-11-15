@@ -807,10 +807,10 @@ export default function EditeHotelForm() {
                             className="w-full px-4 py-2.5 h-18 border bg-white border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all"
                           >
                             <option value="">إختر النوع</option>
-                            <option value="Luxury">فلة</option>
-                            <option value="Budget">شقة</option>
-                            <option value="Boutique">بناء</option>
-                            <option value="Business">مكتب</option>
+                            <option value="فلة">فلة</option>
+                            <option value="شقة">شقة</option>
+                            <option value="بناء">بناء</option>
+                            <option value="مكتب">مكتب</option>
                           </select>
                           {errortype && <p className="text-xl mt-2 text-sec">{errortype}</p>}
                         </div>
@@ -868,9 +868,9 @@ export default function EditeHotelForm() {
                               className="w-full px-4 py-2.5 h-18 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-sec focus:border-sec transition-all bg-white"
                             >
                               <option value="">إختر الغرض</option>
-                              <option value="شقق">بيع</option>
-                              <option value="بناء">إيجار</option>
-                              <option value="فلل">تموويل</option>
+                              <option value="بيع">بيع</option>
+                              <option value="إيجار">إيجار</option>
+                              <option value="تمويل">تمويل</option>
                             </select>
                             {errortype && <p className="text-xl mt-2 text-sec">{errortype}</p>}
                           </div>
