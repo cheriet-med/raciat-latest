@@ -26,7 +26,7 @@ export default function Location({ property }: { property: Property }) {
             <h5 className="properties-title mb_20 text-2xl lg:text-3xl font-bold">الموقع</h5>
             <div className="heading d-flex align-items-center justify-content-between flex-wrap gap_12 mb_16">
                 <div className=" d-flex align-items-center gap_4 text-button fw-7 text_primary-color flex-wrap">
-                    <i className="icon-MapPin"></i>٤٦٠٠ شارع صن ست، لوس أنجلوس، كاليفورنيا ٩٠٠٢٧
+                    <i className="icon-MapPin"></i>{property.address}، {property.city}
 
                 </div>
                

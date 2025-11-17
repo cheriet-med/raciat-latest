@@ -55,7 +55,7 @@ export default function PropertyDetails2({ property }: { property: Property }) {
                     </div>
                     <div className="row wrap-properties">
                         <div className="col-lg-6">
-                            <Description />
+                           
                         </div>
                         <div className="col-lg-5 offset-xl-1">
                             <div className="properties-overview v2">
@@ -73,7 +73,7 @@ export default function PropertyDetails2({ property }: { property: Property }) {
                         <Caculator2 />
                     </div>
                     <div className="properties-nearby tf-spacing-8 pt-0">
-                        <Nearby />
+                        
                     </div>
                     <div className="row">
                         <div className="col-lg-4 col-md-5">
@@ -83,7 +83,7 @@ export default function PropertyDetails2({ property }: { property: Property }) {
                         </div>
                         <div className="col-lg-8 col-md-7">
                             <div className="properties-comment">
-                                <Comment />
+
                                 <FormComments />
                             </div>
                         </div>

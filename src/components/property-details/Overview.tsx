@@ -1,6 +1,21 @@
 import React from "react";
 
-export default function Overview() {
+type Property = {
+  id: number;
+  address: string;
+  title: string;
+  beds?: number;
+  baths?: number;
+  sqft?: number;
+  categories: string;
+  type: string;
+  price: number;
+  garages: number;
+  landArea?: number;
+  yearBuilt?: number;
+};
+
+export default function Overview({ property }: { property: Property }) {
     return (
         <div>
             <h5 className="properties-title mb_20 text-2xl lg:text-3xl font-bold">نظرة عامة</h5>
@@ -10,7 +25,7 @@ export default function Overview() {
                     <div className="d-flex flex-column gap">
                         <span className="text-body-default">المعرف:</span>
                         <span className="text-title fw-6 text_primary-color">
-                            423146
+                           {property.id}
                         </span>
                     </div>
                 </div>
@@ -19,7 +34,7 @@ export default function Overview() {
                     <div className="d-flex flex-column gap">
                         <span className="text-body-default">النوع:</span>
                         <span className="text-title fw-6 text_primary-color">
-                            فيلا
+                          {property.type}
                         </span>
                     </div>
                 </div>
@@ -28,7 +43,7 @@ export default function Overview() {
                     <div className="d-flex flex-column gap">
                         <span className="text-body-default">غرف النوم:</span>
                         <span className="text-title fw-6 text_primary-color">
-                            3 غرف
+                         {property.beds}
                         </span>
                     </div>
                 </div>
@@ -37,7 +52,7 @@ export default function Overview() {
                     <div className="d-flex flex-column gap">
                         <span className="text-body-default">الحمامات:</span>
                         <span className="text-title fw-6 text_primary-color">
-                            3 غرف
+                            {property.baths}
                         </span>
                     </div>
                 </div>
@@ -46,7 +61,7 @@ export default function Overview() {
                     <div className="d-flex flex-column gap">
                         <span className="text-body-default">الكراج:</span>
                         <span className="text-title fw-6 text_primary-color">
-                            نعم
+                             {property.garages}
                         </span>
                     </div>
                 </div>
@@ -55,7 +70,7 @@ export default function Overview() {
                     <div className="d-flex flex-column gap">
                         <span className="text-body-default">المساحة:</span>
                         <span className="text-title fw-6 text_primary-color">
-                            3,200 قدم²
+                            {property.sqft} قدم²
                         </span>
                     </div>
                 </div>
@@ -64,7 +79,7 @@ export default function Overview() {
                     <div className="d-flex flex-column gap">
                         <span className="text-body-default">مساحة الأرض:</span>
                         <span className="text-title fw-6 text_primary-color">
-                            4,200 قدم²
+                            {property.landArea} قدم²
                         </span>
                     </div>
                 </div>
@@ -73,7 +88,7 @@ export default function Overview() {
                     <div className="d-flex flex-column gap">
                         <span className="text-body-default">سنة البناء:</span>
                         <span className="text-title fw-6 text_primary-color">
-                            2024
+                            {property.yearBuilt}
                         </span>
                     </div>
                 </div>

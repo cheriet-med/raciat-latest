@@ -336,7 +336,7 @@ export default function BlogPost2({ blogItem }: { blogItem: BlogItem }) {
                                         <p>{blogItem.authorDesc}</p>
                                     </div>
                                     <div className="mb_40">
-                                        <Comment />
+                                      
                                     </div>
                                     <FormComments />
                                 </div>

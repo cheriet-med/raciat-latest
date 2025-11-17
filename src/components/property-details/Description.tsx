@@ -1,19 +1,28 @@
 import React from "react";
 
-export default function Description() {
+type Property = {
+  id: number;
+  address: string;
+  title: string;
+  description?: string;
+  beds?: number;
+  baths?: number;
+  sqft?: number;
+  categories: string;
+  type: string;
+  price: number;
+};
+
+export default function Description({ property }: { property: Property }) {
     return (
         <div>
             <h5 className="properties-title mb_20 text-2xl lg:text-3xl font-bold">الوصف</h5>
-            <p className="mb_8 text-body-2">
-                يقدم منزل &quot;كاسا لوماس دي ماشالي&quot; مزيجًا مثاليا من الراحة والخصوصية والطبيعة. 
-                يقع في واحدة من أكثر المناطق السكنية أمانًا وهدوءًا في ماشالي، 
-                ويتميز هذا العقار الجميل بتصميم معماري عصري ومساحات داخلية مفتوحة 
-                ونوافذ كبيرة تملأ المنزل بالضوء الطبيعي.
-            </p>
-            <p className="mb_20 text-body-2">
-                يجعل موقعه الهادئ وسهولة الوصول إلى المرافق المحلية منه خيارًا مثاليًا 
-                للعائلات أو لأي شخص يبحث عن أسلوب حياة هادئ على بعد دقائق قليلة من رانكاغوا.
-            </p>
+                        <div
+              className="text-2xl text-gray-600 dark:text-neutral-400 mt-8 space-y-2 prose-inherit text-right"
+              style={{ direction: 'rtl' }}
+              dangerouslySetInnerHTML={{ __html: property.description || '' }}
+            />
+         
         </div>
     );
 }

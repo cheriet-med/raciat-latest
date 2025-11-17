@@ -3,11 +3,11 @@ export const bathroomOptions: string[] = ["أي عدد من الحمامات", "
 export const garageOptions: string[] = ["أي عدد من المرائب", "1", "2", "3+"];
 export const cityOptions: string[] = [
     "جميع المدن",
-    "نيويورك",
-    "لوس أنجلوس",
-    "شيكاغو",
-    "هيوستن",
-    "فينيكس",
+    "جدة",
+    "المدينة",
+    "مكة",
+    "الرياض",
+    "الدمام",
 ];
 export const budgetOptions: string[] = [
     "الحد الأقصى للسعر",

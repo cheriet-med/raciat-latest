@@ -1,47 +1,27 @@
 'use client';
 
 import { useState, FormEvent, ChangeEvent } from 'react';
-import { X, Plus, Calendar, Upload, Award, MapPin, Trash2, Globe } from 'lucide-react';
-import TiptapEditor from '@/components/admin-dashboard/Tiptapeditor';
-import { LuImagePlus } from "react-icons/lu";
-import { AiOutlineFieldNumber } from "react-icons/ai";
-import useFetchBooking from './fetchBooking';
+import { X, Plus } from 'lucide-react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
-import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import moment from 'moment';
-import useFetchAllBookings from './fetchAllBookings';
-import {FaStar } from "react-icons/fa"; 
+import { FaStar } from "react-icons/fa"; 
+
 // TypeScript interfaces
-interface Product {
-  name: string;
+interface ReviewData {
+  product: string;
+  user: string;
+  rating_global: number;
   description: string;
-  price_per_night: string;
-  capacity: string;
-  size: string;
-  cancellation_policy: string;
-  established: string;
-  image: File | null;
-  type:string;
-  longitude: string;
-  location: any;
-  latitude: any;
-  user: any ;
-}
-
-interface NearbyAttraction {
-  name: string;
-  distance: string;
-}
-
-interface Award {
-  name: string;
-  year: string;
-}
-
-interface ApiError {
-  message: string;
+  location: number;
+  room: number;
+  restaurant_space: number;
+  value: number;
+  clearliness: number;
+  service: number;
+  created_at: string;
+  stay_date: string;
 }
 
 interface ImagePreview {
@@ -49,81 +29,53 @@ interface ImagePreview {
   url: string;
 }
 
+interface ApiError {
+  message: string;
+}
 
+interface AddReviewHotelFormProps {
+  proid: any ;
+}
 
-export default function AddReviewHotelForm({proid}:any) {
-  
-const router = useRouter();
-   const { data: session, status } = useSession();
-  //const { Booking } = useFetchBooking(proid)
-const { AllBookings }=useFetchAllBookings()
+export default function AddReviewHotelForm({ proid }: AddReviewHotelFormProps) {
+  const router = useRouter();
+  const { data: session } = useSession();
 
-const date_stay = AllBookings.filter(reservation => reservation.user === session?.user?.id)
-
-
-
-  const [product, setProduct] = useState<Product>({
-    name: '',
+  const [reviewData, setReviewData] = useState<ReviewData>({
+    product: proid,
+    user: session?.user?.id || '',
+    rating_global: 0,
     description: '',
-    price_per_night: '',
-    capacity: '',
-    size: '',
-    type: '',
-    cancellation_policy: '',
-    established: '',
-    image: null,
-    latitude: '',
-    longitude: '',
-    location: '',
-    user: session?.user?.id,
+    location: 0,
+    room: 0,
+    restaurant_space: 0,
+    value: 0,
+    clearliness: 0,
+    service: 0,
+    created_at: moment().format('MMMM Do YYYY'),
+    stay_date: ""
   });
-  
+
   const [images, setImages] = useState<ImagePreview[]>([]);
-  const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
-  const [nearbyAttractions, setNearbyAttractions] = useState<NearbyAttraction[]>([{ name: '', distance: '' }]);
-  const [awards, setAwards] = useState<Award[]>([{ name: '', year: '' }]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [errorname, setErrorname] = useState('');
   const [errordescription, setErrordescription] = useState('');
-  const [errorimage, setErrorimage] = useState('');
-  const [errorprice, setErrorprice] = useState('');
-  const [errortype, setErrortype] = useState('');
-  const [errorcancelation, setErrorcancelation] = useState('');
-  const [errorlocation, setErrorlocation] = useState('');
-  const [errorlatitude, setErrorlatitude] = useState('');
-  const [errorlongtitude, setErrorlongtitude] = useState('');
 
-
- const [review, setReview] = useState('');
+  // Rating states
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-
   const [ratingroom, setRatingroom] = useState(0);
   const [hoverRatingroom, setHoverRatingroom] = useState(0);
-
-
   const [ratingvalue, setRatingvalue] = useState(0);
   const [hoverRatingvalue, setHoverRatingvalue] = useState(0);
-
-
   const [ratingclearliness, setRatingclearliness] = useState(0);
   const [hoverRatingclearliness, setHoverRatingclearliness] = useState(0);
-
-
   const [ratingservice, setRatingservice] = useState(0);
   const [hoverRatingservice, setHoverRatingservice] = useState(0);
 
-
-
-  const handleProductChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setProduct(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleDescriptionChange = (content: string) => {
-    setProduct(prev => ({ ...prev, description: content }));
+  const handleDescriptionChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const content = e.target.value;
+    setReviewData(prev => ({ ...prev, description: content }));
   };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -146,104 +98,77 @@ const date_stay = AllBookings.filter(reservation => reservation.user === session
     });
   };
 
-  
- 
-
-  const addAward = () => {
-    setAwards([...awards, { name: '', year: '' }]);
-  };
-
-  const removeAward = (index: number) => {
-    if (awards.length > 1) {
-      const updated = awards.filter((_, i) => i !== index);
-      setAwards(updated);
-    }
+  const calculateGlobalRating = (): number => {
+    const ratings = [rating, ratingroom, ratingvalue, ratingclearliness, ratingservice];
+    const validRatings = ratings.filter(r => r > 0);
+    return validRatings.length > 0 
+      ? validRatings.reduce((sum, curr) => sum + curr, 0) / validRatings.length 
+      : 0;
   };
 
   const handleSubmit = async (e: FormEvent) => {
-
-    
-
-
-
-
     e.preventDefault();
-      setErrorname('');
-      setErrordescription('');
-      setErrorimage('');
-      setErrorprice('');
-      setErrortype('');
-      setErrorcancelation('');
-      setErrorlocation('');
-      setErrorlatitude('');
-      setErrorlongtitude('');
-      setErrorMessage('');
-   
+    
+    // Reset errors
+    setErrordescription('');
+    setErrorMessage('');
 
- if (!product.name.trim()) {
-       setErrorname('Enter Review Title Please');
+    // Validation
+    if (!reviewData.description.trim()) {
+      setErrordescription('الرجاء إدخال وصف المراجعة');
       return;
     }
 
-  if (!product.description.trim()) {
-       setErrordescription('Enter Review Description Please');
+    // Check if at least one rating is provided
+    if (rating === 0 && ratingroom === 0 && ratingvalue === 0 && 
+        ratingclearliness === 0 && ratingservice === 0) {
+      setErrorMessage('الرجاء تقديم تقييم واحد على الأقل');
       return;
-    } 
-    
-  
-   if (!product.type.trim()) {
-       setErrortype('Enter Trip type Please');
-      return;
-    }  
-   
- setIsSubmitting(true);
-    
-    setSuccessMessage('');
+    }
 
+    setIsSubmitting(true);
 
     try {
-    // Create product with JSON
-    const productData = {
-      product: proid,
-      user: product.user,
-      title: product.name,
-      rating_global:(rating+ratingroom+ratingvalue+ratingclearliness+ratingservice)/5,
-      description: product.description,
-      trip_type: product.type,
-      location: rating,
-      room: ratingroom,
-      restaurant_space: ratingroom,
-      value: ratingvalue,
-      clearliness: ratingclearliness,
-      service: ratingservice,
-      created_at: moment().format('MMMM Do YYYY'),
-      stay_date: date_stay && date_stay[0]? moment(date_stay[0].check_in_date).format("MMMM Do YYYY"): "Not Reserved Through Goamico"
-    };
+      // Calculate global rating
+      const globalRating = calculateGlobalRating();
 
-    const productResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}productreviews/`, {
-      method: 'POST',
-      headers: {
-        "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(productData),
-    });
+      // Create review data
+      const reviewPayload = {
+        ...reviewData,
+        rating_global: globalRating,
+        location: rating,
+        room: ratingroom,
+        restaurant_space: ratingroom, // Using same as room rating
+        value: ratingvalue,
+        clearliness: ratingclearliness,
+        service: ratingservice,
+        user: session?.user?.id || ''
+      };
 
-    if (!productResponse.ok) {
-      const errorData: ApiError = await productResponse.json();
-      throw new Error(errorData.message || 'Error creating Review. Please try again.');
+      // Submit review
+      const reviewResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}productreviews/`, {
+        method: 'POST',
+        headers: {
+          "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reviewPayload),
+      });
 
-    }
+      if (!reviewResponse.ok) {
+        const errorData: ApiError = await reviewResponse.json();
+        throw new Error(errorData.message || 'حدث خطأ أثناء إنشاء المراجعة. يُرجى المحاولة مرة أخرى.');
+      }
 
-    const productResponseData = await productResponse.json();
-    const productId = productResponseData.id;
-   
-      // Submit additional images
+      const reviewResponseData = await reviewResponse.json();
+      const reviewId = reviewResponseData.id;
+
+      // Submit additional images if any
       if (images.length > 0) {
         for (let i = 0; i < images.length; i++) {
           const imageFormData = new FormData();
           imageFormData.append('image', images[i].file);
-          imageFormData.append('ProductReview', productId);
+          imageFormData.append('ProductReview', reviewId);
 
           const imageResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}reviewsimage/`, {
             method: 'POST',
@@ -259,318 +184,206 @@ const date_stay = AllBookings.filter(reservation => reservation.user === session
         }
       }
 
-    
-
+      // Cleanup
       images.forEach(img => URL.revokeObjectURL(img.url));
-      setImages([]);
-      if (mainImagePreview) {
-        URL.revokeObjectURL(mainImagePreview);
-        setMainImagePreview(null);
-      }
-     
+      
+      // Redirect to property page
+      router.push(`/property-details-1/${proid}`);
 
     } catch (error) {
       console.error('Submission error:', error);
       setErrorMessage(
-        error instanceof Error ? error.message : 'Error creating Review. Please try again.'
+        error instanceof Error ? error.message : 'حدث خطأ أثناء إنشاء المراجعة. يُرجى المحاولة مرة أخرى.'
       );
     } finally {
       setIsSubmitting(false);
-      router.push(`/en/booking/${proid}`)
     }
   };
 
+  const renderStarRating = (
+    currentRating: number,
+    hoverRating: number,
+    setCurrentRating: (rating: number) => void,
+    setHoverRating: (rating: number) => void,
+    title: string,
+    description: string
+  ) => (
+    <div className="my-2">
+      <div className='mb-3 flex gap-1 flex-wrap'>
+        <p className="block text-3xl font-semibold text-gray-500">{title} *</p>
+        <p className='text-gray-500 text-3xl'>{description}</p>
+      </div>
+      <div className="flex">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <FaStar
+            key={star}
+            className={`cursor-pointer text-3xl ${
+              star <= (hoverRating || currentRating)
+                ? 'text-sec'
+                : 'text-gray-300'
+            }`}
+            onMouseEnter={() => setHoverRating(star)}
+            onMouseLeave={() => setHoverRating(0)}
+            onClick={() => setCurrentRating(star)}
+          />
+        ))}
+      </div>
+      <hr className='my-6'/>
+    </div>
+  );
+
   return (
-    <div className=" py-4">
-      <div className=" px-4">
-        <div className="bg-white rounded-2xl  overflow-hidden">
+    <div className="py-4">
+      <div>
+        <div className="bg-white rounded-2xl overflow-hidden">
           {/* Header */}
-          <div className="bg-highlights px-8 py-6 flex flex-col justify-center items-center">
-            <h1 className="text-3xl font-bold text-white font-playfair">Add Review</h1>
-            <p className="text-white mt-2">Fill in all required fields marked with a star. To enhance your post, complete all fields. For best results, use a high-quality image sized 160 x 30</p>
+          <div className="bg-prim px-4 py-6">
+            <h1 className="text-3xl font-bold text-white">إضافة تقييم</h1>
+            <p className="text-white mt-2 text-2xl">
+              قم بملء جميع الحقول المطلوبة والمحددة بنجمة. ولتحسين مراجعتك، يُفضّل إكمال جميع الحقول.
+            </p>
           </div>
 
-          <div className="p-1 max-w-3xl mx-auto">
-
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Basic Information */}
-           
-
-                <div>  
-
-                  <div className='mt-1'>
-                   <div className=" rounded-xl p-2">
-                  <div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-500 mb-2">Title *</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={product.name}
-                      onChange={handleProductChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                      placeholder="Enter review summary title"
-                    />
-                    {errorname && <p className="text-sm mt-2 text-accent">{errorname}</p>}
-                  </div>
-                  
-
-                <div className="mt-6">
-                  <label className="block text-sm font-semibold text-gray-500 mb-2">Description *</label>
-                   <textarea
-                    value={product.description}
-                    onChange={(e) => handleDescriptionChange(e.target.value)}
-                    placeholder='Write review description'
+          <div >
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Review Description */}
+              <div className="rounded-xl p-4 border border-gray-200">
+                <div className="mt-4">
+                  <label className="block text-3xl font-semibold text-gray-500 mb-2">
+                    الوصف *
+                  </label>
+                  <textarea
+                    value={reviewData.description}
+                    onChange={handleDescriptionChange}
+                    placeholder='اكتب وصف المراجعة'
                     rows={4}
-                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-prim focus:border-prim transition-all"
                     required
                   />
-                 
-                   {errordescription && <p className="text-sm mt-2 text-accent">{errordescription}</p>}
-                </div>
- <p className="block text-sm font-semibold text-gray-500 my-4">Add special Ratings for every features*</p>
-                  {/* Star Rating */}
-                    <div className=" my-2 ">
-                    <div className='mb-3 flex gap-1 flex-wrap'>
-                      <p className="block text-sm font-semibold text-gray-500">Location *  </p>
-                    <p className='text-gray-500 text-sm'>What’s your rating for this location and how appealing you find it?</p>
-                    </div>
-                    
-                    <div className="flex">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <FaStar
-                          key={star}
-                          className={`cursor-pointer text-2xl ${
-                            star <= (hoverRating || rating)
-                              ? 'text-accent'
-                              : 'text-gray-300'
-                          }`}
-                          onMouseEnter={() => setHoverRating(star)}
-                          onMouseLeave={() => setHoverRating(0)}
-                          onClick={() => setRating(star)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-
-<hr className='my-6'/>
-
-
-                    <div className=" my-2 ">
-                    <div className='mb-3 flex gap-1 flex-wrap'>
-                      <p className="block text-sm font-semibold text-gray-500">Room *  </p>
-                    <p className='text-gray-500 text-sm'>What’s your rating for the room space, comfort, and attractiveness?</p>
-                    </div>
-                    
-                    <div className="flex">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <FaStar
-                          key={star}
-                          className={`cursor-pointer text-2xl ${
-                            star <= (hoverRatingroom || ratingroom)
-                              ? 'text-accent'
-                              : 'text-gray-300'
-                          }`}
-                          onMouseEnter={() => setHoverRatingroom(star)}
-                          onMouseLeave={() => setHoverRatingroom(0)}
-                          onClick={() => setRatingroom(star)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-
-<hr className='my-6'/>
-
-
-
-                    <div className=" my-2 ">
-                    <div className='mb-3 flex gap-1 flex-wrap'>
-                      <p className="block text-sm font-semibold text-gray-500">Value *  </p>
-                    <p className='text-gray-500 text-sm'>How many stars would you give for the value you received?</p>
-                    </div>
-                    
-                    <div className="flex">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <FaStar
-                          key={star}
-                          className={`cursor-pointer text-2xl ${
-                            star <= (hoverRatingvalue || ratingvalue)
-                              ? 'text-accent'
-                              : 'text-gray-300'
-                          }`}
-                          onMouseEnter={() => setHoverRatingvalue(star)}
-                          onMouseLeave={() => setHoverRatingvalue(0)}
-                          onClick={() => setRatingvalue(star)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-
-
-<hr className='my-6'/>
-
-                    <div className=" my-2 ">
-                    <div className='mb-3 flex gap-1 flex-wrap'>
-                      <p className="block text-sm font-semibold text-gray-500">Clearliness *  </p>
-                    <p className='text-gray-500 text-sm'>How many stars would you give for the cleanliness?</p>
-                    </div>
-                    
-                    <div className="flex">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <FaStar
-                          key={star}
-                          className={`cursor-pointer text-2xl ${
-                            star <= (hoverRatingclearliness || ratingclearliness)
-                              ? 'text-accent'
-                              : 'text-gray-300'
-                          }`}
-                          onMouseEnter={() => setHoverRatingclearliness(star)}
-                          onMouseLeave={() => setHoverRatingclearliness(0)}
-                          onClick={() => setRatingclearliness(star)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-
-<hr className='my-6'/>
-
-
-                    <div className=" my-2 ">
-                    <div className='mb-3 flex gap-1 flex-wrap'>
-                      <p className="block text-sm font-semibold text-gray-500">Service * : </p>
-                    <p className='text-gray-500 text-sm'>How would you rate the staff and service?</p>
-                    </div>
-                    
-                    <div className="flex">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <FaStar
-                          key={star}
-                          className={`cursor-pointer text-2xl ${
-                            star <= (hoverRatingservice || ratingservice)
-                              ? 'text-accent'
-                              : 'text-gray-300'
-                          }`}
-                          onMouseEnter={() => setHoverRatingservice(star)}
-                          onMouseLeave={() => setHoverRatingservice(0)}
-                          onClick={() => setRatingservice(star)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-
-
-
-                  
-                  <div className='w-full'>
-                    <label className="block text-sm font-semibold text-gray-500 my-6">Tripe type *</label>
-                    <input
-                      type="text"
-                      name="type"
-                      value={product.type}
-                      onChange={handleProductChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-3 focus:ring-highlights focus:border-highlights transition-all"
-                      placeholder="e.g., Business"
-                    />
-                     {errortype && <p className="text-sm mt-2 text-accent">{errortype}</p>}
-                  </div>
-
-   
-                      </div>
-
-                     
-            
-                </div>      
-                
-                </div>    
-          
-
-<div >
-              {/* Images Section */}
-              <div >
-               
-                
-   
-   
-                {/* Additional Images */}
-            <div className=" rounded-xl p-2">
-                  <label className="block text-sm font-semibold text-gray-500 mb-3">Images</label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
-                    {images.map((img, index) => (
-                      <div key={index} className="relative group">
-                        <Image 
-                        src={img.url} alt={`Preview ${index + 1}`}  
-                        width={150}
-                        height={150}
-                        className="w-full h-24 object-cover rounded-lg" />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute -top-2 -right-2 w-6 h-6 bg-highlights text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-secondary"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                    <label className="cursor-pointer">
-                      <div className="w-full h-24 border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50 rounded-lg flex items-center justify-center hover:border-highlights transition-colors">
-                        <Plus className="w-6 h-6 text-gray-400" />
-                      </div>
-                      <input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                  {images.length > 0 && (
-                    <p className="text-sm text-gray-500">{images.length} additional image(s) selected</p>
+                  {errordescription && (
+                    <p className="text-red-500 mt-2 text-2xl">{errordescription}</p>
                   )}
                 </div>
+
+                <p className="block text-3xl font-semibold text-gray-500 my-6">
+                  أضف تقييمات خاصة لكل ميزة*
+                </p>
+
+                {/* Star Ratings */}
+                {renderStarRating(
+                  rating,
+                  hoverRating,
+                  setRating,
+                  setHoverRating,
+                  "الموقع",
+                  "ما تقييمك لهذا الموقع ومدى جاذبيته؟"
+                )}
+
+                {renderStarRating(
+                  ratingroom,
+                  hoverRatingroom,
+                  setRatingroom,
+                  setHoverRatingroom,
+                  "الغرف",
+                  "ما هو تقييمك لمساحة الغرف وراحتها وجاذبيتها؟"
+                )}
+
+                {renderStarRating(
+                  ratingvalue,
+                  hoverRatingvalue,
+                  setRatingvalue,
+                  setHoverRatingvalue,
+                  "القيمة",
+                  "ما هو تقييمك للقيمة التي تلقيتها؟"
+                )}
+
+                {renderStarRating(
+                  ratingclearliness,
+                  hoverRatingclearliness,
+                  setRatingclearliness,
+                  setHoverRatingclearliness,
+                  "النظافة",
+                  "ما هو تقييمك للنظافة؟"
+                )}
+
+                {renderStarRating(
+                  ratingservice,
+                  hoverRatingservice,
+                  setRatingservice,
+                  setHoverRatingservice,
+                  "الخدمة",
+                  "ما هو تقييمك للموظفين والخدمة؟"
+                )}
               </div>
 
-<div className='my-2'></div>
+              {/* Images Section */}
+              <div className="rounded-xl p-4 border border-gray-200">
+                <label className="block text-2xl font-semibold text-gray-500 mb-4">
+                  الصور الإضافية
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
+                  {images.map((img, index) => (
+                    <div key={index} className="relative group">
+                      <Image 
+                        src={img.url} 
+                        alt={`Preview ${index + 1}`}  
+                        width={150}
+                        height={150}
+                        className="w-full h-24 object-cover rounded-lg" 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 w-6 h-6 bg-sec text-white rounded-full flex items-center justify-center shadow-lg hover:bg-prim transition-all z-10"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <label className="cursor-pointer">
+                    <div className="w-full h-24 border-2 border-dashed border-gray-300 bg-white hover:bg-gray-50 rounded-lg flex items-center justify-center hover:border-prim transition-colors">
+                      <Plus className="w-6 h-6 text-gray-400" />
+                    </div>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                {images.length > 0 && (
+                  <p className="text-2xl text-gray-500">{images.length} صورة إضافية مختارة</p>
+                )}
+              </div>
 
-            {errorMessage && <p className='text-accent'>{errorMessage}</p>}
+              {errorMessage && (
+                <div >
+                  <p className="text-prim text-2xl">{errorMessage}</p>
+                </div>
+              )}
 
               {/* Submit Button */}
-              <div className="flex justify-center pt-6">
+              <div className="flex justify-center pt-4">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`px-4 py-2 bg-highlights w-full text-white font-semibold rounded-xl ${
-                    isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-secondary'
+                  className={`tf-btn btn-bg-1 btn-px-28 text-white${
+                    isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-prim'
                   }`}
                 >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2 justify-center">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin "></div>
-                      Creating Review...
+                      <div className="w-5 h-5 border-2 text-white font-bold border-white border-t-transparent rounded-full animate-spin"></div>
+                      جاري إنشاء التقييم...
                     </span>
                   ) : (
-                    'Create Review'
+                    <p className='text-white font-bold'>إنشاء التقييم</p>
+
                   )}
                 </button>
-              </div>  
-
-                <div className="flex justify-center pt-6 mb-6">
-                 
-                <button
-
-                  className="px-4 py-2 bg-white w-full text-gray-600 border border-1 font-semibold rounded-xl hover:bg-highlights hover:text-white"  
-                  onClick={()=>router.push(`/en/booking/${proid}`)}
-                >
-                  Cancel
-                </button>
-              </div>  
               </div>
-                 </div>
             </form>
           </div>
         </div>

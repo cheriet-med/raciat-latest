@@ -4,13 +4,11 @@ import Relatest from "@/components/property-details/Relatest";
 import { allProperties } from "@/data/properties";
 import React from "react";
 
-
 type PageProps = {
   params: Promise<{
     id: string;
   }>;
 };
-
 
 export default async function Page({ params }: PageProps) {
   const { id } = await params;
@@ -20,12 +18,11 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <Layout>
-      <PropertyDetails1 property={property} />
+      <PropertyDetails1 propertyId={id} fallbackProperty={property} />
       <Relatest />
     </Layout>
   );
 }
-
 
 export async function generateStaticParams() {
   return allProperties.map((property) => ({

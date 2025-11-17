@@ -19,10 +19,10 @@ export const menuItems: MenuItem[] = [
      {
         title: "عقارات",
         links: [
-            { href: "/listing-topmap-grid", label: "شقق"},
-            { href: "/listing-topmap-grid", label: "فلل" },
-            { href: "/listing-topmap-grid", label: "مكاتب" },
-            { href: "/listing-topmap-grid", label: "بناء" },
+            { href: `/listing-topmap-grid?q=${"شقة"}`, label: "شقق"},
+            { href: `/listing-topmap-grid?q=${"فلة"}`, label: "فلل" },
+            { href: `/listing-topmap-grid?q=${"مكتب"}`, label: "مكاتب" },
+            { href: `/listing-topmap-grid?q=${"بناء"}`, label: "بناء" },
         ],
         isCurrent: true,
     },{

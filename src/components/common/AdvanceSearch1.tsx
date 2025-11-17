@@ -7,13 +7,20 @@ import {
     maxSizeOptions,
     amenitiesList,
 } from "@/data/optionfilter";
+// In your AdvanceSearch1.tsx file, update the interface:
 
 interface AdvanceSearchProps {
     allProps: {
+        city: string;
+        setCity: (city: string) => void;
+        bedrooms: string;
+        setBedrooms: (bedrooms: string) => void;
         bathrooms: string;
         setBathrooms: (bathrooms: string) => void;
         garages: string;
         setGarages: (garages: string) => void;
+        budget: string;
+        setBudget: (budget: string) => void;
         minSize: string;
         setMinSize: (minSize: string) => void;
         maxSize: string;
@@ -21,10 +28,11 @@ interface AdvanceSearchProps {
         features: string[];
         setFeatures: (feature: string) => void;
     };
+    ddContainer: React.RefObject<HTMLDivElement | null>;  // Changed from HTMLDivElement to HTMLDivElement | null
     handleFeatureChange: (feature: string) => void;
-    ddContainer: React.RefObject<HTMLDivElement>;
 }
 
+// Rest of your AdvanceSearch1 component code...
 
 
 export default function AdvanceSearch({

@@ -2,7 +2,19 @@
 
 import React, { useState, ChangeEvent, FormEvent } from "react";
 
-export default function BoxSeller1() {
+type Property = {
+  id: number;
+  address: string;
+  title: string;
+  beds?: number;
+  baths?: number;
+  sqft?: number;
+  categories: string;
+  type: string;
+  price: number;
+};
+
+export default function BoxSeller1({ property }: { property: Property }) {
     const [formData, setFormData] = useState({
         name: "",
         phone: ""
@@ -28,11 +40,11 @@ export default function BoxSeller1() {
                     <i className="icon icon-MapPin"></i>
                     <div>
                         <p className="text_primary-color mb_4">
-                            6205 طريق بيتشتري دنودي، <br />
-                            أتلانتا، جورجيا 30328
+                            شجاع بن وهب، عبدالرحمن السديري،<br />
+                           جدة 23436، المملكة العربية السعودية
                         </p>
                         
-                         <a    href="#"
+                         <a    href="/contacts"
                             className="hover-underline-link text-button fw-7 text_primary-color"
                         >
                             اتصل بنا
@@ -42,8 +54,8 @@ export default function BoxSeller1() {
                 <li className="item d-flex gap_12 align-items-center">
                     <i className="icon icon-PhoneCall"></i>
                     <div>
-                        <p className="text_primary-color">1-555-678-8888</p>
-                        <p className="text_primary-color">1-555-678-8888</p>
+                        <p className="text_primary-color">966547029710</p>
+
                     </div>
                 </li>
             </ul>

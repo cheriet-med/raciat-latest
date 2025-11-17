@@ -41,49 +41,7 @@ export default function PropertyDetails4({ property }: { property: Property }) {
         <>
             <div className="properties-details">
                 <Gallery2 />
-                <div className="tf-container  tf-spacing-1">
-                    <div className="properties-title v2">
-                        <PropertiesTitle2 property={property} />
-                    </div>
-                    <div className="properties-overview v4 tf-spacing-8">
-                        <Overview2 />
-                    </div>
 
-                    <div className="properties-description">
-                        <Description />
-                    </div>
-
-                    <div className="properties-utility tf-spacing-8">
-                        <PropertyUtility />
-                    </div>
-
-                    <div className="properties-video v2">
-                        <Video property={property} />
-                    </div>
-
-                    <div className="properties-calculator tf-spacing-8">
-                        <Caculator />
-                    </div>
-
-                    <div className="properties-floor">
-                        <Floor2 />
-                    </div>
-
-                    <div className="properties-location v3 tf-spacing-8">
-                        <Location property={property} />
-                    </div>
-
-                    <div className="properties-nearby ">
-                        <Nearby />
-                    </div>
-                    <div className="properties-seller tf-spacing-8">
-                        <BoxSeller3 />
-                    </div>
-                    <div className="mb_40">
-                        <Comment />
-                    </div>
-                    <FormComments />
-                </div>
             </div>
         </>
     );

@@ -1,7 +1,7 @@
 "use client";
 import { allProperties } from "@/data/properties";
 import Image from "next/image";
-import React, { useEffect, useRef, useState, useReducer } from "react";
+import React, { useEffect, useRef, useState, useReducer, Suspense } from "react";
 import { initialState, reducer } from "@/context/propertiesFilterReduce";
 import Pagination from "@/components/common/Pagination";
 import type { Property } from "@/data/properties";
@@ -9,6 +9,11 @@ import SidebarFilter1 from "../common/SidebarFilter1";
 import Map from "../common/Map";
 import DropdownSelect2 from "../common/DropdownSelect2";
 import Link from "next/link";
+import useFetchListing from "@/components/requests/fetchListings";
+import { useSession } from "next-auth/react";
+import LoginButton from "@/components/header/loginButton";
+import { FaRegHeart, FaHeart } from "react-icons/fa";
+import { useSearchParams } from "next/navigation";
 
 // --- Helper functions for mapping dropdown values to filter values ---
 
@@ -17,9 +22,12 @@ function parseSizeValue(val: string) {
     return val.replace(/[^0-9]/g, "");
 }
 
-export default function Properties1() {
+// Separate component for search params
+function PropertiesContent() {
     const ddContainer = useRef<HTMLDivElement>(null);
     const advanceBtnRef = useRef<HTMLDivElement>(null);
+    const searchParams = useSearchParams();
+    const categoryFromUrl = searchParams.get('q') || 'الكل';
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -39,6 +47,8 @@ export default function Properties1() {
     }, []);
 
     const [state, dispatch] = useReducer(reducer, initialState);
+    const [wishlistItems, setWishlistItems] = useState<Record<number, boolean>>({});
+    const [category, setCategory] = useState<string>("إيجار");
 
     const {
         bedrooms,
@@ -59,51 +69,122 @@ export default function Properties1() {
     // Additional state for form elements
     const [searchKeyword, setSearchKeyword] = useState<string>("");
 
-    // Filtering logic
+    // Fetch listings from API
+    const { listings } = useFetchListing();
+    const { data: session, status } = useSession();
+
+    // Fetch wishlist status for all properties
     useEffect(() => {
-        let filteredList: Property[] = allProperties;
+        const fetchWishlistStatus = async () => {
+            if (status === "authenticated" && listings) {
+                try {
+                    const response = await fetch(
+                        `${process.env.NEXT_PUBLIC_URL}wishlist/${session?.user?.id}/`,
+                        {
+                            headers: {
+                                Authorization: `Token ${process.env.NEXT_PUBLIC_TOKEN}`,
+                            },
+                        }
+                    );
+                    if (response.ok) {
+                        const data = await response.json();
+                        const wishlistMap: Record<number, boolean> = {};
+                        data.forEach((item: any) => {
+                            wishlistMap[item.product.id] = true;
+                        });
+                        setWishlistItems(wishlistMap);
+                    }
+                } catch (error) {
+                    console.error("Error fetching wishlist:", error);
+                }
+            }
+        };
+        fetchWishlistStatus();
+    }, [status, session?.user?.id, listings]);
+
+    const toggleWishlist = async (propertyId: number) => {
+        if (status !== "authenticated") return;
+
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_URL}wishlist/${propertyId}/`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Token ${process.env.NEXT_PUBLIC_TOKEN}`,
+                    },
+                    body: JSON.stringify({
+                        user_id: session?.user?.id
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            setWishlistItems(prev => ({
+                ...prev,
+                [propertyId]: data.is_in_wishlist
+            }));
+
+            return data;
+        } catch (error) {
+            console.error("Error toggling wishlist:", error);
+            throw new Error("Failed to toggle wishlist. Please try again later.");
+        }
+    };
+
+    // Filtering logic - now using listings from API
+    useEffect(() => {
+        if (!listings) return;
+
+        let filteredList: any[] = [...listings];
+
+        // Category filter from tabs (للإيجار or للبيع)
+        if (category) {
+            filteredList = filteredList.filter(
+                (p) => p.category === category
+            );
+        }
+
+        // Category filter from URL parameter
+        if (categoryFromUrl && categoryFromUrl !== "الكل") {
+            filteredList = filteredList.filter(
+                (p) => p.types === categoryFromUrl
+            );
+        }
 
         // City filter
         if (city && city !== "All Cities") {
             filteredList = filteredList.filter(
-                (p) => p.city && p.city === city
+                (p) => p.region && p.region === city
             );
         }
 
-        // Bedrooms filter - FIXED
+        // Bedrooms filter
         if (bedrooms && bedrooms !== "Any Bedrooms") {
             if (bedrooms === "4+") {
-                filteredList = filteredList.filter((p) => Number(p.beds) >= 4);
+                filteredList = filteredList.filter((p) => Number(p.rooms_number) >= 4);
             } else {
                 const bedroomNum = parseInt(bedrooms, 10);
                 filteredList = filteredList.filter(
-                    (p) => p.beds === bedroomNum
+                    (p) => p.rooms_number === bedroomNum
                 );
             }
         }
 
-        // Bathrooms filter - FIXED
+        // Bathrooms filter
         if (bathrooms && bathrooms !== "Any Bathrooms") {
             if (bathrooms === "4+") {
-                filteredList = filteredList.filter((p) => Number(p.baths) >= 4);
+                filteredList = filteredList.filter((p) => Number(p.badrooms_number) >= 4);
             } else {
                 const bathroomNum = parseInt(bathrooms, 10);
                 filteredList = filteredList.filter(
-                    (p) => p.baths === bathroomNum
-                );
-            }
-        }
-
-        // Garages filter - FIXED
-        if (garages && garages !== "Any Garages") {
-            if (garages === "3+") {
-                filteredList = filteredList.filter(
-                    (p) => Number(p.garages) >= 3
-                );
-            } else {
-                const garageNum = parseInt(garages, 10);
-                filteredList = filteredList.filter(
-                    (p) => p.garages === garageNum
+                    (p) => p.badrooms_number === bathroomNum
                 );
             }
         }
@@ -143,7 +224,7 @@ export default function Properties1() {
             const min = parseInt(parseSizeValue(minSize), 10);
             if (!isNaN(min)) {
                 filteredList = filteredList.filter(
-                    (p) => p.sqft !== undefined && Number(p.sqft) >= min
+                    (p) => p.size !== undefined && Number(p.size) >= min
                 );
             }
         }
@@ -153,18 +234,9 @@ export default function Properties1() {
             const max = parseInt(parseSizeValue(maxSize), 10);
             if (!isNaN(max)) {
                 filteredList = filteredList.filter(
-                    (p) => p.sqft !== undefined && Number(p.sqft) <= max
+                    (p) => p.size !== undefined && Number(p.size) <= max
                 );
             }
-        }
-
-        // Features filter
-        if (features && features.length > 0) {
-            filteredList = filteredList.filter(
-                (p) =>
-                    Array.isArray(p.features) &&
-                    features.every((f) => p.features!.includes(f))
-            );
         }
 
         // Search keyword filter
@@ -172,9 +244,9 @@ export default function Properties1() {
             const kw = searchKeyword.trim().toLowerCase();
             filteredList = filteredList.filter(
                 (p) =>
-                    (p.title && p.title.toLowerCase().includes(kw)) ||
-                    (p.address && p.address.toLowerCase().includes(kw)) ||
-                    (p.city && p.city.toLowerCase().includes(kw))
+                    (p.name && p.name.toLowerCase().includes(kw)) ||
+                    (p.location && p.location.toLowerCase().includes(kw)) ||
+                    (p.region && p.region.toLowerCase().includes(kw))
             );
         }
 
@@ -189,14 +261,17 @@ export default function Properties1() {
         maxSize,
         features,
         searchKeyword,
+        listings,
+        categoryFromUrl,
+        category,
     ]);
 
     // Sorting logic
     useEffect(() => {
         const sortedList = [...filtered];
-        if (sortingOption === "Price Ascending") {
+        if (sortingOption === "السعر تصاعدي") {
             sortedList.sort((a, b) => a.price - b.price);
-        } else if (sortingOption === "Price Descending") {
+        } else if (sortingOption === "السعر تنازلي") {
             sortedList.sort((a, b) => b.price - a.price);
         }
         dispatch({ type: "SET_SORTED", payload: sortedList });
@@ -253,6 +328,43 @@ export default function Properties1() {
         },
     };
 
+    const WishlistButton = ({ propertyId }: { propertyId: number }) => {
+        const isInWishlist = wishlistItems[propertyId];
+
+        if (status !== "authenticated") {
+            return <LoginButton />;
+        }
+
+        return (
+            <div
+                className="wishlist cursor-pointer"
+                onClick={(e) => {
+                    e.preventDefault();
+                    toggleWishlist(propertyId);
+                }}
+            >
+                <div className="hover-tooltip tooltip-left box-icon">
+                    {isInWishlist ? (
+                        <FaHeart className="text-red-500 text-xl" />
+                    ) : (
+                        <FaRegHeart className="text-xl" />
+                    )}
+                    <span className="tooltip">
+                        {isInWishlist ? "إزالة من قائمة الرغبات" : "أضف إلى قائمة الرغبات"}
+                    </span>
+                </div>
+            </div>
+        );
+    };
+
+    if (!listings) {
+        return (
+            <div className="text-center py-10">
+                <p>جاري التحميل...</p>
+            </div>
+        );
+    }
+
     return (
         <>
             <div className="flat-map">
@@ -266,13 +378,11 @@ export default function Properties1() {
                         setSearchKeyword={setSearchKeyword}
                         handleSearch={handleSearch}
                         handleFeatureChange={handleFeatureChange}
-                        ddContainer={
-                            ddContainer as React.RefObject<HTMLDivElement>
-                        }
-                        advanceBtnRef={
-                            advanceBtnRef as React.RefObject<HTMLDivElement>
-                        }
+                        ddContainer={ddContainer}
+                        advanceBtnRef={advanceBtnRef}
                         toggleAdvancedFilter={toggleAdvancedFilter}
+                        category={category}
+                        setCategory={setCategory}
                     />
                 </div>
             </div>
@@ -290,36 +400,8 @@ export default function Properties1() {
                             </ul>
                             <h4 className="text-4xl lg:text-5xl font-bold">عقارات</h4>
                         </div>
-                        <div className="right d-flex gap_12">
-                            <ul
-                                className="nav-tab-filter align-items-center group-layout  d-flex gap_12"
-                                role="tablist"
-                            >
-                                <li
-                                    className="nav-tab-item"
-                                    role="presentation"
-                                >
-                                    <a
-                                        href="#gridLayout"
-                                        className=" btn-layout grid nav-link-item active"
-                                        data-bs-toggle="tab"
-                                    >
-                                        <i className="icon-SquaresFour"></i>
-                                    </a>
-                                </li>
-                                <li
-                                    className="nav-tab-item"
-                                    role="presentation"
-                                >
-                                    <a
-                                        href="#listLayout"
-                                        className="nav-link-item btn-layout list"
-                                        data-bs-toggle="tab"
-                                    >
-                                        <i className="icon-Rows"></i>
-                                    </a>
-                                </li>
-                            </ul>
+                        <div className="w-80">
+
                             <DropdownSelect2
                                 onChange={(value) =>
                                     dispatch({
@@ -329,9 +411,9 @@ export default function Properties1() {
                                 }
                                 addtionalParentClass="list-sort"
                                 options={[
-                                    "Sort by (Default)",
-                                    "Price Ascending",
-                                    "Price Descending",
+                                    "فرز حسب (الافتراضي)",
+                                    "السعر تصاعدي",
+                                    "السعر تنازلي",
                                 ]}
                             />
                         </div>
@@ -349,7 +431,7 @@ export default function Properties1() {
                                             (currentPage - 1) * itemPerPage,
                                             currentPage * itemPerPage
                                         )
-                                        .map((property) => (
+                                        .map((property: any) => (
                                             <div
                                                 key={property.id}
                                                 className="card-house style-default hover-image"
@@ -357,80 +439,60 @@ export default function Properties1() {
                                             >
                                                 <div className="img-style mb_20">
                                                     <Image
-                                                        src={property.imgSrc}
+                                                        src={`${process.env.NEXT_PUBLIC_IMAGE}/${property.image}`}
                                                         width={410}
                                                         height={308}
                                                         alt="home"
                                                     />
                                                     <div className="wrap-tag d-flex gap_8 mb_12">
                                                         <div
-                                                            className={`tag  text-button-small fw-6 text_primary-color`}
-                                                             style={{
-                                                    backgroundColor: property.type === "بيع" ? "#dc3545" : "#28a745",
-                                                    color: "#fff"
-                                                }}
+                                                            className="tag text-button-small fw-6 text_primary-color"
+                                                            style={{
+                                                                backgroundColor: property.category === "بيع" ? "#dc3545" : "#28a745",
+                                                                color: "#fff"
+                                                            }}
                                                         >
-                                                             {property.type}
+                                                            {property.category}
                                                         </div>
                                                         <div className="tag categoreis text-button-small fw-6 text_primary-color">
-                                                            {
-                                                                property.categories
-                                                            }
+                                                            {property.types}
                                                         </div>
                                                     </div>
                                                     <Link
                                                         href={`/property-details-1/${property.id}`}
                                                         className="overlay-link"
                                                     ></Link>
-                                                    <div className="wishlist">
-                                                        <div className="hover-tooltip tooltip-left box-icon">
-                                                            <span className="icon icon-Heart"></span>
-                                                            <span className="tooltip">
-                                                                Add to Wishlist
-                                                            </span>
-                                                        </div>
-                                                    </div>
+                                                    <WishlistButton propertyId={property.id} />
                                                 </div>
                                                 <div className="content">
                                                     <h4
                                                         className="price mb_12 text-4xl lg:text-5xl font-bold"
                                                         suppressHydrationWarning
                                                     >
-                                                        SAR {" "}
-                                                        {property.price.toLocaleString()}
-                                                        <span className="text_secondary-color text-body-default">
-                                                            {property.type ===
-                                                            "Sale"
-                                                                ? "/Sqft"
-                                                                : ""}
-                                                        </span>
+                                                        {property.currency} {property.price}
                                                     </h4>
                                                     <Link
                                                         href={`/property-details-1/${property.id}`}
                                                         className="title mb_8 h5 link text_primary-color"
                                                     >
-                                                        {property.title}
+                                                        {property.name}
                                                     </Link>
-                                                    <p>{property.address}</p>
+                                                    <p>{property.location}، {property.region}</p>
                                                     <ul className="info d-flex">
                                                         <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
                                                             <i className="icon-Bed"></i>
-                                                            {property.beds} غرف
+                                                            {property.rooms_number} غرف
                                                         </li>
                                                         <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
                                                             <i className="icon-Bathtub"></i>
-                                                            {property.baths}{" "}
-                                                            حمام
+                                                            {property.badrooms_number} حمام
                                                         </li>
                                                         <li
-                                                            className="d-flex align-items-center gap_8 text-title text_primary-color fw-6 "
+                                                            className="d-flex align-items-center gap_8 text-title text_primary-color fw-6"
                                                             suppressHydrationWarning
                                                         >
                                                             <i className="icon-Ruler"></i>
-                                                            {property.sqft
-                                                                ? property.sqft.toLocaleString()
-                                                                : "0"}{" "}
-                                                            قدم مربع
+                                                            {property.size} قدم مربع
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -449,7 +511,7 @@ export default function Properties1() {
                                             (currentPage - 1) * 5,
                                             currentPage * 5
                                         )
-                                        .map((property) => (
+                                        .map((property: any) => (
                                             <div
                                                 className="card-house style-list v2"
                                                 data-id={property.id}
@@ -461,66 +523,30 @@ export default function Properties1() {
                                                         className="img-style"
                                                     >
                                                         <Image
-                                                            src={
-                                                                property.imgSrc
-                                                            }
+                                                            src={`${process.env.NEXT_PUBLIC_IMAGE}/${property.image}`}
                                                             width={392}
                                                             height={260}
-                                                            alt={
-                                                                property.alt ||
-                                                                "home"
-                                                            }
+                                                            alt="home"
                                                         />
                                                     </Link>
-                                                    {property.imgSrc2 && (
-                                                        <Link
-                                                            href={`/property-details-1/${property.id}`}
-                                                            className="img-style"
-                                                        >
-                                                            <Image
-                                                                src={
-                                                                    property.imgSrc2
-                                                                }
-                                                                width={392}
-                                                                height={260}
-                                                                alt={
-                                                                    property.alt ||
-                                                                    "home"
-                                                                }
-                                                            />
-                                                        </Link>
-                                                    )}
                                                 </div>
                                                 <div className="content">
                                                     <div className="d-flex align-items-center gap_6 top mb_16 flex-wrap justify-content-between">
                                                         <h4 className="price text-4xl lg:text-5xl font-bold" suppressHydrationWarning>
-                                                            SAR {" "}
-                                                            {property.price.toLocaleString()}
-                                                            <span className="text_secondary-color text-body-default">
-                                                                {property.type ===
-                                                                "Sale"
-                                                                    ? "/Sqft"
-                                                                    : ""}
-                                                            </span>
+                                                            {property.currency} {property.price}
                                                         </h4>
                                                         <div className="wrap-tag d-flex gap_8">
                                                             <div
-                                                                className={`tag ${
-                                                                    property.type ===
-                                                                    "Sale"
-                                                                        ? "sale"
-                                                                        : "rent"
-                                                                } text-button-small fw-6 text_primary-color`}
+                                                                className="tag text-button-small fw-6 text_primary-color"
+                                                                style={{
+                                                                    backgroundColor: property.category === "بيع" ? "#dc3545" : "#28a745",
+                                                                    color: "#fff"
+                                                                }}
                                                             >
-                                                                {property.type ===
-                                                                "Sale"
-                                                                    ? "For Sale"
-                                                                    : "For Rent"}
+                                                                {property.category}
                                                             </div>
                                                             <div className="tag categoreis text-button-small fw-6 text_primary-color">
-                                                                {
-                                                                    property.categories
-                                                                }
+                                                                {property.types}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -528,25 +554,21 @@ export default function Properties1() {
                                                         href={`/property-details-1/${property.id}`}
                                                         className="title mb_8 h5 link text_primary-color"
                                                     >
-                                                        {property.title}
+                                                        {property.name}
                                                     </Link>
-                                                    <p>{property.address}</p>
+                                                    <p>{property.location}، {property.region}</p>
                                                     <ul className="info d-flex">
                                                         <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
                                                             <i className="icon-Bed"></i>
-                                                            {property.beds} غرف
+                                                            {property.rooms_number} غرف
                                                         </li>
                                                         <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
                                                             <i className="icon-Bathtub"></i>
-                                                            {property.baths}{" "}
-                                                            حمام
+                                                            {property.badrooms_number} حمام
                                                         </li>
-                                                        <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6"suppressHydrationWarning>
+                                                        <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6" suppressHydrationWarning>
                                                             <i className="icon-Ruler"></i>
-                                                            {property.sqft
-                                                                ? property.sqft.toLocaleString()
-                                                                : "0"}{" "}
-                                                             قدم مربع
+                                                            {property.size} قدم مربع
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -566,7 +588,6 @@ export default function Properties1() {
                                     payload: value,
                                 })
                             }
-                            
                             itemPerPage={itemPerPage}
                             itemLength={sorted.length}
                         />
@@ -574,5 +595,18 @@ export default function Properties1() {
                 </div>
             </div>
         </>
+    );
+}
+
+// Main component with Suspense wrapper
+export default function Properties1() {
+    return (
+        <Suspense fallback={
+            <div className="text-center py-10">
+                <p>جاري التحميل...</p>
+            </div>
+        }>
+            <PropertiesContent />
+        </Suspense>
     );
 }

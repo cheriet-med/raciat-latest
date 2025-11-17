@@ -58,7 +58,7 @@ export default function DropdownSelect2({
           {selected || defaultOption || options[0]}
         </span>
       </div>
-      <ul className="list" style={{ textAlign: 'right' }}>
+      <ul className="list " style={{ textAlign: 'right' }}>
         {options.map((elm, i) => (
           <li
             key={i}

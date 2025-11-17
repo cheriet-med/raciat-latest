@@ -22,21 +22,19 @@ export default function MapComponent({ property }: { property: Property }) {
     const map = useRef<mapboxgl.Map | null>(null);
     const popupRef = useRef<mapboxgl.Popup | null>(null);
     const [error, setError] = useState<string | null>(null);
-
     const createPopupHTML = (p: Property) => `
-        <div class="popup-property">
+        <div class="popup-property md:w-[500px]">
             <div class="img-style">
-                <img src="${
-                    p.imgSrc
-                }" width="120" height="120" alt="popup-property" />
+                <img src="${`${process.env.NEXT_PUBLIC_IMAGE}/${p.imgSrc}`
+}" width="120" height="120" alt="popup-property" />
             </div>
             <div class="content">
                 <p class="text-caption-1 mb_4">${p.address}</p>
                 <h6 class="mb_12 line-clamp-1">${p.title}</h6>
-                <ul class="info d-flex">
-                    <li><i class="icon-Bed"></i> ${p.beds ?? 0} Bed</li>
-                    <li><i class="icon-Bathtub"></i> ${p.baths ?? 0} Bath</li>
-                    <li><i class="icon-Ruler"></i> ${p.sqft ?? 0} sqft</li>
+                <ul class="info d-flex w-full ">
+                    <li><i class="icon-Bed"></i> ${p.beds ?? 0} غرف</li>
+                    <li><i class="icon-Bathtub"></i> ${p.baths ?? 0} حمامات</li>
+                    <li><i class="icon-Ruler"></i> ${p.sqft ?? 0} قدم مربع</li>
                 </ul>
             </div>
         </div>
