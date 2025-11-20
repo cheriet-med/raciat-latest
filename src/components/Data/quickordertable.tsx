@@ -2,28 +2,32 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Search, Download } from 'lucide-react';
 import useFetchAllNewsLetterEmails from '../requests/fetchAllNewsletters';
+import NewsletterTable from './newsletterTable';
+import useFetchQuikeOrders from '../requests/fetchQuikOrders';
 
 const QuikeOrderTable = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [lastUpdated, setLastUpdated] = useState('');
   const { AllNewsLetters } = useFetchAllNewsLetterEmails();
+  const { orders } = useFetchQuikeOrders();
 
   useEffect(() => {
     setLastUpdated(new Date().toLocaleString());
   }, []);
 
   const filteredSubscribers = useMemo(() => {
-    if (!searchTerm) return AllNewsLetters;
-    return AllNewsLetters.filter(subscriber =>
-      subscriber.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      subscriber.date.includes(searchTerm)
-    );
-  }, [AllNewsLetters, searchTerm]);
+    if (!searchTerm) return orders || [];
+    return orders?.filter(subscriber =>
+      subscriber.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      subscriber.phone_number.includes(searchTerm) ||
+      subscriber.date?.includes(searchTerm)
+    ) || [];
+  }, [orders, searchTerm]);
 
   const exportToCSV = () => {
     const csvContent = [
-      ['البريد الإلكتروني', 'التاريخ', 'الوقت'],
-      ...filteredSubscribers.map(sub => [sub.email, sub.date, sub.time])
+      [' اﻹسم', 'التاريخ', 'رقم الهاتف'],
+      ...filteredSubscribers.map(sub => [sub.name, sub.date, sub.phone_number])
     ];
 
     const csvString = csvContent
@@ -83,55 +87,60 @@ const QuikeOrderTable = () => {
       </div>
 
       {/* الجدول */}
-<div
-  dir="rtl"
-  className="overflow-x-auto rounded-lg bg-white "
-  style={{ direction: 'rtl', textAlign: 'right' }}
->
-  <table className="w-full table-auto">
-<thead className="bg-prim" style={{ direction: 'rtl' }}>
-  <tr>
-    <th className="px-6 py-3 text-xl font-bold text-sec uppercase tracking-wider text-right">
-      البريد الإلكتروني
-    </th>
-    <th className="px-6 py-3 text-xl font-bold text-sec uppercase tracking-wider text-right">
-      تاريخ ووقت الطلب
-    </th>
-  </tr>
-</thead>
-<tbody className='bg-sec'>
-  {filteredSubscribers.length > 0 ? (
-    filteredSubscribers.map((subscriber, index) => (
-      <tr
-        key={index}
-        className=" transition-colors duration-150 border-b last:border-0 border-gray-50"
+      <div
+        dir="rtl"
+        className="overflow-x-auto rounded-lg bg-white "
+        style={{ direction: 'rtl', textAlign: 'right' }}
       >
-        <td className="px-6 py-4 whitespace-nowrap text-xl font-bold text-white" style={{ textAlign: 'right' }}>
-          {subscriber.email}
-        </td>
-        <td className="px-6 py-4 whitespace-nowrap text-xl font-bold text-white" style={{ textAlign: 'right' }}>
-          {formatDateTime(subscriber.date)} - {subscriber.time}
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan={2} className="px-6 py-8 text-center text-white text-xl">
-        لم يتم العثور على نتائج .
-      </td>
-    </tr>
-  )}
-</tbody>
-
-  </table>
-</div>
-
-
+        <table className="w-full table-auto">
+          <thead className="bg-prim" style={{ direction: 'rtl' }}>
+            <tr>
+              <th className="px-6 py-3 text-xl font-bold text-sec uppercase tracking-wider text-right">
+                اﻹسم
+              </th>
+              <th className="px-6 py-3 text-xl font-bold text-sec uppercase tracking-wider text-right">
+                رقم الهاتف
+              </th>
+              <th className="px-6 py-3 text-xl font-bold text-sec uppercase tracking-wider text-right">
+                تاريخ ووقت الطلب
+              </th>
+            </tr>
+          </thead>
+          <tbody className='bg-sec'>
+            {filteredSubscribers.length > 0 ? (
+              filteredSubscribers.map((subscriber, index) => (
+                <tr
+                  key={index}
+                  className=" transition-colors duration-150 border-b last:border-0 border-gray-50"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-xl font-bold text-white" style={{ textAlign: 'right' }}>
+                    {subscriber.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-xl font-bold text-white" style={{ textAlign: 'right' }}>
+                    {subscriber.phone_number}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-xl font-bold text-white" style={{ textAlign: 'right' }}>
+                    {subscriber.date}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={3} className="px-6 py-8 text-center text-white text-xl">
+                  لم يتم العثور على نتائج .
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* الفوتر */}
       <div className="mt-4 text-xl text-gray-500 text-center">
         يتم تحديث البيانات في الوقت الفعلي {lastUpdated && `• آخر تحديث: ${lastUpdated}`}
       </div>
+      <div className='py-4'></div>
+      <NewsletterTable/>
     </div>
   );
 };

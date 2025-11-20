@@ -2,10 +2,10 @@
 
 import { useSession} from "next-auth/react";
 import DashboardAdmin from "@/components/admin-dashboard/dashboard";
-import DashboardUser from "@/components/user-dashboard/dashboarduser";
+import DashboardUser from "@/components/user-dashboard/orderUser";
 import DashboardPartner from "@/components/partner-dashboard/partner-dashboard";
-import MessagesUser from "@/components/user-dashboard/messagesPage";
-import TripssUser from "@/components/user-dashboard/tripsUser";
+import ManageOrders from "@/components/admin-dashboard/manageorders";
+
 export default function ProtectedPage() {
   const { data: session, status } = useSession({ required: true });
 
@@ -22,5 +22,5 @@ export default function ProtectedPage() {
     </div>  
     </div>);
   }
-  return session?.user?.is_superuser? <DashboardAdmin/> :  ( session?.user?.is_staff? <DashboardPartner/>:<TripssUser/>)
+  return session?.user?.is_superuser? <ManageOrders/> :  ( session?.user?.is_staff? <DashboardPartner/>:<DashboardUser/>)
 }

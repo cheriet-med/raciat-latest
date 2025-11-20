@@ -3,8 +3,7 @@
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { useRouter } from "next/navigation"; // Import useRouter
-import { useLocale } from "next-intl";
-import { useTranslations } from "next-intl";
+import Layout from "@/components/layouts/Layout-defaul";
 import { FaEye, FaEyeSlash, FaCircleNotch, FaCopy } from "react-icons/fa"; // Import FaCopy
 import { useSession } from "next-auth/react";
 
@@ -15,36 +14,35 @@ export default function ResetPassword() {
    const [password, setPassword] = useState('');
     const [error2, setError2] = useState(""); // Password validation error state
      const [isLoadingg, setIsLoadingg] = useState(false); // Loading state
-     const l = useLocale();
+
      const router = useRouter(); // Initialize the router
-     const locale = useLocale(); // Get the current locale
-     const t = useTranslations('Login');
-     const te = useTranslations('user-dashboard');
+
+
      const [showPassword, setShowPassword] = useState(false); // Show password state
      const validatePassword = (password: string): string | null => {
       // Check if password is at least 8 characters long
       if (password.length < 8) {
-        return t('8-characters');
+        return 'أكتب على اﻷقل 8 أرقام و أعداد ورموز';
       }
   
       // Check if password contains at least one uppercase letter
       if (!/[A-Z]/.test(password)) {
-        return t('uppercase');
+        return '  أكتب حروف كبيرة';
       }
   
       // Check if password contains at least one lowercase letter
       if (!/[a-z]/.test(password)) {
-        return t('lowercase');
+        return 'أكتب حروف صغيرة';
       }
   
       // Check if password contains at least one digit
       if (!/[0-9]/.test(password)) {
-        return t('number');
+        return 'أكتب أرقام';
       }
   
       // Check if password contains at least one special character
       if (!/[!@#$%^&*]/.test(password)) {
-        return t('character');
+        return 'أكتب رموز';
       }
   
       // If all conditions are met, return null (no error)
@@ -89,7 +87,7 @@ export default function ResetPassword() {
       return false;
     }finally{
         setIsLoadingg(false);
-        {session?.user ? router.push(`/${l}/account`): router.push(`/${l}/login`)}
+        {session?.user ? router.push(`/account`): router.push(`/login`)}
         
     }
   };
@@ -100,26 +98,27 @@ export default function ResetPassword() {
 
 
   return (
-     <div className="fixed inset-0 bg-[url('/02.webp')] bg-no-repeat bg-center bg-cover overflow-auto">
-      <div className="min-h-screen flex items-center justify-center p-4 font-montserrat ">
-    <div className=' bg-secondary p-6 rounded-2xl'>
-        <h1 className=' mb-4 text-gray-100'>write your new password</h1>
+     <Layout>
+     <div>
+      <div className="my-60 flex items-center justify-center p-4 font-montserrat ">
+    <div className='  p-6 rounded-2xl'>
+        <h1 className=' mb-4 text-3xl'>اكتب كلمة المرور الجديدة الخاصة بك</h1>
         <div>
         <div className="relative ">
                     <input
      type={showPassword ? "text" : "password"}
      value={password}
      onChange={(e) => setPassword(e.target.value)}
-     placeholder="New password"
-     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-yel bg-highlights placeholder:text-gray-200"
+     placeholder="كلمة المرور الجديدة"
+     className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-yel bg-gray-50 "
      required
    />
 <button
                type="button"
                onClick={() => setShowPassword(!showPassword)}
-               className="absolute right-2 top-2 text-gray-200 hover:text-gray-300 flex items-center justify-center w-6 h-6"
+               className="absolute left-4 top-7 text-gray-400 hover:text-gray-300 flex items-center justify-center w-6 h-6"
              >
-               {showPassword ? <FaEyeSlash className="w-5 h-5"/> : <FaEye className="w-5 h-5 " />}
+               {showPassword ? <FaEyeSlash className="w-6 h-6"/> : <FaEye className="w-6 h-6 " />}
              </button>
              
              </div>
@@ -130,22 +129,22 @@ export default function ResetPassword() {
                     {isLoadingg ? (
                                     <button
                                       onClick={handleSubscribe}
-                                      className="w-full hover:bg-accent hover:text-yel py-2 rounded-lg bg-a text-white transition-colors uppercase flex gap-3 justify-center items-center"
+                                      className="w-full hover:bg-sec hover:text-yel font-bold py-4 rounded-lg bg-prim text-white transition-colors uppercase flex gap-3 justify-center items-center"
                                     >
-                                       {te('Edite')}
+                                       {'تعديل'}
                                       <FaCircleNotch className="animate-spin w-5 h-5"/>
                                     </button>
                                   ) : (
                                     <button
                                       onClick={handleSubscribe}
-                                      className="w-full bg-a text-white py-2 rounded-lg hover:bg-accent font-medium transition-colors uppercase"
+                                      className="w-full bg-sec text-white py-4 font-bold  rounded-lg hover:bg-prim  transition-colors uppercase"
                                     >
-                                     {te('Edite')}
+                                     {'تعديل'}
                                     </button>
                                   )}
                 </div>
     </div>
     </div>
-    </div>
+    </div></Layout>
   )
 }

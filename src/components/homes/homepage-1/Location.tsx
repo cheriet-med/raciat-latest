@@ -1,7 +1,26 @@
+"use client"
+
+import useFetchListing from "@/components/requests/fetchListings";
 import Image from "next/image";
 import React from "react";
 
+
+
 export default function Location() {
+
+    const { listings } = useFetchListing(); 
+
+    const jaddah = listings?.filter(listing => listing.region === "جدة")
+     const riyadh = listings?.filter(listing => listing.region === "الرياض")
+      const makkah = listings?.filter(listing => listing.region === "مكة")
+       const tabuk = listings?.filter(listing => listing.region === "تبوك")
+        const eastern = listings?.filter(listing => listing.region === "الشرقية")
+        const aseer = listings?.filter(listing => listing.region === "عسير")
+         const almadinah = listings?.filter(listing => listing.region === "المدينة")
+          const alqassim = listings?.filter(listing => listing.region === "القصيم")
+
+
+
     return (
         <div className="section-location tf-spacing-1">
             <div className="tf-container">
@@ -10,7 +29,7 @@ export default function Location() {
                        استكشف المدن
                     </span>
                     <h3 className="split-text effect-blur-fade text-5xl lg:text-7xl font-bold">
-مواقع مميزة
+مواقع مميزة                       
                     </h3>
                 </div>
                 <div className="wrap-location">
@@ -20,7 +39,7 @@ export default function Location() {
                                 className="location-item hover-image scrolling-effect effectFade"
                                 data-delay="0.2"
                             >
-                                <a href="#" className="img-style mb_18">
+                                <a href={`/category?q=${"جدة"}`} className="img-style mb_18">
                                     <Image
                                         width={300}
                                         height={300}
@@ -30,19 +49,19 @@ export default function Location() {
                                 </a>
                                 <div className="content">
                                     <a
-                                        href="#"
+                                        href={`/ategory?q=${"جدة"}`}
                                         className="mb_4 link h5 text_primary-color"
                                     >
-                                       حي الحمراء
+                                      جدة
                                     </a>
-                                    <p>62 عقار</p>
+                                    <p>{jaddah?.length} عقار</p>
                                 </div>
                             </div>
                             <div
                                 className="location-item hover-image scrolling-effect effectFade"
                                 data-delay="0.3"
                             >
-                                <a href="#" className="img-style mb_18">
+                                <a href={`/category?q=${"الرياض"}`} className="img-style mb_18">
                                     <Image
                                         width={300}
                                         height={300}
@@ -52,12 +71,12 @@ export default function Location() {
                                 </a>
                                 <div className="content">
                                     <a
-                                        href="#"
+                                        href={`/ategory?q=${"الرياض"}`}
                                         className="mb_4 link h5 text_primary-color"
                                     >
-                                       حي الروضة
+                                       الرياض
                                     </a>
-                                    <p>128 عقار</p>
+                                    <p>{riyadh?.length} عقار</p>
                                 </div>
                             </div>
                         </div>
@@ -65,7 +84,7 @@ export default function Location() {
                             className="location-item hover-image scrolling-effect effectFade"
                             data-delay="0.4"
                         >
-                            <a href="#" className="img-style mb_18">
+                            <a href={`/category?q=${"مكة"}`} className="img-style mb_18">
                                 <Image
                                     width={630}
                                     height={300}
@@ -75,12 +94,12 @@ export default function Location() {
                             </a>
                             <div className="content">
                                 <a
-                                    href="#"
+                                    href={`/ategory?q=${"مكة"}`}
                                     className="mb_4 link h5 text_primary-color"
                                 >
-                                    حي الشاطئ
+                                    مكة
                                 </a>
-                                <p>234 عقار</p>
+                                <p>{makkah?.length} عقار</p>
                             </div>
                         </div>
                     </div>
@@ -89,7 +108,7 @@ export default function Location() {
                             className="location-item hover-image scrolling-effect effectFade"
                             data-delay="0.4"
                         >
-                            <a href="#" className="img-style mb_18">
+                            <a href={`/category?q=${"الشرقية"}`} className="img-style mb_18">
                                 <Image
                                     width={630}
                                     height={300}
@@ -99,12 +118,12 @@ export default function Location() {
                             </a>
                             <div className="content">
                                 <a
-                                    href="#"
+                                    href={`/ategory?q=${"الشرقية"}`}
                                     className="mb_4 link h5 text_primary-color"
                                 >
-                                   حي المرجان
+                                   الشرقية
                                 </a>
-                                <p>231 عقار</p>
+                                <p>{eastern?.length} عقار</p>
                             </div>
                         </div>
                         <div className="d-flex gap_30">
@@ -112,7 +131,7 @@ export default function Location() {
                                 className="location-item hover-image scrolling-effect effectFade"
                                 data-delay="0.3"
                             >
-                                <a href="#" className="img-style mb_18">
+                                <a href={`/category?q=${"تبوك"}`} className="img-style mb_18">
                                     <Image
                                         width={300}
                                         height={300}
@@ -122,19 +141,19 @@ export default function Location() {
                                 </a>
                                 <div className="content">
                                     <a
-                                        href="#"
+                                        href={`/ategory?q=${"تبوك"}`}
                                         className="mb_4 link h5 text_primary-color"
                                     >
-                                       حي الصفا
+                                      تبوك
                                     </a>
-                                    <p>221 عقار</p>
+                                    <p>{tabuk?.length} عقار</p>
                                 </div>
                             </div>
                             <div
                                 className="location-item hover-image scrolling-effect effectFade"
                                 data-delay="0.2"
                             >
-                                <a href="#" className="img-style mb_18">
+                                <a href={`/category?q=${"عسير"}`} className="img-style mb_18">
                                     <Image
                                         width={300}
                                         height={300}
@@ -144,12 +163,12 @@ export default function Location() {
                                 </a>
                                 <div className="content">
                                     <a
-                                        href="#"
+                                        href={`/ategory?q=${"عسير"}`}
                                         className="mb_4 link h5 text_primary-color"
                                     >
-                                        حي البساتين
+                                       عسير
                                     </a>
-                                    <p>128 عقار</p>
+                                    <p>{aseer?.length} عقار</p>
                                 </div>
                             </div>
                         </div>

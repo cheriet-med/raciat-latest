@@ -22,7 +22,7 @@ const StarRating: React.FC<StarRatingProps> = ({
   return (
     <div className="flex items-center gap-1">
       {/* Stars */}
-      <div className="flex text-secondary">
+      <div className="flex text-sec">
         {[...Array(maxRating)].map((_, index) => {
           const starValue = index + 1;
           

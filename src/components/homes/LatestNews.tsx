@@ -10,7 +10,7 @@ import moment from 'moment';
 import 'moment/locale/ar'
 
 export default function LatestNews() {
-      const { listings, isLoading, error, mutate } = useFetchPostListing();
+      const { listingsp, isLoading, error, mutate } = useFetchPostListing();
         moment.locale('ar');
     return (
         <div className="sw-layout tf-spacing-1">
@@ -44,7 +44,7 @@ export default function LatestNews() {
                     modules={[Pagination]}
                     pagination={{ clickable: true, el: ".spb7" }}
                 >
-                    {listings?.slice(0, 3).map((item, ind) => (
+                    {listingsp?.slice(0, 3).map((item, ind) => (
                         <SwiperSlide className="swiper-slide" key={ind}>
                             <div
                                 className="blog-article-item style-default hover-image-translate loadItem"

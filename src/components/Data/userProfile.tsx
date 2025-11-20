@@ -186,7 +186,7 @@ const TrustScoreCardSkeleton = () => (
       </div>
     </div>
 
-    <div className='flex items-center gap-x-2.5 text-gray-500 mt-4'>
+    <div className='flex items-center gap-x-2.5 text-white mt-4'>
       <div className="w-6 h-6 bg-gray-200 animate-pulse rounded"></div>
       <div className="h-4 bg-gray-200 animate-pulse rounded w-48"></div>
     </div>
@@ -212,6 +212,38 @@ const ProfileCard: React.FC = () => {
   const [emailsenderrorvalidation, setEmailsenderrorvalidation] = useState(false);
   const userId = session?.user?.id;
   const { Users, isLoading, mutate } = useFetchUser(userId);
+
+
+const {AllReview} = useFetchAllReviews()
+
+const Review = AllReview.filter((user) => +user.user === +userId)
+
+
+const averageRating = Review && Review.length > 0
+  ? Review.reduce((sum, r) => sum + +r.rating_global, 0) / Review.length
+  : 0;
+
+const {Score} = useFetchScores()
+const userScore = Score.filter((user) => user.user === userId)
+function average(arr: any[], key: string, normalize = false) {
+  if (arr.length === 0) return 0;
+  const avg = arr.reduce((sum, r) => sum + +r[key], 0) / arr.length;
+  const value = normalize ? avg / 100 : avg; // normalize if percentage (0–100)
+  return parseFloat(value.toFixed(2)); // round to 2 decimals
+}
+
+const cleanScore = average(userScore, "clean", true);
+const cleanBlur = average(userScore, "blur", true);
+const cleanVerified = average(userScore, "verified", true);
+const cleanFake = average(userScore, "fake", true);
+
+const cleantotal = parseFloat((
+  (cleanScore * cleanVerified) 
+  * Math.pow(Math.max(0, 1 - cleanBlur), 1.5) 
+  * Math.pow(Math.max(0, 1 - cleanFake), 3.0)
+).toFixed(2));
+
+
 
   const sendVerificationEmail = async () => {
     try {
@@ -342,34 +374,7 @@ const ProfileCard: React.FC = () => {
         </div> 
       : "" }
       
-      <div className="rounded-2xl m-1 sm:m-2 md:m-3 relative">
-        <Map
-          center={
-            profileData.latitude && profileData.longtitude
-              ? [parseFloat(profileData.latitude), parseFloat(profileData.longtitude)]
-              : [51.505, -0.09]
-          }
-          zoom={profileData.latitude && profileData.longtitude ? 15 : 9}
-          height="300px"
-          markers={
-            profileData.latitude && profileData.longtitude
-              ? [{
-                  position: [parseFloat(profileData.latitude), parseFloat(profileData.longtitude)],
-                  popup: profileData.location || profileData.address_line_1 || "Location"
-                }]
-              : []
-          }
-        />
-        <EditLocationPopup 
-          initialLatitude={51.505} 
-          initialLongtitude={-0.09} 
-          infoId={userId}
-          onUpdateSuccess={(newLat, newLng) => {
-            console.log('Updated coordinates:', newLat, newLng);
-          }}
-          mutate={mutate}
-        />
-      </div>
+
 
       <div className="mx-2 lg:mx-24 my-8 font-montserrat"> 
         
@@ -388,8 +393,12 @@ const ProfileCard: React.FC = () => {
 
         {/* Profile & About Section - 2 Column Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+
+
+
           {/* Profile Card - RTL Fixed */}
-          <div className='border border-1 rounded-2xl p-6 shadow-sm bg-white relative'>
+          <div className='border border-1 rounded-2xl p-6 shadow-sm bg-prim relative'>
           <div className="absolute left-40 top-4">
             <EditInfo
               initialFullName={profileData.full_name}
@@ -430,7 +439,7 @@ const ProfileCard: React.FC = () => {
           </div>
 
           {/* Profile Section */}
-          <div className="flex items-center gap-8 flex-wrap-reverse">
+          <div className="flex items-center gap-10  p-4">
 
                         <div className="shrink-0 relative group mr-auto">
               <input
@@ -447,7 +456,7 @@ const ProfileCard: React.FC = () => {
                 onClick={handleImageClick}
               >
                 <Image
-                  className={`shrink-0 size-48 rounded-full object-cover transition-all duration-300 ${
+                  className={`shrink-0 size-48 lg:size-60 rounded-full object-cover transition-all duration-300 ${
                     !isUploading ? 'group-hover:brightness-75' : 'opacity-75'
                   }`}
                   src={profileData.profile_image == null ? '/profile.png':`${process.env.NEXT_PUBLIC_IMAGE}/${profileData.profile_image}`}
@@ -478,17 +487,15 @@ const ProfileCard: React.FC = () => {
             </div>
             <div className="grow mt-6">
               <div className='flex gap-4 flex-wrap items-center'>
-                <h1 className="text-4xl font-bold text-gray-800 dark:text-neutral-200 font-playfair text-right">
+                <h1 className="text-3xl lg:text-5xl font-extrabold text-sec dark:text-neutral-200 font-playfair text-right">
                   {profileData.full_name || " "}
                 </h1>
               </div>
              
-              <p className="text-4xl text-gray-500 my-2 font-medium text-right">
+              <p className="text-3xl  lg:text-4xl text-white my-2 font-medium text-right">
                 {profileData.title || " "}
               </p>
-              <p className="text-2xl text-gray-500 hover:text-gray-600 hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
-                انضم في {profileData.joined}
-              </p>
+
             </div>
 
 
@@ -497,81 +504,164 @@ const ProfileCard: React.FC = () => {
           <hr className='mt-8'/>
 
           {/* Contact Info Grid - RTL Fixed */}
-          <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3">
-            {profileData.want_to_go && (
-              <div className="flex items-center gap-x-2.5 text-gray-500">
-                <MdOutlineTravelExplore size={24} className="flex-shrink-0"/>
-                <p className="text-2xl hover:text-gray-800 hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
-                  أريد الذهاب إلى: {profileData.want_to_go}
+          <div className="my-5  grid grid-cols-1 md:grid-cols-2 gap-3">
+           
+              <div className="flex items-center gap-x-2.5 text-white">
+                <MdOutlineTravelExplore size={24} className="flex-shrink-0 text-sec"/>
+                <p className="text-2xl hover:text-sec hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
+                  أريد الذهاب إلى: {profileData.want_to_go && ( profileData.want_to_go )}
                 </p>
               </div>
-            )}
+           
         
             {profileData.language && (
-              <div className="flex items-center gap-x-2.5 text-gray-500">
-                <IoLanguage size={24} className="flex-shrink-0"/>
-                <p className="text-2xl hover:text-gray-800 hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
+              <div className="flex items-center gap-x-2.5 text-white">
+                <IoLanguage size={24} className="flex-shrink-0 text-sec"/>
+                <p className="text-2xl hover:text-sec hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
                   يتحدث {profileData.language}
                 </p>
               </div>
             )}
 
-            {profileData.location && (
-              <div className="flex items-center gap-x-2.5 text-gray-500">
-                <CiLocationOn size={24} className="flex-shrink-0"/>
-                <p className="text-2xl hover:text-gray-800 hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
-                  يعيش في {profileData.location}
+           
+              <div className="flex items-center gap-x-2.5 text-white">
+                <CiLocationOn size={24} className="flex-shrink-0 text-sec"/>
+                <p className="text-2xl hover:text-sec hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
+                  يعيش في  {profileData.location && (profileData.location)}
                 </p>
               </div>
-            )}
+            
+           
+              <div className="flex items-center gap-x-2.5 text-white">
+                <MdAccessTime size={24} className="flex-shrink-0 text-sec"/>
+                <p className="text-2xl hover:text-sec hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
+                  أقضي الكثير من الوقت:  {profileData.time_spend && (profileData.time_spend )}
+                </p>
+              </div>
+           
 
-            {profileData.time_spend && (
-              <div className="flex items-center gap-x-2.5 text-gray-500">
-                <MdAccessTime size={24} className="flex-shrink-0"/>
-                <p className="text-2xl hover:text-gray-800 hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
-                  أقضي الكثير من الوقت: {profileData.time_spend}
+            
+              <div className="flex items-center gap-x-2.5 text-white">
+                <LiaBirthdayCakeSolid size={24} className="flex-shrink-0 text-sec"/>
+                <p className="text-2xl hover:text-sec hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
+                  ولد في {profileData.born && (profileData.born)}
                 </p>
               </div>
-            )}
+          
 
-            {profileData.born && (
-              <div className="flex items-center gap-x-2.5 text-gray-500">
-                <LiaBirthdayCakeSolid size={24} className="flex-shrink-0"/>
-                <p className="text-2xl hover:text-gray-800 hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
-                  ولد في {profileData.born}
+           
+              <div className="flex items-center gap-x-2.5 text-white">
+                <MdOutlinePets size={24} className="flex-shrink-0 text-sec"/>
+                <p className="text-2xl hover:text-sec hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
+                  الحيوانات الأليفة:  {profileData.pets && (profileData.pets)}
                 </p>
               </div>
-            )}
-
-            {profileData.pets && (
-              <div className="flex items-center gap-x-2.5 text-gray-500">
-                <MdOutlinePets size={24} className="flex-shrink-0"/>
-                <p className="text-2xl hover:text-gray-800 hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
-                  الحيوانات الأليفة: {profileData.pets}
-                </p>
-              </div>
-            )}
+          
           </div>
                   </div>
 
+
+
+{/* map */}
+      <div className="rounded-2xl m-1 sm:m-2 md:m-3 relative">
+        <Map
+          center={
+            profileData.latitude && profileData.longtitude
+              ? [parseFloat(profileData.latitude), parseFloat(profileData.longtitude)]
+              : [51.505, -0.09]
+          }
+          zoom={profileData.latitude && profileData.longtitude ? 15 : 9}
+          height="400px"
+          markers={
+            profileData.latitude && profileData.longtitude
+              ? [{
+                  position: [parseFloat(profileData.latitude), parseFloat(profileData.longtitude)],
+                  popup: profileData.location || profileData.address_line_1 || "Location"
+                }]
+              : []
+          }
+        />
+        <EditLocationPopup 
+          initialLatitude={51.505} 
+          initialLongtitude={-0.09} 
+          infoId={userId}
+          onUpdateSuccess={(newLat, newLng) => {
+            console.log('Updated coordinates:', newLat, newLng);
+          }}
+          mutate={mutate}
+        />
+      </div>
+
+
+
+
+
           {/* About Card - RTL Fixed */}
-          <div className='border border-1 rounded-2xl p-6 shadow-sm bg-white relative'>
+          <div className='border border-1 rounded-2xl p-6 shadow-sm bg-sec relative'>
             <div className="absolute left-40 top-4">
               <EditAboutPopup initialAbout={profileData.about} infoId={userId} mutate={mutate}/>
             </div>
-            <h1 className='font-bold font-playfair text-3xl text-sec text-right'>معلومات عنا</h1>
+            <h1 className='font-bold font-playfair text-3xl text-white text-right'>معلومات عني</h1>
 
-            <div
-              className="text-2xl text-gray-600 dark:text-neutral-400 mt-8 space-y-2 prose-inherit text-right"
+            
+            {profileData?.about == null || profileData?.about == "" ?
+            <div className="text-4xl pt-32 text-prim items-center flex justify-center dark:text-neutral-400 mt-8 prose-inherit text-right">
+أكتب نبدة مختصرة عنك بالضغط على زر التعديل              </div>: <div
+              className="text-2xl text-prim dark:text-neutral-400 mt-8 space-y-2 prose-inherit text-right"
               style={{ direction: 'rtl' }}
               dangerouslySetInnerHTML={{ __html: profileData?.about || '' }}
             />
+              }
+          </div>
+       
+
+          {/* Reviews */}
+    <div className='border border-1 rounded-2xl p-6 shadow-sm bg-prim relative '>
+      <h1 className='font-bold font-playfair text-3xl text-sec text-right mb-8'>التقييمات</h1>
+
+      <div className='flex flex-col justify-center items-center'>
+        <div className='flex justify-between mb-4 flex-wrap'>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-2xl font-bold text-white">{averageRating}</span>
+             <StarRating rating={averageRating} size={16}/>
+            <span className="text-sec font-bold">{averageRating == 5? "ممتاز": (averageRating == 4? "جيد جدا" :(averageRating == 3? "جيد":(averageRating == 2? 	"سيئ" : "")))}</span>
+            <span className="text-2xl text-white">({Review.length} تقييم)</span>
+          </div>
+          {Review.length >50 ?  <div className="text-sm  mb-4 px-2 py-1 border border-1 bg-secondary text-white rounded-3xl font-bold w-fit mt-2">Top Reviewer</div>: ""}
+         
+        </div>
+        <div>
+          <div className="space-y-12">
+            <div className="grid gap-3 md:w-[400px]">
+                                 {[
+                      { label: "الموقع", score: Review && Review.length > 0? Review.reduce((sum, r) => sum + +r.location, 0) / Review.length: 0, color: "bg-sec" },
+                      { label: "الغرف", score: Review && Review.length > 0? Review.reduce((sum, r) => sum + +r.room, 0) / Review.length: 0, color: "bg-sec" },
+                      { label: "القيمة", score: Review && Review.length > 0? Review.reduce((sum, r) => sum + +r.value, 0) / Review.length: 0, color: "bg-sec" },
+                      { label: "النظافة", score: Review && Review.length > 0? Review.reduce((sum, r) => sum + +r.clearliness, 0) / Review.length: 0, color: "bg-sec" },
+                      { label: "الخدمة", score: Review && Review.length > 0? Review.reduce((sum, r) => sum + +r.service, 0) / Review.length: 0, color: "bg-sec" },
+                      { label: "المساحة", score: Review && Review.length > 0? Review.reduce((sum, r) => sum + +r.restaurant_space, 0) / Review.length: 0, color: "bg-sec" }
+                    ].map((item) => (
+                      <div key={item.label} className="flex items-center gap-4">
+                        <div className="w-24 md:w-28  text-2xl font-bold text-white">{item.label}</div>
+                        <div className="flex-1 bg-gray-100 rounded-full h-4">
+                          <div 
+                            className={`h-4 rounded-full ${item.color}`}
+                            style={{ width: `${(item.score / 5) * 100}%` }}
+                          />
+                        </div>
+                        <div className="w-8 text-2xl font-extrabold text-white text-right">{item.score}</div>
+                      </div>
+                    ))}
+            </div>
+              <ReviewsCart/>
           </div>
         </div>
+      </div>
+    </div>
 
-        {/* Reviews Section - Full Width */}
-
-    </div>  </div>
+  </div>
+    </div>  
+    </div>
   );
 };
 

@@ -51,7 +51,7 @@ const useFetchPostListing = () => {
   );
 
   return { 
-    listings: data || null, // Return single user object instead of array
+    listingsp: data || null, // Return single user object instead of array
     error, 
     isLoading,
     mutate // Export mutate function for manual revalidation

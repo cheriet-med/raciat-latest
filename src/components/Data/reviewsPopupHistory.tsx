@@ -335,8 +335,8 @@ const averageRating = Review && Review.length > 0
            
 
              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <Link href={`/en/booking/${listings?.find((user) => user.id === +review.product)?.id}`}>  
-                <div className="w-auto h-64 relative rounded-md overflow-hidden">
+                <Link href={`/property-details-1/${listings?.find((user) => user.id === +review.product)?.id}`}>  
+                <div className="w-auto h-96 relative rounded-md overflow-hidden">
                   <Image
                     src={`${process.env.NEXT_PUBLIC_IMAGE}/${listings?.find((user) => user.id === +review.product)?.image}` || '/profile.webp'}
                     alt="Profile"
@@ -348,9 +348,9 @@ const averageRating = Review && Review.length > 0
                 </div>
               </Link>
 
-                <div className="space-y-1 w-full">
-                   <Link href={`/en/booking/${listings?.find((user) => user.id === +review.product)?.id}`}>  
-                  <p className="font-semibold text-secondary hover:underline capitalize font-playfair text-xl">
+                <div className="space-y-3 w-full">
+                   <Link href={`/property-details-1/${listings?.find((user) => user.id === +review.product)?.id}`}>  
+                  <p className="font-semibold text-secondary hover:underline capitalize font-playfair text-3xl">
                      {listings?.find((user) => user.id === +review.product)?.name || "Unknown"}
                   </p>
          </Link>
@@ -358,10 +358,10 @@ const averageRating = Review && Review.length > 0
           
          
 
-          <div className="flex items-center flex-wrap gap-2 ml-15">
+          <div className="flex items-center flex-wrap gap-2 ml-15 mt-8">
             <StarRating rating={averageRating} size={16}/>
             <span className="font-semibold text-secondary">{review.title}</span>
-            <span className="text-sm text-gray-500">• {review.created_at}</span>
+            <span className="text-xl text-gray-500">• {review.created_at}</span>
           </div>
 
           <p className="text-gray-500 leading-relaxed ml-15">{review.description}</p>
@@ -382,7 +382,7 @@ const averageRating = Review && Review.length > 0
                       <div
                         ref={ref}
                         onClick={open}
-                        className="w-24 h-24 rounded-xl relative overflow-hidden cursor-pointer"
+                        className="w-32 h-24 rounded-xl relative overflow-hidden cursor-pointer"
                       >
                         <Image
                           src={`${process.env.NEXT_PUBLIC_IMAGE}/${reviewimage.image}`}
@@ -398,30 +398,7 @@ const averageRating = Review && Review.length > 0
           </Gallery>
 </div>
          
-          <div className="flex items-center justify-between ml-15 flex-wrap">
-            <div className="flex items-center flex-wrap gap-4 text-sm text-gray-500">
-             Date of stay: {review.stay_date}
-            </div>
-            <div className="flex justify-between w-full"> 
-              <div className="flex items-center flex-wrap gap-4 text-sm text-gray-500">
-            • Trip type: {review.trip_type}
-            </div>
-            <div className="flex items-center gap-2">
-             
-                {AllHelpfullReview.filter(r => +r.user === +review.user).length == 1 ?
-                  <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900" onClick={() => handleDelete(AllHelpfullReview.find((user) => user.user === +review.user)?.id)}>
-                    <AiFillLike size={24} className=" mr-1 text-secondary" />
-                    Helpful {" "} {AllHelpfullReview.filter(r => +r.review === +review.id).length}
-                  </Button>
-                  :
-                  <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-900" onClick={() => handleSubmit(AllUsers.find((user) => user.id === +review.user)?.id, review.id)}>
-                    <AiOutlineLike size={24} className=" mr-1" />
-                    Helpful {" "} {AllHelpfullReview.filter(r => +r.review === +review.id).length}
-                  </Button>}
-                 
-               </div>
-              </div>
-             </div>  
+
             </div>
             </div>
           </div>
@@ -502,9 +479,9 @@ const Review = AllReview.filter((user) => user.user === session?.user?.id)
   return (
     <>
       {/* Trigger Button */}
-       <div className='flex gap-1 justify-center text-gray-600 mt-8 cursor-pointer hover:text-secondary'  onClick={openPopup}>
+       <div className='flex gap-1 justify-center  text-sec mt-8 cursor-pointer font-semibold hover:text-secondary'  onClick={openPopup}>
                 <TbHistoryToggle size={24}/>
-                <p className='underline'>Reviews History</p>
+                <p className='underline'>التقييمات السابقة</p>
               </div>
      
 
@@ -514,22 +491,17 @@ const Review = AllReview.filter((user) => user.user === session?.user?.id)
           className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
           onClick={handleBackdropClick}
         >
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+          <div className="bg-white rounded-lg max-w-5xl  max-h-[90vh]  overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div className="flex items-center gap-2">
               
-                <h2 className="text-2xl font-semibold font-playfair">Reviews History</h2>
+                <h2 className="text-3xl font-semibold font-playfair text-sec">التقييمات السابقة</h2>
               
               </div>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={closePopup}
-                className="h-8 w-8"
-              >
-                <X className="w-4 h-4" />
-              </Button>
+           
+                <X className="w-8 h-8 text-sec font-bold "   onClick={closePopup}/>
+        
             </div>
 
             {/* Content */}

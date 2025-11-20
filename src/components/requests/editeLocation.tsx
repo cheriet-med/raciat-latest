@@ -137,7 +137,7 @@ const EditLocationPopup = ({
     <div>
       {/* Edit Button */}
       <div 
-        className="absolute bg-white text-sec items-center right-4 top-4 border border-1 px-3 py-0.5 rounded-3xl border-sec shadow-sm text-xl flex gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
+        className="absolute bg-prim text-sec items-center right-4 top-4 border border-1 px-3 py-0.5 rounded-3xl border-sec shadow-sm text-xl flex gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
         onClick={() => setIsOpen(true)}
       >
         <GoPencil size={18} />
@@ -164,17 +164,19 @@ const EditLocationPopup = ({
                     <label className="block text-xl font-medium text-secondary mb-1">
                       Latitude 
                     </label>
-                    <input
-                      type="text"
-                      className={`w-full p-3 border  focus:ring-2 focus:ring-blue-500 focus:border-transparent rounded-xl ${
-                        latitude && !isValidCoordinate(latitude, 'lat') 
-                          ? 'border-red-500' 
-                          : 'border-gray-300'
-                      }`}
-                      value={latitude}
-                      onChange={(e) => setLatitude(e.target.value)}
-                      placeholder="Enter latitude (e.g., 40.7128)"
-                    />
+<input
+  type="text"
+  className={`w-full p-3 border rounded-xl
+    focus:ring-1 focus:ring-sec focus:border-sec
+    ${latitude && !isValidCoordinate(latitude, 'lat') 
+      ? 'border-sec' 
+      : 'border-gray-300'
+    }`}
+  value={latitude}
+  onChange={(e) => setLatitude(e.target.value)}
+  placeholder="Enter latitude (e.g., 40.7128)"
+/>
+
                     {latitude && !isValidCoordinate(latitude, 'lat') && (
                       <p className="mt-1 text-xl text-red-600">Invalid latitude value</p>
                     )}
@@ -186,9 +188,10 @@ const EditLocationPopup = ({
                     </label>
                     <input
                       type="text"
-                      className={`w-full p-3 border  focus:ring-2 focus:ring-blue-500 focus:border-transparent rounded-xl ${
+                      className={`w-full p-3 border  rounded-xl
+    focus:ring-1 focus:ring-sec focus:border-sec${
                         longtitude && !isValidCoordinate(longtitude, 'lng') 
-                          ? 'border-red-500' 
+                          ? 'border-sec' 
                           : 'border-gray-300'
                       }`}
                       value={longtitude}
@@ -216,7 +219,7 @@ const EditLocationPopup = ({
                     إلغاء
                   </button>
                   <button
-                    className="px-6 py-3 bg-sec text-white  hover:bg-prim transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed rounded-lg"
+                    className="px-6 py-3 bg-sec text-white  hover:bg-prim transition-colors disabled:bg-sec disabled:cursor-not-allowed rounded-lg"
                     onClick={handleSave}
                     disabled={isSaving || !isFormValid()}
                   >

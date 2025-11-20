@@ -20,8 +20,13 @@ import { RiPassValidLine } from "react-icons/ri";
 import { RiArticleFill } from "react-icons/ri";
 import { LiaFirstOrder } from "react-icons/lia";
 import { FaUsers } from "react-icons/fa";
-
-
+import ReservationChartAdmin from "./reservationChartAdmin";
+import ApexChart from "./ApexChart";
+import useFetchListing from "../requests/fetchListings";
+import useFetchPostListing from "../requests/fetchPostsListings";
+import useFetchAllUser from "../requests/fetchAllUsers";
+import useFetchAllNewsLetterEmails from "../requests/fetchAllNewsletters";
+import useFetchQuikeOrders from "../requests/fetchQuikOrders";
 // Skeleton Components
 const MetricCardSkeleton = () => (
   <article className="rounded-xl border border-gray-100 bg-white p-6 w-full shadow-sm animate-pulse">
@@ -66,16 +71,22 @@ export default function AnalyticsAdmin() {
     }, 2000);
     return () => clearTimeout(timer);
   }, []);
+ const { listings, error, mutate } = useFetchListing(); 
+  const { listingsp,  } = useFetchPostListing();
+  const { AllUsers,  } = useFetchAllUser();
+ const { AllNewsLetters } = useFetchAllNewsLetterEmails();
+const {orders} = useFetchQuikeOrders()
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {isLoading ? (
           <>
             <MetricCardSkeleton />
             <MetricCardSkeleton />
             <MetricCardSkeleton />
             <MetricCardSkeleton />
+             <MetricCardSkeleton />
           </>
         ) : (
           <>
@@ -83,7 +94,7 @@ export default function AnalyticsAdmin() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl text-white">عدد العقارات المتوفرة</p>
-                  <p className="text-2xl font-medium text-white">{0}</p>
+                  <p className="text-3xl font-extrabold text-white">{listings?.length}</p>
                 </div>
                 <FaBuilding size={32} className="text-sec"/>
               </div>
@@ -92,7 +103,7 @@ export default function AnalyticsAdmin() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl text-white">عدد المقالات</p>
-                  <p className="text-2xl font-medium text-white">{0}</p>
+                  <p className="text-3xl font-extrabold text-white">{listingsp?.length}</p>
                 </div>
                 <RiArticleFill size={32} className="text-sec"/>
               </div>
@@ -101,7 +112,7 @@ export default function AnalyticsAdmin() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl text-white">عدد الطلبات</p>
-                  <p className="text-2xl font-medium text-white">{0}</p>
+                  <p className="text-3xl font-extrabold text-white">{orders?.length}</p>
                 </div>
                 <LiaFirstOrder size={32} className="text-sec"/>
               </div>
@@ -110,7 +121,16 @@ export default function AnalyticsAdmin() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-2xl text-white">عدد المستخدمين</p>
-                  <p className="text-2xl font-medium text-white">{0}</p>
+                  <p className="text-3xl font-extrabold text-white">{AllUsers?.length}</p>
+                </div>
+                <FaUsers size={32} className="text-sec"/>
+              </div>
+            </article>
+                        <article className="rounded-xl border border-gray-100 bg-prim p-6 w-full shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl text-white">عدد المشتركين في النشرة اﻹخبارية</p>
+                  <p className="text-3xl font-extrabold text-white">{AllNewsLetters?.length}</p>
                 </div>
                 <FaUsers size={32} className="text-sec"/>
               </div>
@@ -119,6 +139,12 @@ export default function AnalyticsAdmin() {
         )}
       </div>
       
+           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div className="grid xl:col-span-2">
+ <ReservationChartAdmin/></div>
+  <div className="grid xl:col-span-1">
+<ApexChart/></div>
+</div>
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="grid xl:col-span-2">
           {isLoading ? (
@@ -132,12 +158,12 @@ export default function AnalyticsAdmin() {
           {isLoading ? (
             <>
               <TableSkeleton />
-              <TableSkeleton />
+            
             </>
           ) : (
             <>
               <QuikeOrderTable/>
-              <NewsletterTable/>
+            
             </>
           )}
         </div>

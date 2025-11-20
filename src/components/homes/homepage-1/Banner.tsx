@@ -3,12 +3,12 @@ import OdometerCounter from "@/components/common/Odometer";
 export default function Banner() {
     return (
         <div className="banner-2">
-            <div
-                className="parallaxie "
-                style={{
-                    background: 'url("/hero2.avif")',
-                }}
-            >
+<div
+    className="parallaxie"
+    style={{
+        background: 'url("/hero2.avif") center/cover no-repeat',
+    }}
+>
                 <div className="content">
                     <div className="wrap d-flex flex-column">
                         <div className="tf-box-icon style-1">

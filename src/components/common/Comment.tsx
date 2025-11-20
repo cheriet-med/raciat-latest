@@ -113,7 +113,9 @@ export default function Comment({ property }: { property: Property }) {
                                     <h6 className="name text_primary-color mb_4">
                                         {AllUsers.find((user) => user.id === +review.user)?.full_name || "مستخدم"}
                                     </h6>
-                                    <p className="text-body-default">{review.created_at ? moment(review.created_at.replace(/(\d+)(st|nd|rd|th)/, '$1')).locale('ar').fromNow() : 'تاريخ غير متوفر'}</p>
+                                    <p className="text-body-default">
+                                        {review.created_at}
+                                      </p>
                                 </div>
                                 {(session?.user?.id === review.user || session?.user?.id === +review.user || session?.user?.is_superuser === true  || String(session?.user?.id) === String(review.user)) && (
                                     <button
@@ -173,13 +175,13 @@ export default function Comment({ property }: { property: Property }) {
                 </div>
                 );
             })}
-
+ {visibleCount < Review.length && (
             <p
                 onClick={handleLoadMore}
                 className="all-review  text_primary-color text-button hover:underline cursor-pointer"
             >
-                عرض جميع المراجعات {Review.length}
-            </p>
+                عرض المزيدمن التقييمات  {Review.length}
+            </p>)}
 
             {/* Delete Confirmation Popup */}
             {deletePopup && (

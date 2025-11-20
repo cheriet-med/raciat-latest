@@ -9,6 +9,7 @@ import { MdOutlineAttachEmail } from "react-icons/md";
 import { 
   X,
 } from 'lucide-react';
+import { RiChatSettingsFill } from "react-icons/ri";
 import { MdDashboard } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
 import { FaRegHeart } from "react-icons/fa";
@@ -79,9 +80,10 @@ export default function DashboardUser() {
     { id: 'لوحة التحكم', label: 'لوحة التحكم', icon: <MdDashboard size={24} className='text-white'/>, href: '/account' },
      { id: 'العقارات', label: 'العقارات', icon: <BsBuildingsFill size={24} className='text-white'/>, href: '/account/listings' },
       { id: 'المدونة', label: 'المدونة', icon: <RiArticleFill size={24} className='text-white'/>, href: '/account/posts' },
-       { id: 'التذاكر', label: 'التذاكر', icon: <HiTicket size={24} className='text-white'/>, href: '/' },
+           { id: 'التذاكر والطلبات', label: 'التذاكر والطلبات', icon: <HiTicket size={24} className='text-white'/>, href: '/account/orders' },
+
   
-   
+     { id: 'إعدادات الطلبات', label: 'إعدادات الطلبات', icon: <RiChatSettingsFill size={24} className='text-white'/>, href: '/account/trips' },
     { id: 'صندوق البريد الإلكتروني', label: 'صندوق البريد الإلكتروني', icon:  <MdOutlineAttachEmail size={24} className='text-white'/>, href: '/account/emails' },
      { id: 'إعدادت الحساب', label: 'أعدادات الحساب', icon:<IoSettingsOutline size={24} className='text-white'/>, href: '/account/personal-information' },
     { id: 'الصفحة الرئيسية', label: 'الصفحة الرئيسية', icon: <IoHomeOutline size={24} className='text-white'/>, href: '/' },

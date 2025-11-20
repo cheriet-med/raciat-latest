@@ -4,22 +4,32 @@ import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Link from "next/link";
+import useFetchListing from "../requests/fetchListings";
 
-interface Property {
-    id: number | string;
-    name: string;
-    location: string;
-    region: string;
-    rooms_number?: number;
-    badrooms_number?: number;
-    size?: number;
-    latitude: number;
-    longitude: number;
-    image: string;
-    price: number;
-    currency: string;
-    category: string;
-    types: string;
+interface Listing {
+  id: number;
+  user: any;
+  name: string | null;
+  description: string | null;
+  category: string | null;
+  types: string | null;
+  price: string | null;
+  currency: string | null;
+  video_link: string | null;
+  rooms_number: string | null;
+  badrooms_number: string | null;
+  image: string | null;
+  latitude: string | null;
+  longtitude: string | null;
+  location: string | null;
+  created_at_meta: string | null;
+  updated_at_meta: string | null;
+  size: string | null;
+  capacity: string | null;
+  established: string | null;
+  garages: string | null;
+  region: string | null;
+  is_featured: boolean;
 }
 
 interface ProcessedProperty {
@@ -35,13 +45,15 @@ interface ProcessedProperty {
     currency: string;
     category: string;
     types: string;
+    is_featured: boolean;
 }
 
 interface MapComponentProps {
-    sorted: Property[];
+    sorted: Listing[];
 }
 
 export default function MapComponent({ sorted }: MapComponentProps) {
+    const { listings } = useFetchListing();
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
     const markers = useRef<mapboxgl.Marker[]>([]);
@@ -51,6 +63,11 @@ export default function MapComponent({ sorted }: MapComponentProps) {
     // Helper to create popup HTML with full property details
     const createPopupContent = (property: ProcessedProperty): string => {
         const categoryColor = property.category === "بيع" ? "#dc3545" : "#28a745";
+        const featuredBadge = property.is_featured ? `
+            <div style="position: absolute; top: 10px; right: 10px; background-color: #ffd700; color: #000; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                ⭐ مميز
+            </div>
+        ` : '';
         
         return `
             <div class="popup-property" style="min-width: 280px;">
@@ -61,12 +78,13 @@ export default function MapComponent({ sorted }: MapComponentProps) {
                              height="180" 
                              alt="${property.title}"
                              style="border-radius: 8px; object-fit: cover;" />
-                        <div style="position: absolute; top: 10px; left: 10px; display: flex; gap: 8px;">
+                        ${featuredBadge}
+                        <div style="position: absolute; top: 10px; left: 10px; display: flex; gap: 8px; flex-direction: column;">
                             <div style="background-color: ${categoryColor}; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600;">
-                                ${property.category}
+                                ${property.category || 'غير محدد'}
                             </div>
                             <div style="background-color: rgba(255,255,255,0.9); padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600;">
-                                ${property.types}
+                                ${property.types || 'غير محدد'}
                             </div>
                         </div>
                     </div>
@@ -81,18 +99,24 @@ export default function MapComponent({ sorted }: MapComponentProps) {
                             📍 ${property.address}
                         </p>
                         <ul class="info" style="display: flex; gap: 12px; list-style: none; padding: 0; margin: 0; flex-wrap: wrap;">
-                            <li style="display: flex; align-items: center; gap: 4px; font-size: 14px; color: #555;">
-                                <i class="icon-Bed"></i> 
-                                <span>${property.rooms ?? 0} غرف</span>
-                            </li>
-                            <li style="display: flex; align-items: center; gap: 4px; font-size: 14px; color: #555;">
-                                <i class="icon-Bathtub"></i> 
-                                <span>${property.baths ?? 0} حمام</span>
-                            </li>
-                            <li style="display: flex; align-items: center; gap: 4px; font-size: 14px; color: #555;">
-                                <i class="icon-Ruler"></i> 
-                                <span>${property.size ?? 0} قدم مربع</span>
-                            </li>
+                            ${property.rooms ? `
+                                <li style="display: flex; align-items: center; gap: 4px; font-size: 14px; color: #555;">
+                                    <i class="icon-Bed"></i> 
+                                    <span>${property.rooms} غرف</span>
+                                </li>
+                            ` : ''}
+                            ${property.baths ? `
+                                <li style="display: flex; align-items: center; gap: 4px; font-size: 14px; color: #555;">
+                                    <i class="icon-Bathtub"></i> 
+                                    <span>${property.baths} حمام</span>
+                                </li>
+                            ` : ''}
+                            ${property.size ? `
+                                <li style="display: flex; align-items: center; gap: 4px; font-size: 14px; color: #555;">
+                                    <i class="icon-Ruler"></i> 
+                                    <span>${property.size} قدم مربع</span>
+                                </li>
+                            ` : ''}
                         </ul>
                         <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #eee;">
                             <span style="color: #ff5a5f; font-size: 13px; font-weight: 600;">
@@ -105,6 +129,111 @@ export default function MapComponent({ sorted }: MapComponentProps) {
         `;
     };
 
+    // Create marker with label
+    const createMarkerElement = (property: ProcessedProperty): HTMLDivElement => {
+        // Create wrapper container that will hold everything
+        const wrapper = document.createElement("div");
+        wrapper.className = "marker-wrapper";
+        wrapper.setAttribute("data-property-id", property.id);
+        wrapper.style.cssText = `
+            position: relative;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+        `;
+        
+        const markerColor = property.is_featured ? "#ffd700" : "#ff5a5f";
+        const borderColor = property.is_featured ? "#000" : "#fff";
+        
+        // Create price label (above marker)
+        const priceLabel = document.createElement("div");
+        priceLabel.className = "marker-price-label";
+        priceLabel.style.cssText = `
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            min-width: 60px;
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        `;
+        
+        const priceValue = property.price > 1000 
+            ? `${(property.price / 1000).toFixed(0)}K` 
+            : property.price.toString();
+            
+        priceLabel.textContent = `${property.currency} ${priceValue}`;
+        
+        // Create the marker circle
+        const markerElement = document.createElement("div");
+        markerElement.className = "office-marker";
+        markerElement.style.cssText = `
+            width: 50px;
+            height: 50px;
+            background-color: ${markerColor};
+            border: 3px solid ${borderColor};
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 5;
+        `;
+        
+        // House icon
+        markerElement.innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+        `;
+        
+        // Create type badge (below marker)
+        const typeBadge = document.createElement("div");
+        typeBadge.className = "marker-type-badge";
+        typeBadge.style.cssText = `
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+            border: 1px solid #ddd;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            pointer-events: none;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        `;
+        
+        typeBadge.textContent = property.types?.split(' ')[0] || 'عقار';
+        
+        // Assemble the marker
+        wrapper.appendChild(priceLabel);
+        wrapper.appendChild(markerElement);
+        wrapper.appendChild(typeBadge);
+        
+        return wrapper;
+    };
+
     // Show popup for a property
     const showPopup = (property: ProcessedProperty, marker?: mapboxgl.Marker): void => {
         if (currentPopup.current) {
@@ -115,7 +244,7 @@ export default function MapComponent({ sorted }: MapComponentProps) {
             closeButton: true,
             closeOnClick: false,
             anchor: "bottom",
-            offset: [0, -45],
+            offset: [0, -25],
             maxWidth: "320px",
             className: "property-popup"
         })
@@ -135,13 +264,61 @@ export default function MapComponent({ sorted }: MapComponentProps) {
         // Handle popup close
         currentPopup.current.on('close', () => {
             // Reset all markers
-            document.querySelectorAll(".office-marker").forEach((m) => {
+            document.querySelectorAll(".marker-wrapper").forEach((m) => {
                 m.classList.remove("active");
-                (m as HTMLElement).style.backgroundColor = "#ff5a5f";
-                (m as HTMLElement).style.transform = "scale(1)";
-                (m as HTMLElement).style.zIndex = "1";
+                const markerElement = m as HTMLElement;
+                const circle = markerElement.querySelector(".office-marker") as HTMLElement;
+                if (circle) {
+                    const isFeatured = circle.style.backgroundColor === "rgb(255, 215, 0)";
+                    circle.style.backgroundColor = isFeatured ? "#ffd700" : "#ff5a5f";
+                    circle.style.transform = "scale(1)";
+                }
+                markerElement.style.zIndex = "1";
             });
         });
+    };
+
+    // Process listings data
+    const processListings = (listings: Listing[]): ProcessedProperty[] => {
+        return listings
+            .filter((listing): listing is Listing & { 
+                latitude: string; 
+                longtitude: string;
+                name: string;
+                price: string;
+            } => {
+                // Filter out listings with invalid coordinates
+                if (!listing.latitude || !listing.longtitude) return false;
+                if (!listing.name || !listing.price) return false;
+                
+                const lat = parseFloat(listing.latitude);
+                const lng = parseFloat(listing.longtitude);
+                
+                return !isNaN(lat) && !isNaN(lng) && 
+                       lat >= -90 && lat <= 90 && 
+                       lng >= -180 && lng <= 180;
+            })
+            .map((listing) => {
+                const lat = parseFloat(listing.latitude);
+                const lng = parseFloat(listing.longtitude);
+                const price = parseFloat(listing.price) || 0;
+                
+                return {
+                    id: listing.id.toString(),
+                    address: `${listing.location || 'غير محدد'}، ${listing.region || 'غير محدد'}`,
+                    title: listing.name,
+                    rooms: listing.rooms_number ? parseInt(listing.rooms_number) : undefined,
+                    baths: listing.badrooms_number ? parseInt(listing.badrooms_number) : undefined,
+                    size: listing.size ? parseInt(listing.size) : undefined,
+                    coordinates: [lng, lat] as [number, number],
+                    image: listing.image ? `${process.env.NEXT_PUBLIC_IMAGE}/${listing.image}` : '/default-property.jpg',
+                    price: price,
+                    currency: listing.currency || 'ريال',
+                    category: listing.category || 'غير محدد',
+                    types: listing.types || 'غير محدد',
+                    is_featured: listing.is_featured || false
+                };
+            });
     };
 
     // Bind hover events to property cards
@@ -178,14 +355,16 @@ export default function MapComponent({ sorted }: MapComponentProps) {
 
             // Highlight marker on card hover
             card.addEventListener("mouseenter", () => {
-                const markerElement = document.querySelector(
-                    `.office-marker[data-property-id="${property.id}"]`
+                const markerWrapper = document.querySelector(
+                    `.marker-wrapper[data-property-id="${property.id}"]`
                 ) as HTMLElement;
                 
-                if (markerElement) {
-                    markerElement.style.transform = "scale(1.2)";
-                    markerElement.style.backgroundColor = "#e04848";
-                    markerElement.style.zIndex = "1000";
+                if (markerWrapper) {
+                    const circle = markerWrapper.querySelector(".office-marker") as HTMLElement;
+                    if (circle) {
+                        circle.style.transform = "scale(1.2)";
+                    }
+                    markerWrapper.style.zIndex = "1000";
                 }
 
                 map.current?.flyTo({
@@ -196,14 +375,16 @@ export default function MapComponent({ sorted }: MapComponentProps) {
             });
 
             card.addEventListener("mouseleave", () => {
-                const markerElement = document.querySelector(
-                    `.office-marker[data-property-id="${property.id}"]`
+                const markerWrapper = document.querySelector(
+                    `.marker-wrapper[data-property-id="${property.id}"]`
                 ) as HTMLElement;
                 
-                if (markerElement && !markerElement.classList.contains("active")) {
-                    markerElement.style.transform = "scale(1)";
-                    markerElement.style.backgroundColor = "#ff5a5f";
-                    markerElement.style.zIndex = "1";
+                if (markerWrapper && !markerWrapper.classList.contains("active")) {
+                    const circle = markerWrapper.querySelector(".office-marker") as HTMLElement;
+                    if (circle) {
+                        circle.style.transform = "scale(1)";
+                    }
+                    markerWrapper.style.zIndex = "1";
                 }
             });
 
@@ -259,7 +440,7 @@ export default function MapComponent({ sorted }: MapComponentProps) {
             // Close popup when clicking on map
             map.current.on("click", (e: mapboxgl.MapMouseEvent) => {
                 const target = e.originalEvent.target as HTMLElement;
-                if (!target.closest(".office-marker") && 
+                if (!target.closest(".marker-wrapper") && 
                     !target.closest(".mapboxgl-popup") && 
                     currentPopup.current) {
                     currentPopup.current.remove();
@@ -300,64 +481,14 @@ export default function MapComponent({ sorted }: MapComponentProps) {
             currentPopup.current = null;
         }
 
-        // Process properties from sorted prop - filter valid coordinates
-        const properties: ProcessedProperty[] = (sorted as Property[])
-            .filter(
-                (p): p is Property & { latitude: number; longitude: number } =>
-                    typeof p.latitude === "number" && 
-                    typeof p.longitude === "number" &&
-                    p.latitude !== 0 && 
-                    p.longitude !== 0 &&
-                    !isNaN(p.latitude) && 
-                    !isNaN(p.longitude) &&
-                    Math.abs(p.latitude) <= 90 &&
-                    Math.abs(p.longitude) <= 180
-            )
-            .map((p) => ({
-                id: p.id.toString(),
-                address: `${p.location}، ${p.region}`,
-                title: p.name,
-                rooms: p.rooms_number,
-                baths: p.badrooms_number,
-                size: p.size,
-                coordinates: [p.longitude, p.latitude] as [number, number],
-                image: `${process.env.NEXT_PUBLIC_IMAGE}/${p.image}`,
-                price: p.price,
-                currency: p.currency,
-                category: p.category,
-                types: p.types,
-            }));
+        // Process properties from listings
+        const properties = processListings(sorted);
 
         console.log(`Displaying ${properties.length} properties on map out of ${sorted.length} total`);
 
         // Add markers for all properties
-        properties.forEach((property, index) => {
-            const markerElement = document.createElement("div");
-            markerElement.className = "office-marker";
-            markerElement.setAttribute("data-property-id", property.id);
-            markerElement.style.cssText = `
-                width: 44px;
-                height: 44px;
-                background-color: #ff5a5f;
-                border: 3px solid white;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-                transition: all 0.3s ease;
-                position: relative;
-                z-index: 1;
-            `;
-            
-            // Use house icon or location pin
-            markerElement.innerHTML = `
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                </svg>
-            `;
-
+        properties.forEach((property) => {
+            const markerElement = createMarkerElement(property);
             const marker = new mapboxgl.Marker(markerElement)
                 .setLngLat(property.coordinates)
                 .addTo(map.current!);
@@ -366,15 +497,19 @@ export default function MapComponent({ sorted }: MapComponentProps) {
 
             // Hover effects
             markerElement.addEventListener("mouseenter", () => {
-                markerElement.style.transform = "scale(1.15)";
-                markerElement.style.backgroundColor = "#e04848";
+                const circle = markerElement.querySelector(".office-marker") as HTMLElement;
+                if (circle) {
+                    circle.style.transform = "scale(1.2)";
+                }
                 markerElement.style.zIndex = "1000";
             });
 
             markerElement.addEventListener("mouseleave", () => {
                 if (!markerElement.classList.contains("active")) {
-                    markerElement.style.transform = "scale(1)";
-                    markerElement.style.backgroundColor = "#ff5a5f";
+                    const circle = markerElement.querySelector(".office-marker") as HTMLElement;
+                    if (circle) {
+                        circle.style.transform = "scale(1)";
+                    }
                     markerElement.style.zIndex = "1";
                 }
             });
@@ -384,17 +519,24 @@ export default function MapComponent({ sorted }: MapComponentProps) {
                 e.stopPropagation();
                 
                 // Reset all markers
-                document.querySelectorAll(".office-marker").forEach((m) => {
+                document.querySelectorAll(".marker-wrapper").forEach((m) => {
                     m.classList.remove("active");
-                    (m as HTMLElement).style.backgroundColor = "#ff5a5f";
-                    (m as HTMLElement).style.transform = "scale(1)";
-                    (m as HTMLElement).style.zIndex = "1";
+                    const markerEl = m as HTMLElement;
+                    const circle = markerEl.querySelector(".office-marker") as HTMLElement;
+                    if (circle) {
+                        const isFeatured = circle.style.backgroundColor === "rgb(255, 215, 0)";
+                        circle.style.backgroundColor = isFeatured ? "#ffd700" : "#ff5a5f";
+                        circle.style.transform = "scale(1)";
+                    }
+                    markerEl.style.zIndex = "1";
                 });
                 
                 // Activate clicked marker
                 markerElement.classList.add("active");
-                markerElement.style.backgroundColor = "#e04848";
-                markerElement.style.transform = "scale(1.15)";
+                const circle = markerElement.querySelector(".office-marker") as HTMLElement;
+                if (circle) {
+                    circle.style.transform = "scale(1.2)";
+                }
                 markerElement.style.zIndex = "1000";
                 
                 showPopup(property, marker);
@@ -411,7 +553,7 @@ export default function MapComponent({ sorted }: MapComponentProps) {
             
             map.current.fitBounds(bounds, {
                 padding: 80,
-                maxZoom: 15,
+                maxZoom: 12,
                 duration: 1000,
             });
         }

@@ -347,7 +347,7 @@ export default function Footer1() {
                                 <p className="text_color-1">
                                   من خلال الضغط على الاشتراك فإنك توافق على
                                     <Link
-                                        href="#"
+                                        href="/terms-and-conditions"
                                         className="hover-underline-link link"
                                     >
                                        شروط الخدمة

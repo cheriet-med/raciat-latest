@@ -2,7 +2,6 @@
 
 import { useSession} from "next-auth/react";
 import DashboardAdmin from "@/components/admin-dashboard/dashboard";
-import MessagesUser from "@/components/user-dashboard/messagesPage";
 import Cancel from "@/components/Data/cancel";
 export default function ProtectedPage() {
   const { data: session, status } = useSession({ required: true });
@@ -20,5 +19,5 @@ export default function ProtectedPage() {
     </div>  
     </div>);
   }
-  return session?.user?.is_superuser? <DashboardAdmin/> :  ( session?.user?.is_staff? <Cancel/>:<MessagesUser/>)
+  return session?.user?.is_superuser? <DashboardAdmin/> :  ( session?.user?.is_staff? <Cancel/>:<Cancel/>)
 }

@@ -134,7 +134,7 @@ const EditInfo = ({
     <div className="relative">
       {/* Edit Button */}
       <div 
-        className="absolute right-4 top-4 border border-1 px-3 py-0.5 items-center text-sec rounded-3xl border-sec shadow-sm text-xl flex gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
+        className="absolute  top-4 border border-1 px-3 py-0.5 items-center text-sec rounded-3xl border-sec shadow-sm text-xl flex gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
         onClick={() => setIsOpen(true)}
       >
         <GoPencil size={18} />
@@ -181,8 +181,7 @@ const EditInfo = ({
 </div>
               <div>
                 <label htmlFor="wantToGo" className="block text-xl font-medium text-secondary mb-1">
-                  أريد الذهاب 
-                </label>
+أريد الدهاب إلى                </label>
                 <input
                   id="wantToGo"
                   type="text"

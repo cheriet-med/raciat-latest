@@ -41,7 +41,7 @@ export default function Process() {
             <div
                 className="parallaxie"
                 style={{
-                    background: 'url("/hero4.avif")',
+                    background: 'url("/hero4.avif") center/cover no-repeat',
                 }}
             >
                 <div className="tf-container">

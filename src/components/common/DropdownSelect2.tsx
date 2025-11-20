@@ -44,7 +44,7 @@ export default function DropdownSelect2({
     <div 
       className={`nice-select ${addtionalParentClass}`} 
       ref={selectRef}
-      style={{ direction: 'rtl' }}
+     
     >
       <div onClick={toggleDropdown}>
         <span 
@@ -67,7 +67,7 @@ export default function DropdownSelect2({
               onChange(elm);
               toggleDropdown();
             }}
-            className={`option ${
+            className={`option  ${
               selected === elm ? "selected" : ""
             } text text-1`}
           >

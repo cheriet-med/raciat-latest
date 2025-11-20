@@ -28,38 +28,35 @@ const fetcher = async <T,>(url: string): Promise<T> => {
     clearTimeout(timeoutId);
   }
 };
-
 interface Bookings {
-  id: number;
-  product: string;                   
-  user: string;               
-  created_at: string; 
-  status: string;     
-  updated_at:string;
-  image:string;
-  check_in_date:string;
-  check_out_date:string;
-  adults:string;
-  children:string;
-  room_quantity:string;
-  base_price:string;
-  tax_amount:string;
-  service_fee:string;
-  discount_amount:string;
-  total_price:string;
-  payment_method:string;
-  cancellation_date:string;
-  refund_amount:string;
-  restaurat_check_in_date:string;
-  restaurat_check_in_time:string;
-  name:string;
-  category:string;
-  cancellation_policy:string;
-  location:string;
-  total_guests:string;
-  user_owner:string;
-  receipt:string
+ id: number;
+  user: number;
+  name: string;
+  address?: string;
+  badrooms_number?: string;
+  created_at: string;
+  description?: string | null ;
+  hurry?: string;
+  image?: string;
+  is_read: boolean;
+  latitude?: string;
+  location?: string;
+  longtitude?: string;
+  max_price?: string;
+  min_price?: string;
+  phone?: string;
+  potential_client?: any;
+  price: string;
+  reason: string;
+  region?: string;
+  representative?: any;
+  rooms_number?: string;
+  status: string;
+  surface?: string;
+  types?: string;
+  updated_at?: string;
 }
+
 
 const useFetchAllBookings = () => {
   const { data, error, isLoading , mutate} = useSWR<Bookings[]>(

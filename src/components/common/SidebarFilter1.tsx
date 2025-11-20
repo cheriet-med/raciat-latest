@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import DropdownSelect from "./DropdownSelect";
+import React, { useState, useEffect } from "react";
+import SimpleDropdown from "./DropdownSelect";
 import AdvanceSearch from "./AdvanceSearch1";
 import {
     bedroomOptions,
     budgetOptions,
     cityOptions,
-} from "@/data/optionfilter";
+} from "@/data/customoptions";
 
 interface AllPropsType {
     city: string;
@@ -55,13 +55,64 @@ function SidebarFilter1(props: Props) {
         setCategory,
     } = props;
 
-    const { city, bedrooms, budget } = allProps;
+    const { 
+        city, setCity, 
+        bedrooms, setBedrooms, 
+        budget, setBudget,
+        setBathrooms,
+        setGarages,
+        setMinSize,
+        setMaxSize
+    } = allProps;
+    
     const [activeTab, setActiveTab] = useState<"إيجار" | "بيع">(category as "إيجار" | "بيع");
+
+    // Auto-search when filters change
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            // Trigger search automatically when any filter changes
+            if (searchKeyword || city || bedrooms || budget) {
+                const syntheticEvent = { preventDefault: () => {} } as React.FormEvent;
+                handleSearch(syntheticEvent);
+            }
+        }, 500); // 500ms debounce
+
+        return () => clearTimeout(timer);
+    }, [searchKeyword, city, bedrooms, budget]);
 
     const handleTabChange = (tabCategory: "إيجار" | "بيع") => {
         setActiveTab(tabCategory);
         if (setCategory) {
             setCategory(tabCategory);
+        }
+        // Trigger search when category changes
+        const syntheticEvent = { preventDefault: () => {} } as React.FormEvent;
+        handleSearch(syntheticEvent);
+    };
+
+    const handleInputChange = (field: string, value: string) => {
+        switch (field) {
+            case "city":
+                setCity(value);
+                break;
+            case "bedrooms":
+                setBedrooms(value);
+                break;
+            case "budget":
+                setBudget(value);
+                break;
+            case "bathrooms":
+                setBathrooms(value);
+                break;
+            case "garages":
+                setGarages(value);
+                break;
+            case "minSize":
+                setMinSize(value);
+                break;
+            case "maxSize":
+                setMaxSize(value);
+                break;
         }
     };
 
@@ -140,30 +191,30 @@ function SidebarFilter1(props: Props) {
                                 <div className="text-button text_primary-color mb_8">
                                     المنطقة
                                 </div>
-                                <DropdownSelect
+                                <SimpleDropdown
                                     options={cityOptions}
-                                    selected={city}
-                                    setSelected={allProps.setCity}
+                                    onSelect={(value) => handleInputChange("city", value)}
+                                 
                                 />
                             </div>
                             <div>
                                 <div className="text-button text_primary-color mb_8">
                                     عدد الغرف
                                 </div>
-                                <DropdownSelect
+                                <SimpleDropdown
                                     options={bedroomOptions}
-                                    selected={bedrooms}
-                                    setSelected={allProps.setBedrooms}
+                                    onSelect={(value) => handleInputChange("bedrooms", value)}
+                                  
                                 />
                             </div>
                             <div>
                                 <div className="text-button text_primary-color mb_8">
                                     السعر
                                 </div>
-                                <DropdownSelect
+                                <SimpleDropdown
                                     options={budgetOptions}
-                                    selected={budget}
-                                    setSelected={allProps.setBudget}
+                                    onSelect={(value) => handleInputChange("budget", value)}
+                                   
                                 />
                             </div>
                         </div>
@@ -193,6 +244,7 @@ function SidebarFilter1(props: Props) {
                     allProps={allProps}
                     ddContainer={ddContainer}
                     handleFeatureChange={handleFeatureChange}
+                    onInputChange={handleInputChange}
                 />
             </div>
         </div>

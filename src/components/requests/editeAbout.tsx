@@ -58,7 +58,7 @@ const EditAboutPopup = ({ initialAbout = '', infoId, onUpdateSuccess, mutate }: 
     <div className="relative">
       {/* Edit Button */}
       <div 
-        className="absolute right-4 top-4 border border-1 items-center text-sec px-3 py-0.5 rounded-3xl border-sec shadow-sm text-sm flex gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
+        className="absolute right-4 top-4 border bg-prim border-1 items-center text-sec px-3 py-0.5 rounded-3xl border-sec shadow-sm text-sm flex gap-1 cursor-pointer hover:bg-gray-50 transition-colors"
         onClick={() => setIsOpen(true)}
       >
         <GoPencil size={18} />
@@ -94,7 +94,7 @@ const EditAboutPopup = ({ initialAbout = '', infoId, onUpdateSuccess, mutate }: 
                 إلغاء
               </button>
               <button
-                className="px-6 py-3 bg-sec text-white  hover:bg-prim transition-colors disabled:bg-accent disabled:cursor-not-allowed rounded-lg"
+                className="px-6 py-3 bg-sec text-white  hover:bg-prim transition-colors disabled:bg-sec disabled:cursor-not-allowed rounded-lg"
                 onClick={handleSave}
                 disabled={isSaving || !about.trim()}
               >

@@ -219,7 +219,7 @@ console.log(rating)
       clearliness: ratingclearliness,
       service: ratingservice,
       created_at: moment().format('MMMM Do YYYY'),
-      stay_date: date_stay && date_stay[0]? moment(date_stay[0].restaurat_check_in_date).format("MMMM Do YYYY"): "Not Reserved Through Goamico"
+      stay_date: "Not Reserved Through Goamico"
     };
 
     const productResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}productreviews/`, {

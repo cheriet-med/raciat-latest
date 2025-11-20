@@ -5,7 +5,7 @@ import React from 'react';
 import { CiCircleChevRight } from "react-icons/ci";
 import StarRating from "@/components/starsComponent";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
-
+import Image from 'next/image';
 import { useSession} from "next-auth/react";
 import LoginButton from '@/components/header/loginButton';
 import Link from "next/link";
@@ -101,68 +101,48 @@ const toggle = async () => {
   };
 
   return (
-    <div className="block rounded-lg p-2 shadow-xs shadow-black border border-1  font-montserrat text-secondary bg-white">
-      <div className="relative">
-        <Link href={`/en/booking/${id}`}>
-       <button
-          className="absolute left-4 top-4 z-10 py-1 px-3 rounded-3xl bg-secondary hover:bg-sec transition-colors group">
-               <p className='text-sm text-white'>Book Now</p>
-            </button> 
-          </Link>
-
-          {
-            status === "authenticated" ?
-            
-          
- (
-  
-               wishlistStatus?.is_in_wishlist == true ? <button 
-            onClick={toggle}
-            className="absolute right-4 top-4 z-10 p-1 rounded-full bg-white/80 hover:bg-white transition-colors group"
-          >
-                 <FaHeart size={24} className="text-secondary" />
-              </button> : 
-               <button 
-            onClick={toggle}
-            className="absolute right-4 top-4 z-10 p-1 rounded-full bg-white/80 hover:bg-white transition-colors group"
-          >
-                  <FaRegHeart size={24} className="text-gray-600 group-hover:text-sec transition-colors" />
-             </button>
-           
-          )   
-         :
-           (
-            <LoginButton />
-          )}
-     <Link href={`/en/booking/${id}`}>
-     <img
-          alt="Property"
-          src={imageUrl}
-          className="h-80 w-full rounded-md object-cover"
-        />
-     </Link>
-        
-      </div>
- <Link href={`/en/booking/${id}`}>
-      <div className="mt-2 flex flex-col gap-1">  
-        <div>
-          <dd className="font-medium font-playfair">{address}</dd>
-        </div>  
-        <div className='flex gap-1'>
-           {totalReviews == 0 ? "" : <p className="text-sm">{totalReviews}</p>} 
-          <StarRating rating={totalReviews} />      
-         {totalReviews == 0 ? "" : <p className=' text-sm'>{"("}{Review.length}{")"}</p>} 
-        </div>
-         <div className="flex gap-1 text-sm items-center">
-           {price?.includes("Averege Price") && <CiForkAndKnife size={14} />}
-          {category == "Hotel"? 
-           <dd className="text-sm text-gray-500">{"From $"+price + " per night"}</dd>:
-          <dd className="text-sm text-gray-500">{"Averege Price $"+price +" -$$" }</dd>
-          }
-         </div>
-      </div>
-      </Link>
-    </div>
+   <div className="flex flex-col rounded-lg p-3 shadow-xs shadow-black border border-1 bg-prim">
+  <div className="relative w-full">
+    {status === "authenticated" ? (
+      wishlistStatus?.is_in_wishlist == true ? (
+        <button 
+          onClick={toggle}
+          className="absolute right-4 top-4 z-10 p-3 rounded-full bg-white/80 hover:bg-white transition-colors group"
+        >
+          <FaHeart size={24} className="text-sec" />
+        </button>
+      ) : (
+        <button 
+          onClick={toggle}
+          className="absolute right-4 top-4 z-10 p-1 rounded-full bg-white/80 hover:bg-white transition-colors group"
+        >
+          <FaRegHeart size={24} className="text-dec group-hover:text-sec transition-colors" />
+        </button>
+      )
+    ) : (
+      <LoginButton />
+    )}
+    
+<Link href={`/property-details-1/${id}`} className="block w-full">
+  <Image
+    alt="Property"
+    src={imageUrl}
+    width={800}  // required
+    height={600} // required
+    className="w-full h-80 lg:h-96 rounded-md object-cover"
+    priority={false} // optional - use true for above-the-fold images
+  />
+</Link>
+  </div>
+<Link href={`/property-details-1/${id}`} className="block mt-4">
+  <div className="flex flex-col gap-3">  
+    <p className="text-4xl font-bold font-playfair text-white hover:text-sec transition-colors cursor-pointer">{address}</p>
+    <p className="text-2xl font-bold font-playfair text-white hover:text-sec transition-colors cursor-pointer">{category}</p> 
+    <hr className="my-2" />
+    <p className="text-3xl font-bold font-playfair text-white hover:text-sec transition-colors cursor-pointer">{price}</p>
+  </div>
+</Link>
+</div>
   );
 };
 
@@ -221,8 +201,8 @@ const wishlistProductIds = wishlist?.map(w => Number(w.product));
             <PropertyCard
               id={res.id } // Use restaurant ID or fallback
               location=""
-              price=""
-              category={res.category ?? ""}
+              price={`${res.price ?? ""}${" "} ${res.currency ?? ""}`}
+              category={`${res.location ?? ""}${"، "} ${res.region ?? ""}`}
               address={res.name ?? ""}
               imageUrl={`${process.env.NEXT_PUBLIC_IMAGE}/${res.image}` }
               averageRating={0}

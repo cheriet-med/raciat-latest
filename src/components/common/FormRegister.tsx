@@ -298,7 +298,7 @@ export default function FormRegister() {
                                     <span className="text-body-default">
                                         أوافق على{" "}
                                         <a
-                                            href="/privacy-policy"
+                                            href="/terms-and-conditions"
                                             className="hover-underline-link text_primary-color fw-7"
                                         >
                                             شروط الاستخدام

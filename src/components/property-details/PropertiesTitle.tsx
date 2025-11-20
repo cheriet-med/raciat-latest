@@ -1,4 +1,18 @@
 import React from "react";
+import { useState, useEffect } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import { properties } from "@/data/properties";
+import Image from "next/image";
+import Link from "next/link";
+import useFetchListing from "@/components/requests/fetchListings";
+import { useSession } from "next-auth/react";
+import LoginButton from "@/components/header/loginButton";
+import { FaRegHeart, FaHeart } from "react-icons/fa";
+import LoginButtonSinglePage from "../header/loginButtonBookingHotel";
+import ShareButton from "../Data/shareSocial";
 
 type Property = {
   id: number;
@@ -18,6 +32,121 @@ export default function PropertiesTitle({ property }: { property: Property }) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-SA').format(price);
   };
+
+
+
+
+    const [wishlistItems, setWishlistItems] = useState<Record<number, boolean>>({});
+    
+    const { listings } = useFetchListing(); 
+    const { data: session, status } = useSession();
+
+    // Fetch wishlist status for all properties
+    useEffect(() => {
+        const fetchWishlistStatus = async () => {
+            if (status === "authenticated" && listings) {
+                try {
+                    const response = await fetch(
+                        `${process.env.NEXT_PUBLIC_URL}wishlist/${session?.user?.id}/`,
+                        {
+                            headers: {
+                                Authorization: `Token ${process.env.NEXT_PUBLIC_TOKEN}`,
+                            },
+                        }
+                    );
+                    if (response.ok) {
+                        const data = await response.json();
+                        // Create a map of product IDs that are in wishlist
+                        const wishlistMap: Record<number, boolean> = {};
+                        data.forEach((item: any) => {
+                            wishlistMap[item.product.id] = true;
+                        });
+                        setWishlistItems(wishlistMap);
+                    }
+                } catch (error) {
+                    console.error("Error fetching wishlist:", error);
+                }
+            }
+        };
+        fetchWishlistStatus();
+    }, [status, session?.user?.id, listings]);
+
+ 
+    const toggleWishlist = async (propertyId: number) => {
+        if (status !== "authenticated") return;
+
+        try {
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_URL}wishlist/${propertyId}/`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Token ${process.env.NEXT_PUBLIC_TOKEN}`,
+                    },
+                    body: JSON.stringify({ 
+                        user_id: session?.user?.id
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            // Update local state based on server response
+            setWishlistItems(prev => ({
+                ...prev,
+                [propertyId]: data.is_in_wishlist
+            }));
+            
+            return data;
+        } catch (error) {
+            console.error("Error toggling wishlist:", error);
+            throw new Error("Failed to toggle wishlist. Please try again later.");
+        }
+    };
+
+
+
+    const WishlistButton = ({ propertyId }: { propertyId: number }) => {
+        const isInWishlist = wishlistItems[propertyId];
+        
+        if (status !== "authenticated") {
+            return <LoginButtonSinglePage />;
+        }
+
+        return (
+            <div 
+                className="wishlist cursor-pointer hover:bg-gray-100 border-gray-300 border rounded-xl p-3" 
+                onClick={(e) => {
+                    e.preventDefault();
+                    toggleWishlist(propertyId);
+                }}
+            >
+                <div className="hover-tooltip tooltip-left box-icon">
+                    {isInWishlist ? (
+                        <FaHeart className="text-red-500 text-xl" size={32}/>
+                    ) : (
+                        <FaRegHeart className="text-xl" size={32}/>
+                    )}
+                    <span className="tooltip">
+                        {isInWishlist ? "إزالة من قائمة الرغبات" : "أضف إلى قائمة الرغبات"}
+                    </span>
+                </div>
+            </div>
+        );
+    };
+
+
+
+
+
+
+
+
 
   return (
     <div>
@@ -76,14 +205,12 @@ export default function PropertiesTitle({ property }: { property: Property }) {
         </div>
         <ul className="list-action d-flex gap_16">
           <li>
-            <a href="#">
-              <span className="icon icon-Heart"></span>
-            </a>
+             <WishlistButton propertyId={property.id} />
+           
           </li>
           <li>
-            <a href="#" className="">
-              <i className="icon-ShareNetwork"></i>
-            </a>
+             <ShareButton id={property.id}/> 
+            
           </li>
         </ul>
       </div>

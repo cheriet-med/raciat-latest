@@ -57,18 +57,18 @@ interface AlUsers {
   language:string;
   is_email_verified:boolean;
   is_phone_number_verified:boolean;
-status:string;
-plan:string;
-last_login:string;
-is_active:boolean;
-types:string;
-want_to_go:string;
-obsessed:string;
-pets:string;
-time_spend:string;
-is_superuser:string;
-premium_plan:string;
-
+  stars:string;
+  status:string;
+  plan:string;
+  last_login:string;
+  is_active:boolean;
+  types:string;
+  want_to_go:string;
+  obsessed:string;
+  pets:string;
+  time_spend:string;
+  is_superuser:string;
+  premium_plan:string;
 }
 
 const useFetchAllUser = () => {

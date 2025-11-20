@@ -189,6 +189,9 @@ export default function AddReviewHotelForm({ proid }: AddReviewHotelFormProps) {
       
       // Redirect to property page
       router.push(`/property-details-1/${proid}`);
+      setTimeout(() => {
+  window.location.reload();
+}, 300);
 
     } catch (error) {
       console.error('Submission error:', error);
@@ -197,6 +200,7 @@ export default function AddReviewHotelForm({ proid }: AddReviewHotelFormProps) {
       );
     } finally {
       setIsSubmitting(false);
+
     }
   };
 

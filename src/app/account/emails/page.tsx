@@ -4,7 +4,6 @@ import { useSession} from "next-auth/react";
 import DashboardAdmin from "@/components/admin-dashboard/dashboard";
 import DashboardUser from "@/components/user-dashboard/dashboarduser";
 import DashboardPartner from "@/components/partner-dashboard/partner-dashboard";
-import MessagesUser from "@/components/user-dashboard/messagesPage";
 import CalendarDashboardPartner from "@/components/partner-dashboard/calendar";
 import EmailsAdmin from "@/components/admin-dashboard/emails";
 import Emails from "@/components/admin-dashboard/emails";
@@ -25,5 +24,5 @@ export default function ProtectedPage() {
     </div>  
     </div>);
   }
-  return session?.user?.is_superuser? <Emails/> :  ( session?.user?.is_staff? <CalendarDashboardPartner/>:<MessagesUser/>)
+  return session?.user?.is_superuser? <Emails/> :  ( session?.user?.is_staff? <CalendarDashboardPartner/>:<CalendarDashboardPartner/>)
 }

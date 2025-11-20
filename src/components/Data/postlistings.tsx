@@ -107,12 +107,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 };
 
 export default function PostListings() {
-  const { listings, isLoading, error, mutate } = useFetchPostListing();
+  const { listingsp, isLoading, error, mutate } = useFetchPostListing();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  const totalPages = Math.ceil((listings?.length || 0) / itemsPerPage);
-  const currentItems = listings?.slice(
+  const totalPages = Math.ceil((listingsp?.length || 0) / itemsPerPage);
+  const currentItems = listingsp?.slice(
     (currentPage - 1) * itemsPerPage,
     (currentPage - 1) * itemsPerPage + itemsPerPage
   ) || [];

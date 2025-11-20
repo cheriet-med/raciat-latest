@@ -72,16 +72,7 @@ const HotelBookingComponent = ({bookdata}:any) => {
     const currentDate = new Date(dateRange.checkIn);
     while (currentDate < dateRange.checkOut) {
       const totalRooms = Booking.reduce((sum, booking) => {
-        if (!booking.check_in_date || !booking.check_out_date || !booking.room_quantity) return sum;
-        
-        const checkIn = new Date(booking.check_in_date);
-        const checkOut = new Date(booking.check_out_date);
-        
-        // Check if the current date falls within the booking period
-        if (currentDate >= checkIn && currentDate < checkOut) {
-          return sum + parseInt(booking.room_quantity);
-        }
-        
+      
         return sum;
       }, 0);
       
@@ -98,15 +89,7 @@ const HotelBookingComponent = ({bookdata}:any) => {
     
     // Get bookings that overlap with this date and sum their room quantities
     const totalRooms = Booking.reduce((sum, booking) => {
-      if (!booking.check_in_date || !booking.check_out_date || !booking.room_quantity) return sum;
-      
-      const checkIn = new Date(booking.check_in_date);
-      const checkOut = new Date(booking.check_out_date);
-      
-      // Check if the date falls within the booking period
-      if (date >= checkIn && date < checkOut) {
-        return sum + parseInt(booking.room_quantity);
-      }
+     
       
       return sum;
     }, 0);

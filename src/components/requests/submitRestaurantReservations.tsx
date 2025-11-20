@@ -169,10 +169,7 @@ const RestaurantBookingComponent = ({bookdata}:any) => {
     
     return Booking.filter(reservation => {
       // Only count reservations that have valid restaurant data
-      if (!reservation.restaurat_check_in_date || !reservation.restaurat_check_in_time) return false;
-      
-      const parsedDate = parseDate(reservation.restaurat_check_in_date);
-      return parsedDate === dateString;
+  
     }).length;
   };
 
@@ -184,10 +181,7 @@ const RestaurantBookingComponent = ({bookdata}:any) => {
     
     return Booking.some(reservation => {
       // Check if this is a restaurant reservation with valid time
-      if (!reservation.restaurat_check_in_time || !reservation.restaurat_check_in_date) return false;
-      
-      const parsedDate = parseDate(reservation.restaurat_check_in_date);
-      return parsedDate === dateString && reservation.restaurat_check_in_time === timeSlot;
+     
     });
   };
 

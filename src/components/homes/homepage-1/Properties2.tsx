@@ -2,45 +2,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-
-const propertiesData = [
-    {
-        id: "tab1",
-        title: "فيلا الواحة الذهبية",
-        address: "شارع الملك عبدالعزيز، حي الزهراء، جدة",
-        img: "/assets/images/home/64.jpg",
-    },
-    {
-        id: "tab2",
-        title: "قصر النخيل الملكي",
-        address: "طريق الملك فهد، حي النسيم، الرياض",
-         img: "/assets/images/home/60.jpeg",
-    },
-    {
-        id: "tab3",
-        title: "مجمع الياسمين السكني",
-        address: "شارع الأمير سلطان، حي الروضة، جدة",
-         img: "/assets/images/home/80.jpeg",
-    },
-    {
-        id: "tab4",
-        title: "برج الماس التجاري",
-        address: "طريق الملك عبدالله، حي العليا، الرياض",
-         img: "/assets/images/home/98.jpeg",
-    },
-    {
-        id: "tab5",
-        title: "شاليه البحر الأحمر",
-        address: "كورنيش جدة، حي الشاطئ، جدة",
-         img: "/assets/images/home/100.jpeg",
-    },
-];
-
+import useFetchListing from "@/components/requests/fetchListings";
 export default function Properties2() {
+
+     const { listings } = useFetchListing(); 
     const [activeTab, setActiveTab] = useState("tab1");
     let hoverTimer: ReturnType<typeof setTimeout>;
 
-    const handleMouseEnter = (tabId: string) => {
+     const featured = listings?.filter(
+    list => list.is_featured === true
+  ) || [];
+  
+    const handleMouseEnter = (tabId: any) => {
         hoverTimer = setTimeout(() => {
             setActiveTab(tabId);
         }, 100);
@@ -55,11 +28,11 @@ export default function Properties2() {
             <div className="tf-container">
                 <div className="tf-grid-layout lg-col-2 tabs-hover-wrap align-items-center">
                     <div className="box">
-                        {propertiesData.map((property) => (
+                        {featured?.map((property) => (
                             <div
                                 key={property.id}
                                 className={`process-item item scrolling-effect effectLeft${
-                                    activeTab === property.id ? " active" : ""
+                                    +activeTab === property.id ? " active" : ""
                                 }`}
                                 data-tab={property.id}
                                 onMouseEnter={() =>
@@ -75,27 +48,27 @@ export default function Properties2() {
                                                 href={'/property-details-1/1'}
                                                 className="link"
                                             >
-                                                {property.title}
+                                                {property.name}
                                             </Link>
                                         </h4>
-                                        <p>{property.address}</p>
+                                        <p>{property.location}, {property.region}</p>
                                     </div>
                                 </div>
                             </div>
                         ))}
                     </div>
                     <div className="tab-content-wrap">
-                        {propertiesData.map((property) => (
+                        {featured.map((property) => (
                             <div
                                 key={property.id}
-                                id={property.id}
+                                
                                 className={`tab-content${
-                                    activeTab === property.id ? " active" : ""
+                                    +activeTab === property.id ? " active" : ""
                                 }`}
                             >
                                 <Link href={'/property-details-1/1'} className="img-style">
                                     <Image
-                                        src={property.img}
+                                        src={`${process.env.NEXT_PUBLIC_IMAGE}/${property.image}`}
                                         width={645}
                                         height={645}
                                         alt="process"

@@ -20,6 +20,7 @@ declare module "next-auth" {
     phoneNumber?: string | null;
     access_token?: string;
     refresh_token?: string;
+
   }
 
   interface Session {

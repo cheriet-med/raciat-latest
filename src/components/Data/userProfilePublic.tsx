@@ -601,7 +601,7 @@ const hotelMarkers = [{
             <span className="text-background font-medium">{averageRating == 5? "Excellent": (averageRating == 4? "Very Good" :(averageRating == 3? "Good":(averageRating == 2? 	"Poor" : "")))}</span>
             <span className="text-sm text-gray-500">({Review.length} reviews)</span>
           </div>
-          {Review.length >50 ?  <div className="text-sm text-gray-500 mb-4 px-2 py-1 border border-1 bg-secondary text-white rounded-3xl font-bold w-fit mt-2">Top Reviewer</div>: ""}
+          {Review.length >50 ?  <div className="text-sm  mb-4 px-2 py-1 border border-1 bg-secondary text-white rounded-3xl font-bold w-fit mt-2">Top Reviewer</div>: ""}
          
         </div>
         <div>

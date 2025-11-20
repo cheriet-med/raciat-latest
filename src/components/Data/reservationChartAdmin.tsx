@@ -4,7 +4,7 @@ import { LuCalendarDays } from "react-icons/lu";
 import { GiConfirmed } from "react-icons/gi";
 import { TbCalendarCancel } from "react-icons/tb";
 import dynamic from 'next/dynamic';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ApexOptions } from 'apexcharts';
 import useFetchAllBookings from "@/components/requests/fetchAllBookings";
 import { useSession } from "next-auth/react";
@@ -14,19 +14,68 @@ import NewsletterTable from "@/components/Data/newsletterTable";
 import { FaGlobeEurope } from "react-icons/fa";
 import { MdPendingActions } from "react-icons/md";
 import { RiPassValidLine } from "react-icons/ri";
+import useFetchAllUser from "../requests/fetchAllUsers";
+import useFetchQuikeOrders from "../requests/fetchQuikOrders";
 
 // Dynamically import ApexCharts to avoid SSR issues
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 type SeriesData = [number, number][];
 
-interface Booking {
+// Define proper types for your data
+interface User {
   id: number;
+  name: string;
+  username: string;
+  full_name: string;
+  title: string;
+  category: string;
+  amenities: string;
+  email: string;
+  location: string;
+  profile_image: string;
+  identity_verified: boolean;
+  about: string;
+  website: string;
+  joined: string;
+  phoneNumber: string;
+  address_line_1: string;
+  address_line_2: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  countryCode: string;
+  latitude: string;
+  longtitude: string;
+  is_staff: boolean;
+  hotel_stars: string;
+  born: string;
+  language: string;
+  is_email_verified: boolean;
+  is_phone_number_verified: boolean;
+  stars: string;
   status: string;
-  created_at: string;
-  total_price: string | null;
-  category: string | null;
-  restaurat_check_in_date: string | null;
-  check_in_date: string | null;
+  plan: string;
+  last_login: string;
+  is_active: boolean;
+  types: string;
+  want_to_go: string;
+  obsessed: string;
+  pets: string;
+  time_spend: string;
+  is_superuser: string;
+  premium_plan: string;
+}
+
+interface Order {
+  id: number;
+  name: string;
+  phone_number: string;
+  date: string | null;
+  is_read: boolean;
+}
+
+interface AllUsersResponse {
+  AllUsers?: User[];
 }
 
 // Skeleton Components
@@ -59,149 +108,156 @@ const ChartSkeleton = ({ height = 300 }: { height?: number }) => (
   </div>
 );
 
+// Helper function to compare arrays by content
+const areArraysEqual = (arr1: any[], arr2: any[]): boolean => {
+  if (arr1 === arr2) return true;
+  if (arr1.length !== arr2.length) return false;
+  
+  return arr1.every((item, index) => {
+    if (typeof item === 'object' && item !== null) {
+      return JSON.stringify(item) === JSON.stringify(arr2[index]);
+    }
+    return item === arr2[index];
+  });
+};
+
 export default function ReservationChartAdmin() {
-  const [revenueSeries, setRevenueSeries] = useState<{ name: string; data: SeriesData }[]>([
-    { name: "Revenue", data: [] }
+  const [usersSeries, setUsersSeries] = useState<{ name: string; data: SeriesData }[]>([
+    { name: "المستخدمين", data: [] }
   ]);
-  const [bookingSeries, setBookingSeries] = useState<{ name: string; data: SeriesData }[]>([
-    { name: "Bookings", data: [] }
+  const [ordersSeries, setOrdersSeries] = useState<{ name: string; data: SeriesData }[]>([
+    { name: "الطلبات", data: [] }
   ]);
   const [isLoading, setIsLoading] = useState(true);
   const { data: session, status } = useSession({ required: true });
   const { AllBookings } = useFetchAllBookings();
 
+  // Type the hooks properly
+  const { AllUsers } = useFetchAllUser() as AllUsersResponse;
+  const { orders } = useFetchQuikeOrders() as { orders: Order[] };
 
-  const Owner = useMemo(() => {
-    return AllBookings.filter((user) => user.user_owner === session?.user?.id);
-  }, [AllBookings, session?.user?.id]);
+  // Use ref to track previous processed data
+  const previousProcessedDataRef = useRef<{
+    usersData: SeriesData;
+    ordersData: SeriesData;
+  } | null>(null);
 
- const completedBooking = AllBookings.filter(b => b.status === 'Completed').length;
- const pendingBooking = AllBookings.filter(b => b.status === 'pending').length;
-  const confirmedBooking = AllBookings.filter(b => b.status === 'confirmed').length;
-   const cancelledBooking = AllBookings.filter(b => b.status === 'cancelled').length;
-console.log("complete booking is:",cancelledBooking)
-  // Revenue totals
-const todayBookings = AllBookings.filter(item =>
-  item.created_at && moment(item.created_at).isSame(moment(), "day")
-);
-
-
-const totalPerDay =
-  todayBookings.length > 0
-    ? todayBookings.reduce((sum, r) => sum + Number(r.total_price || 0), 0)
-    : 0;
+  useEffect(() => {
+    // Safely get users data with proper typing
+    const currentUsers = Array.isArray(AllUsers) 
+      ? AllUsers 
+      : (AllUsers && 'AllUsers' in AllUsers ? (AllUsers as AllUsersResponse).AllUsers || [] : []);
     
+    const currentOrders = orders || [];
 
-const month = AllBookings.filter(item =>
-  item.created_at &&
-  moment(item.created_at, ["MMMM Do YYYY", moment.ISO_8601], true).isSame(moment(), "month")
-);
+    console.log('AllUsers data:', AllUsers);
+    console.log('Orders data:', orders);
 
-const totalPerMonth =
-  month.length > 0 ? month.reduce((sum, r) => sum + Number(r.total_price), 0) : 0;
+    if (currentUsers.length === 0 && currentOrders.length === 0) {
+      console.log('No data available');
+      // Only update if we're not already in this state
+      if (usersSeries[0].data.length > 0 || ordersSeries[0].data.length > 0 || isLoading) {
+        setUsersSeries([{ name: "المستخدمين", data: [] }]);
+        setOrdersSeries([{ name: "الطلبات", data: [] }]);
+        setIsLoading(false);
+      }
+      return;
+    }
 
+    // Process users per day
+    const usersByDay: { [key: string]: number } = {};
+    currentUsers.forEach((user: User) => {
+      const date = user.joined;
+      if (date) {
+        try {
+          const formattedDate = moment(date).format('YYYY-MM-DD');
+          usersByDay[formattedDate] = (usersByDay[formattedDate] || 0) + 1;
+        } catch (error) {
+          console.log('Error processing user date:', date, error);
+        }
+      }
+    });
 
-  const year = AllBookings.filter(item =>
-    item.created_at && moment(item.created_at, ["MMMM Do YYYY", moment.ISO_8601]).isSame(moment(), "year")
-  );
-  const totalPerYear = year.length > 0 ? year.reduce((sum, r) => sum + +r.total_price, 0) : 0;
+    // Process orders per day
+    const ordersByDay: { [key: string]: number } = {};
+    currentOrders.forEach((order: Order) => {
+      const date = order.date;
+      if (date) {
+        try {
+          const formattedDate = moment(date).format('YYYY-MM-DD');
+          ordersByDay[formattedDate] = (ordersByDay[formattedDate] || 0) + 1;
+        } catch (error) {
+          console.log('Error processing order date:', date, error);
+        }
+      }
+    });
 
-  // Calculate metrics
-  const calculateMetrics = (bookings: Booking[]) => {
-    const today = new Date().toDateString();
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
+    console.log('Users by day:', usersByDay);
+    console.log('Orders by day:', ordersByDay);
 
-    const todayRevenue = bookings
-      .filter(b => new Date(b.created_at).toDateString() === today && b.total_price)
-      .reduce((sum, b) => sum + parseFloat(b.total_price || '0'), 0);
+    // Get all unique dates from both datasets
+    const allDates = Array.from(new Set([
+      ...Object.keys(usersByDay),
+      ...Object.keys(ordersByDay)
+    ])).sort();
 
-    const monthRevenue = bookings
-      .filter(b => {
-        const d = new Date(b.created_at);
-        return d.getMonth() === currentMonth && d.getFullYear() === currentYear && b.total_price;
-      })
-      .reduce((sum, b) => sum + parseFloat(b.total_price || '0'), 0);
+    console.log('All dates:', allDates);
 
-    const yearRevenue = bookings
-      .filter(b => new Date(b.created_at).getFullYear() === currentYear && b.total_price)
-      .reduce((sum, b) => sum + parseFloat(b.total_price || '0'), 0);
+    // Convert to series data format [timestamp, count]
+    const usersPerDay = allDates.map(date => [
+      moment(date).valueOf(),
+      usersByDay[date] || 0
+    ]) as [number, number][];
 
-    const completedBookings = bookings.filter(b => b.status === 'Completed').length;
+    const ordersPerDay = allDates.map(date => [
+      moment(date).valueOf(),
+      ordersByDay[date] || 0
+    ]) as [number, number][];
 
-    return {
-      todayRevenue: todayRevenue.toFixed(2),
-      monthRevenue: monthRevenue.toFixed(2),
-      yearRevenue: yearRevenue.toFixed(2),
-      completedBookings
+    console.log('Users per day series:', usersPerDay);
+    console.log('Orders per day series:', ordersPerDay);
+
+    // Check if the processed data has actually changed
+    const currentProcessedData = {
+      usersData: usersPerDay,
+      ordersData: ordersPerDay
     };
-  };
 
-  useEffect(() => {
-    if (status !== 'loading' && AllBookings !== undefined) {
-      const timer = setTimeout(() => setIsLoading(false), 500);
-      return () => clearTimeout(timer);
+    const previousProcessedData = previousProcessedDataRef.current;
+
+    if (
+      previousProcessedData &&
+      areArraysEqual(previousProcessedData.usersData, currentProcessedData.usersData) &&
+      areArraysEqual(previousProcessedData.ordersData, currentProcessedData.ordersData)
+    ) {
+      console.log('Processed data unchanged, skipping update');
+      setIsLoading(false);
+      return;
     }
-  }, [status, AllBookings]);
 
-  useEffect(() => {
-    if (AllBookings && AllBookings.length > 0) {
-      const processBookingData = (bookings: Booking[]) => {
-        const dailyData: { [key: string]: { revenue: number; count: number } } = {};
+    // Store the new processed data
+    previousProcessedDataRef.current = currentProcessedData;
 
-        bookings.forEach(b => {
-          let dateToUse = b.check_in_date || b.restaurat_check_in_date || b.created_at;
-          let bookingDate = moment(dateToUse, ["MMMM Do YYYY", moment.ISO_8601]).toDate();
-          const dateKey = bookingDate.toDateString();
-
-          if (!dailyData[dateKey]) {
-            dailyData[dateKey] = { revenue: 0, count: 0 };
-          }
-          dailyData[dateKey].count += 1;
-          if (b.total_price) dailyData[dateKey].revenue += parseFloat(b.total_price);
-        });
-
-        const revenueData: SeriesData = [];
-        const bookingData: SeriesData = [];
-
-        Object.entries(dailyData)
-          .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
-          .forEach(([date, data]) => {
-            const ts = new Date(date).getTime();
-            revenueData.push([ts, data.revenue]);
-            bookingData.push([ts, data.count]);
-          });
-
-        return { revenueData, bookingData };
-      };
-
-      const { revenueData, bookingData } = processBookingData(AllBookings);
-      setRevenueSeries([{ name: "Revenue", data: revenueData }]);
-      setBookingSeries([{ name: "Bookings", data: bookingData }]);
-    }
-  }, [AllBookings]);
-
-  const metrics = AllBookings ? calculateMetrics(AllBookings) : {
-    todayRevenue: '0.00',
-    monthRevenue: '0.00',
-    yearRevenue: '0.00',
-    completedBookings: 0
-  };
+    // Update state once with all the processed data
+    setUsersSeries([{ name: "المستخدمين", data: usersPerDay }]);
+    setOrdersSeries([{ name: "الطلبات", data: ordersPerDay }]);
+    setIsLoading(false);
+  }, [AllUsers, orders, usersSeries, ordersSeries, isLoading]); // Include state dependencies
 
   const options1: ApexOptions = {
     chart: {
       id: "chart1",
       type: "area",
-      foreColor: "#ccc",
+      foreColor: "#D9AA52",
       toolbar: { autoSelected: "pan", show: false }
     },
     noData: {
-      text: "No Revenue Data",
+      text: "لا توجد بيانات للمستخدمين",
       align: "center",
       verticalAlign: "middle",
-      style: { color: "#888", fontSize: "16px" }
+      style: { color: "#D9AA52", fontSize: "16px" }
     },
-    colors: ["#00BAEC"],
+    colors: ["#142B40"],
     stroke: { curve: "smooth", width: 2 },
     grid: { borderColor: "#555", yaxis: { lines: { show: false } } },
     dataLabels: { enabled: false },
@@ -209,119 +265,133 @@ const totalPerMonth =
       type: "gradient",
       gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.1, stops: [0, 90, 100] }
     },
-    markers: { size: 5, colors: ["#000524"], strokeWidth: 3 },
-    tooltip: { theme: "dark", y: { formatter: val => "$" + val.toFixed(2) } },
-    xaxis: { type: "datetime" },
-    yaxis: { min: 0, tickAmount: 4, labels: { formatter: val => "$" + val.toFixed(0) } }
+    markers: { size: 5, colors: ["#142B40"], strokeWidth: 3 },
+    tooltip: { 
+      theme: "dark", 
+      y: { 
+        formatter: function(val: number) {
+          return `${val} مستخدم`;
+        }
+      },
+      x: {
+        formatter: function(val: number) {
+          return moment(val).format('YYYY-MM-DD');
+        }
+      }
+    },
+    xaxis: { 
+      type: "datetime",
+      labels: {
+        formatter: function(val: number) {
+          return moment(val).format('YYYY-MM-DD');
+        }
+      }
+    },
+    yaxis: { 
+      min: 0, 
+      tickAmount: 4, 
+      labels: { 
+        formatter: function(val: number) {
+          return `${val}`;
+        }
+      } 
+    },
+    title: {
+      text: "عدد المستخدمين المسجلين يومياً",
+      align: 'center',
+      style: {
+        fontSize: '16px',
+        color: '#D9AA52'
+      }
+    }
   };
 
   const options2: ApexOptions = {
     chart: {
       id: "chart2",
       type: "bar",
-      foreColor: "#ccc",
+      foreColor: "#D9AA52",
       brush: { target: "chart1", enabled: true },
-      selection: { enabled: true, fill: { color: "#fff", opacity: 0.4 } }
+      selection: { enabled: true, fill: { color: "#D9AA52", opacity: 0.4 } }
     },
     noData: {
-      text: "No Booking Data",
+      text: "لا توجد بيانات للطلبات",
       align: "center",
       verticalAlign: "middle",
-      style: { color: "#888", fontSize: "16px" }
+      style: { color: "#D9AA52", fontSize: "16px" }
     },
-    colors: ["#B796AC"],
+    colors: ["#D9AA52"],
     stroke: { width: 2 },
     grid: { borderColor: "#444" },
     markers: { size: 0 },
-    tooltip: { theme: "dark", y: { formatter: val => val + " bookings" } },
-    xaxis: { type: "datetime", tooltip: { enabled: false } },
-    yaxis: { tickAmount: 2 }
+    tooltip: { 
+      theme: "dark", 
+      y: { 
+        formatter: function(val: number) {
+          return `${val} طلب`;
+        }
+      },
+      x: {
+        formatter: function(val: number) {
+          return moment(val).format('YYYY-MM-DD');
+        }
+      }
+    },
+    xaxis: { 
+      type: "datetime", 
+      tooltip: { enabled: false },
+      labels: {
+        formatter: function(val: number) {
+          return moment(val).format('YYYY-MM-DD');
+        }
+      }
+    },
+    yaxis: { 
+      tickAmount: 2,
+      labels: {
+        formatter: function(val: number) {
+          return `${val}`;
+        }
+      }
+    },
+    title: {
+      text: "عدد الطلبات من صفحة العقار يومياً",
+      align: 'center',
+      style: {
+        fontSize: '16px',
+        color: '#D9AA52'
+      }
+    }
   };
 
+  // Calculate totals for display with proper typing
+  const totalUsers = Array.isArray(AllUsers) 
+    ? AllUsers.length 
+    : (AllUsers && 'AllUsers' in AllUsers ? (AllUsers as AllUsersResponse).AllUsers?.length || 0 : 0);
+    
+  const totalOrders = orders?.length || 0;
+
   return (
-    <div className="mx-2 lg:mx-6 mt-6">
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-        {isLoading ? (
-          <>
-            <MetricCardSkeleton />
-            <MetricCardSkeleton />
-            <MetricCardSkeleton />
-            <MetricCardSkeleton />
-             <MetricCardSkeleton />
-          </>
-        ) : (
-          <>
-            <article className="rounded-xl border border-gray-100 bg-a p-6 w-full shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white">Total Reservations</p>
-                  <p className="text-2xl font-medium text-white">{AllBookings?.length || 0}</p>
-                </div>
-                <FaGlobeEurope size={32} className="text-accent"/>
-              </div>
-            </article>
-            <article className="rounded-xl border border-gray-100 bg-a  p-6 w-full shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white">Completed Reservations</p>
-                  <p className="text-2xl font-medium text-white">{completedBooking}</p>
-                </div>
-                <LuCalendarDays size={32} className="text-accent"/>
-              </div>
-            </article>
-            <article className="rounded-xl border border-gray-100 bg-a p-6 w-full shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white">Pending Reservations</p>
-                  <p className="text-2xl font-medium text-white">{pendingBooking}</p>
-                </div>
-                <MdPendingActions size={32} className="text-accent"/>
-              </div>
-            </article>
-            <article className="rounded-xl border border-gray-100 bg-a p-6 w-full shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white">Confirmed Reservations</p>
-                  <p className="text-2xl font-medium text-white">{confirmedBooking}</p>
-                </div>
-              <RiPassValidLine size={32} className="text-accent"/>
-              </div>
-            </article>
-              <article className="rounded-xl border border-gray-100 bg-a p-6 w-full shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-white">Cancelled Reservations</p>
-                  <p className="text-2xl font-medium text-white">{cancelledBooking}</p>
-                </div>
-                <TbCalendarCancel size={32} className="text-accent"/>
-              </div>
-            </article>
-          </>
-        )}
-      </div>
-<div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+    <div className="mx-2 lg:mx-6 my-6">
+
       {/* Charts */}
-            <div className=" lg:col-span-2 rounded-xl border border-gray-100 bg-white  shadow-sm">
+      <div className="lg:col-span-2 rounded-xl border border-gray-100 bg-white shadow-sm">
         {isLoading ? (
           <div className="p-6">
-            <ChartSkeleton height={300} />
-            <div className="mt-8"><ChartSkeleton height={300} /></div>
+            <ChartSkeleton height={200} />
+            <div className="mt-8"><ChartSkeleton height={200} /></div>
           </div>
         ) : (
           <>
-            <p className="font-playfair text-center p-6">Daily Revenue and Booking Trends</p>
+            <p className="font-playfair text-center p-6">رسم بياني يمثل عدد المستخدمين وعدد الطلبات من صفحة العقار</p>
             <div className="px-6">
-              <Chart options={options1} series={revenueSeries} type="area" height={300} />
+              <Chart options={options1} series={usersSeries} type="area" height={200} />
             </div>
             <div className="px-6 pb-6">
-              <Chart options={options2} series={bookingSeries} type="bar" height={300} />
+              <Chart options={options2} series={ordersSeries} type="bar" height={200} />
             </div>
           </>
         )}
-      </div>
-      <NewsletterTable/>
-      
       </div>
     </div>
   );

@@ -2,7 +2,6 @@
 
 import { useSession} from "next-auth/react";
 import DashboardAdmin from "@/components/admin-dashboard/dashboard";
-import MessagesUser from "@/components/user-dashboard/messagesPage";
 import EarninPartnerProfileDashboard from "@/components/partner-dashboard/profile";
 
 
@@ -22,5 +21,5 @@ export default function ProtectedPage() {
     </div>  
     </div>);
   }
-  return session?.user?.is_superuser? <DashboardAdmin/> :  ( session?.user?.is_staff? <EarninPartnerProfileDashboard/>:<MessagesUser/>)
+  return session?.user?.is_superuser? <DashboardAdmin/> :  ( session?.user?.is_staff? <EarninPartnerProfileDashboard/>:<EarninPartnerProfileDashboard/>)
 }

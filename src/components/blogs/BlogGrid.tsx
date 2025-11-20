@@ -8,14 +8,14 @@ import moment from "moment";
 import "moment/locale/ar";
 
 export default function BlogGrid() {
-  const { listings, isLoading, error, mutate } = useFetchPostListing();
+  const { listingsp, isLoading, error, mutate } = useFetchPostListing();
   moment.locale("ar");
 
   const [displayedItems, setDisplayedItems] = useState(9);
   const itemsPerLoad = 3;
 
   // Ensure listings is always an array
-  const safeListings = listings ?? [];
+  const safeListings = listingsp ?? [];
 
   const handleLoadMore = () => {
     setDisplayedItems((prev) => prev + itemsPerLoad);

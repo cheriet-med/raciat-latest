@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { signOut } from "next-auth/react";
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-
+import { FaFirstOrder } from "react-icons/fa";
 import { 
   X,
 } from 'lucide-react';
@@ -19,7 +19,8 @@ import { HiOutlineMenuAlt1 } from "react-icons/hi";
 import { useSession } from 'next-auth/react';
 import useFetchUser from '../requests/fetchUser';
 import ProfileCard from '../Data/userProfile';
-
+import { RiArticleFill } from "react-icons/ri";
+import { HiTicket } from "react-icons/hi2";
 interface MenuItem {
   id: string;
   label: string;
@@ -62,22 +63,43 @@ export default function DashboardUser() {
   const pathname = usePathname();
 
   const { data: session, status } = useSession({ required: true });
-  const {Users}  =useFetchUser(session?.user?.id)
+  const {Users}  = useFetchUser(session?.user?.id)
   
   useEffect(() => {
     setMounted(true);
   }, []);
 
 
+
+
+const menuItems: MenuItem[] = [
+  { id: 'الملف الشخصي', label: 'الملف الشخصي', icon: <CgProfile size={24} className='text-white'/>, href: '/account' },
+  { id: 'قائمة الرغبات', label: 'قائمة الرغبات', icon: <FaRegHeart size={24} className='text-white'/>, href: '/account/wishlist' },
+
+ 
+  ...(Users?.status === "blogger"
+    ? [{ id: 'المدونة', label: 'المدونة', icon: <RiArticleFill size={24} className='text-white'/>, href: '/account/posts' }]
+    : []
+  ),
+
+
+    ...(Users?.status === "seller"
+    ? [{id: 'التذاكر والطلبات', label: 'التذاكر والطلبات', icon: <HiTicket size={24} className='text-white'/>, href: '/account/orders' },]
+    : []
+  ),
  
 
+      ...(Users?.status === "field"
+    ? [{id: 'التذاكر ', label: 'التذاكر ', icon: <HiTicket size={24} className='text-white'/>, href: '/account/ticket' },]
+    : []
+  ),
 
-  const menuItems: MenuItem[] = [
-    { id: 'الملف الشخصي', label: 'الملف الشخصي', icon: <CgProfile size={24} className='text-white'/>, href: '/account' },
-    { id: 'قائمة الرغبات', label: 'قائمة الرغبات', icon:  <FaRegHeart size={24} className='text-white'/>, href: '/account/wishlist' },
-    { id: 'إعدادت الحساب', label: 'أعدادات الحساب', icon:<IoSettingsOutline size={24} className='text-white'/>, href: '/account/personal-information' },
-    { id: 'الصفحة الرئيسية', label: 'الصفحة الرئيسية', icon: <IoHomeOutline size={24} className='text-white'/>, href: '/' },
-  ];
+  { id: 'الطلبات', label: 'الطلبات', icon: <FaFirstOrder size={24} className='text-white'/>, href: '/account/trips' },
+  { id: 'إعدادت الحساب', label: 'أعدادات الحساب', icon:<IoSettingsOutline size={24} className='text-white'/>, href: '/account/personal-information' },
+  { id: 'الصفحة الرئيسية', label: 'الصفحة الرئيسية', icon: <IoHomeOutline size={24} className='text-white'/>, href: '/' },
+];
+
+
 
 
   const toggleMobileMenu = () => {

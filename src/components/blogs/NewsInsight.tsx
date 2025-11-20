@@ -14,7 +14,7 @@ import 'moment/locale/ar'
 export default function NewsInsight() {
 
     
-      const { listings, isLoading, error, mutate } = useFetchPostListing();
+      const { listingsp, isLoading, error, mutate } = useFetchPostListing();
         moment.locale('ar');
     return (
         <>
@@ -43,7 +43,7 @@ export default function NewsInsight() {
                     modules={[Pagination]}
                     pagination={{ clickable: true, el: ".spb7" }}
                 >
-                    {listings?.slice(4, 7).map((item) => (
+                    {listingsp?.slice(4, 7).map((item) => (
                         <SwiperSlide className="swiper-slide" key={item.id}>
                             <div
                                 className="blog-article-item style-default hover-image-translate loadItem"

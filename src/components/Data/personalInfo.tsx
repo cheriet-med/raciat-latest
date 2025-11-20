@@ -360,7 +360,7 @@ const sendVerificationEmail = async () => {
 <hr className="text-sec border-2"/>
           {/* Phone Numbers */}
           <div className="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="font-medium text-gray-900 font-playfair text-3xl">أرقام الهواتف</dt>
+            <dt className="font-medium text-gray-900 font-playfair text-3xl">رقم الهاتف </dt>
             <dd className="mt-1 text-2xl text-gray-700 sm:col-span-2 sm:mt-0">
               <div className="flex justify-between items-start">
                 <div>
@@ -444,20 +444,20 @@ const sendVerificationEmail = async () => {
 
       {/* Delete Dialog */}
       {isOpendelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-highlights rounded-lg shadow-lg p-6 max-w-lg w-full relative space-y-4">
+         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="rounded-2xl bg-white p-6 max-w-5xl mx-auto space-y-4">
             {/* Close Button */}
             <RiCloseLargeLine
               size={24}
-              className="absolute top-2 right-2 text-white hover:text-gray-300 cursor-pointer"
+              className="absolute top-2 right-2 text-sec hover:text-gray-300 cursor-pointer"
               onClick={handleCloseDialog}
             />
 
             {/* Content */}
-<h1 className="text-4xl font-semibold font-playfair text-white">
+<h1 className="text-4xl font-semibold font-playfair text-sec">
   حذف الحساب
 </h1>
-<p className="text-2xl text-white">
+<p className="text-2xl text-prim">
   هل أنت متأكد أنك تريد حذف هذا الحساب؟ لا يمكن التراجع عن هذا الإجراء.
 </p>
 
@@ -470,14 +470,14 @@ const sendVerificationEmail = async () => {
 
             <div className="flex justify-end gap-3 mt-6">
               <button
-                className="px-3 py-1 border border-gray-300 hover:bg-sec transition-colors disabled:opacity-50 rounded-lg text-white"
+                className="px-3 py-3 border border-gray-300 hover:bg-sec transition-colors disabled:opacity-50 rounded-lg text-prim"
                 onClick={handleCloseDialog}
                 disabled={isSaving}
               >
                إلغاء
               </button>
               <button
-                className="px-3 py-1 bg-secondary text-white hover:bg-sec transition-colors disabled:bg-sec disabled:cursor-not-allowed rounded-lg"
+                className="px-3 py-3 bg-sec text-white hover:bg-prim transition-colors disabled:bg-sec disabled:cursor-not-allowed rounded-lg"
                 onClick={handleDeleteConfirm}
                 disabled={isSaving }
               >
@@ -489,7 +489,7 @@ const sendVerificationEmail = async () => {
                     </svg>
                     حدف...
                   </span>
-                ) : 'Delete Account'}
+                ) : 'حدف الحساب'}
               </button>
             </div>
 

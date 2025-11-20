@@ -18,7 +18,7 @@ export default function SideBar2({
    
 }: SideBar2Props) {
 
-      const { listings, isLoading, error, mutate } = useFetchPostListing();
+      const { listingsp, isLoading, error, mutate } = useFetchPostListing();
         moment.locale('ar');
     return (
         <div className="tf-sidebar">
@@ -26,7 +26,7 @@ export default function SideBar2({
             <div className="sidebar-item sidebar-recent-post">
                 <h5 className="sidebar-title mb_17">المشاركات الاخيرة</h5>
                 <ul>
-                    {listings?.slice(0, 4).map((post) => (
+                    {listingsp?.slice(0, 4).map((post) => (
                         <li
                             className="recent-post hover-image-rotate"
                             key={post.id}

@@ -14,6 +14,7 @@ import { FaPlus } from "react-icons/fa6";
 import useFetchListing from '@/components/requests/fetchListings';
 import { FaBuildingCircleArrowRight } from "react-icons/fa6";
 import ManageListing from "@/components/Data/manageListing";
+import { FaStar, FaRegStar } from "react-icons/fa";
 
 // Skeleton Components
 const PropertyCardSkeleton = () => {
@@ -69,6 +70,7 @@ interface PropertyCardProps {
   location:string;
   description: string;
   category:string | null,
+  status:boolean,
   mutate?: () => Promise<any>;
 }
 
@@ -81,24 +83,48 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   description,
   lengtReviews,
   location,
+  status,
   category,
   mutate,
 }) => {
+  const [isFeatured, setIsFeatured] = useState(status);
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const roundFirstDecimalDigit = (num: number) => {
-    const intPart = Math.floor(num);
-    const decimal = num - intPart;
-  
-    // Shift decimal left to isolate the first two digits
-    const shifted = decimal * 10;
-    const roundedFirst = Math.round(shifted);
-  
-    // Recombine with integer part
-    return intPart + roundedFirst / 10;
-  }
+const { data: session } = useSession({ required: true });
 
- 
+  // Handle featured toggle
+  const handleFeaturedToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setIsUpdating(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}productid/${id}`, {
+        method: 'PUT',
+        headers: {
+            "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+            "Content-Type": "application/json",
+          },
+        body: JSON.stringify({
+          user:session?.user?.id,
+          is_featured: !isFeatured
+        }),
+      });
 
+      if (response.ok) {
+        setIsFeatured(!isFeatured);
+        if (mutate) {
+          await mutate();
+        }
+      } else {
+        console.error('Failed to update featured status');
+      }
+    } catch (error) {
+      console.error('Error updating featured status:', error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   // Handle heart icon click
   const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -120,10 +146,23 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         />
       </div>
       <div className="mt-2  ">
-     <div className="flex justify-between "> 
+     <div className="flex justify-between items-start"> 
       <p className="px-4 py-2  h-12 rounded-2xl bg-prim text-white text-2xl font-bold mt-4">{category}</p>
-    <ManageListing id={id} category={category} mutate={mutate}/>  
-  
+      <div className="flex gap-2 items-center mt-4">
+        <button
+          onClick={handleFeaturedToggle}
+          disabled={isUpdating}
+          className={`transition-all ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
+          title={isFeatured ? 'إزالة من المميز' : 'إضافة للمميز'}
+        >
+          {isFeatured ? (
+            <FaStar size={24} className="text-prim" />
+          ) : (
+            <FaRegStar size={24} className="text-white hover:text-prim" />
+          )}
+        </button>
+        <ManageListing id={id} category={category} mutate={mutate}/>
+      </div>
 </div>
   <p className='font-bold text-4xl text-prim'><span className="text-2xl">السعر:</span>{price} </p>
        
@@ -176,7 +215,7 @@ export default function ListinPartnerCard() {
   }
 
   if (error) {
-    return <div className="flex justify-center items-center h-64 text-red-500">Error loading listins: {error.message}</div>;
+    return <div className="flex justify-center items-center h-64 text-red-500">خطئ في تحميل العقارات: {error.message}</div>;
   }
 
 
@@ -219,6 +258,7 @@ export default function ListinPartnerCard() {
               lengtReviews={"0"} // You might want to add this to your API
               category={listin.types}
               description={listin.description || "Undescripted" }
+              status= {listin.is_featured}
               mutate={mutate}
             />
           </div>
@@ -227,23 +267,23 @@ export default function ListinPartnerCard() {
        }
       {/* Pagination */}
         {!isLoading && currentItems.length > 0 && totalPages > 1 && (
-        <div className="flex justify-end items-center gap-1 flex-wrap">
-          <button 
-            disabled={currentPage === 1} 
-            onClick={handlePrevious} 
-            className="text-highlights hover:text-accent flex items-center"
-          >
-            <FaCircleChevronRight size={40} className="rotate-180"/>
-          </button>
-
-          <button 
-            disabled={currentPage === totalPages} 
-            onClick={handleNext} 
-            className="text-highlights hover:text-accent flex items-center"
-          >
-            <FaCircleChevronRight size={40}/>
-          </button>
-        </div>
+          <div className="flex justify-end items-center gap-1 flex-wrap">
+               
+                  <button
+                    disabled={currentPage === totalPages}
+                    onClick={handleNext}
+                    className="text-sec hover:text-prim flex items-center"
+                  >
+                    <FaCircleChevronRight size={40}/>
+                  </button>
+                     <button
+                    disabled={currentPage === 1}
+                    onClick={handlePrevious}
+                    className="text-sec hover:text-prim flex items-center"
+                  >
+                    <FaCircleChevronRight size={40} className="rotate-180"/>
+                  </button>
+                </div>
       )
       }
     </div>

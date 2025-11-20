@@ -4,9 +4,8 @@ import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { FaCircleNotch, FaStar } from "react-icons/fa"; 
 import { useRouter } from "next/navigation"; // Import useRouter
-import { useLocale } from "next-intl";
 import MailChecker from "mailchecker";
-import { useTranslations } from "next-intl";
+import Layout from "@/components/layouts/Layout-defaul";
 import { signOut } from "next-auth/react";
 
 export default function ResetPassword() {
@@ -15,29 +14,27 @@ export default function ResetPassword() {
    const [email, setEmail] = useState('');
   
      const [isLoadingg, setIsLoadingg] = useState(false); // Loading state
-     const l = useLocale();
+
    
-     const t = useTranslations('Login');
-     const te = useTranslations('user-dashboard');
+
      const [error1, setError1] = useState(""); // Email validation error state
 
   const isValidEmail = async (email: string): Promise<{ valid: boolean; message?: string }> => {
     // Step 1: Check if the email is empty or null
     if (!email || email.trim() === "") {
-      return { valid: false, message: t('Email-is-required') };
+      return { valid: false, message: 'البريد الإلكتروني مطلوب' };
     }
 
     // Step 2: Validate email format using regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return { valid: false, message: t('Invalid-email-format') };
+      return { valid: false, message: 'تنسيق البريد الإلكتروني غير صالح' };
     }
 
-    // Step 3: Validate email format using validator library
 
     // Step 4: Check if the email is disposable using mailchecker
     if (!MailChecker.isValid(email)) {
-      return { valid: false, message: t('Disposable-emails') };
+      return { valid: false, message: 'رسائل البريد الإلكتروني التي يمكن التخلص منها' };
     }
 
     // If all checks pass, the email is valid
@@ -53,7 +50,7 @@ export default function ResetPassword() {
       // Validate email
       const emailValidation = await isValidEmail(email);
       if (!emailValidation.valid) {
-        setError1(emailValidation.message || t('Invalid-email'));
+        setError1(emailValidation.message || 'بريد إلكتروني غير صالح');
         setIsLoadingg(false); // Stop loading state
         return;
       }
@@ -82,7 +79,7 @@ export default function ResetPassword() {
       return false;
     }finally{
         setIsLoadingg(false);
-        signOut({ callbackUrl: `/${l}/login-signin` })
+        signOut({ callbackUrl: `/register` })
     }
   };
 
@@ -95,18 +92,19 @@ export default function ResetPassword() {
    
 
 
-  <div className="fixed inset-0 bg-[url('/02.webp')] bg-no-repeat bg-center bg-cover overflow-auto">
-      <div className="min-h-screen flex items-center justify-center p-4 font-montserrat ">
-    <div className=' bg-secondary p-6 rounded-2xl'>
-        <h1 className=' mb-4 text-gray-100'>write your new Email</h1>
+     <Layout>
+     <div>
+      <div className="my-60 flex items-center justify-center p-4 font-montserrat ">
+    <div className='  p-6 rounded-2xl'>
+       <h1 className=' mb-4 text-3xl'>اكتب بريدك الإلكتروني الجديد</h1>
         <div>
         <div className="relative ">
                     <input
       type="text"
      value={email}
      onChange={(e) => setEmail(e.target.value)}
-     placeholder="New email"
-     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-yel bg-highlights placeholder:text-gray-200"
+     placeholder="بريد إلكتروني جديد"
+     className="w-full px-4 py-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-yel bg-gray-50 "
      required
    />
 
@@ -119,22 +117,23 @@ export default function ResetPassword() {
                     {isLoadingg ? (
                                     <button
                                       onClick={handleSubscribe}
-                                      className="w-full hover:bg-accent hover:text-yel py-2 rounded-lg bg-a text-white transition-colors uppercase flex gap-3 justify-center items-center"
+                                      className="w-full hover:bg-sec hover:text-yel font-bold py-4 rounded-lg bg-prim text-white transition-colors uppercase flex gap-3 justify-center items-center"
                                     >
-                                       {te('Edite')}
+                                       {'تعديل'}
                                       <FaCircleNotch className="animate-spin w-5 h-5"/>
                                     </button>
                                   ) : (
                                     <button
                                       onClick={handleSubscribe}
-                                      className="w-full bg-a text-white py-2 rounded-lg hover:bg-accent font-medium transition-colors uppercase"
+                                        className="w-full bg-sec text-white py-4 font-bold  rounded-lg hover:bg-prim  transition-colors uppercase"
                                     >
-                                     {te('Edite')}
+                                     {'تعديل'}
                                     </button>
                                   )}
                 </div>
     </div>
     </div>
     </div>
+    </Layout>
   )
 }

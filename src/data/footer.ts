@@ -14,10 +14,9 @@ export const footerSections: FooterSection[] = [
         className: "company",
         heading: "شركتنا",
         links: [
-            { href: "/listing-topmap-grid", label: "عقارات للبيع" },
-            { href: "/listing-topmap-grid", label: "عقارات للإيجار" },
-            { href: "/listing-topmap-grid", label: "عقارات للشراء" },
-            { href: "/listing-topmap-grid", label: "جميع العقارات" },
+            { href: `/type?q=${"بيع"}`, label: "عقارات للبيع" },
+            { href: `/type?q=${"إيجار"}`, label: "عقارات للإيجار" },
+            { href: `/listing-topmap-grid?q=${"الكل"}`, label: "جميع العقارات" },
           
         ],
     },
@@ -27,7 +26,6 @@ export const footerSections: FooterSection[] = [
         links: [
             { href: "/about-us", label: "من نحن" },
             { href: "/contacts", label: "اتصل بنا" },
-            { href: "#", label: "فريقنا" },
             { href: "/blog-grid", label: "آخر الأخبار" },
            
         ],

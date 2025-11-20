@@ -49,6 +49,7 @@ interface Listing {
   established: string | null;
   garages: string | null;
   region: string | null;
+  is_featured:boolean;
   // Removed fields that don't exist in the Django model:
   // rating, price_per_night, cancellation_policy, price_range, 
   // average_cost, chef, receipt, opening_hours fields,

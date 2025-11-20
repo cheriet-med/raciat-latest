@@ -62,7 +62,7 @@ const ShareButton = ({id}:any) => {
 
   const handleCopyPassword = () => {
     
-      navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_HOME}/booking/${id}`)
+      navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_HOME}/property-details-1/${id}`)
         .then(() => {
           setIsCopied(true); // Show "Copied!" text
           setTimeout(() => setIsCopied(false), 2000); // Hide "Copied!" text after 2 seconds
@@ -73,14 +73,14 @@ const ShareButton = ({id}:any) => {
 const social = () => {
     return (
       <div className="flex gap-3 text-secondary flex-wrap">
-         <FacebookShareButton url={`${process.env.NEXT_PUBLIC_HOME}/booking/${id}`}><AiFillFacebook size={24} className="hover:text-[#1877F2]"/></FacebookShareButton>
-          <TwitterShareButton url={`${process.env.NEXT_PUBLIC_HOME}/booking/${id}`}><RiTwitterXFill size={24} className="hover:text-gray-600"/></TwitterShareButton>
-         <RedditShareButton url={`${process.env.NEXT_PUBLIC_HOME}/booking/${id}`}> <FaRedditAlien size={24} className="hover:text-[#FF4500]"/></RedditShareButton>
-         <TelegramShareButton url={`${process.env.NEXT_PUBLIC_HOME}/booking/${id}`}> <FaTelegramPlane size={24} className="hover:text-blue-500"/></TelegramShareButton>
-         <WhatsappShareButton url={`${process.env.NEXT_PUBLIC_HOME}/booking/${id}`}><FaWhatsapp size={24} className="hover:text-[#25D366]"/></WhatsappShareButton>
-           <LinkedinShareButton url={`${process.env.NEXT_PUBLIC_HOME}/booking/${id}`}><FaLinkedin size={24} className="hover:text-[#0077B5]"/></LinkedinShareButton>
-          <VKShareButton url={`${process.env.NEXT_PUBLIC_HOME}/booking/${id}`}> <ImVk size={24} className="hover:text-[#0077FF]"/></VKShareButton>
-          <EmailShareButton url={`${process.env.NEXT_PUBLIC_HOME}/booking/${id}`}><MdEmail size={24} className="hover:text-gray-600 "/></EmailShareButton>
+         <FacebookShareButton url={`${process.env.NEXT_PUBLIC_HOME}/property-details-1/${id}`}><AiFillFacebook size={24} className="hover:text-[#1877F2]"/></FacebookShareButton>
+          <TwitterShareButton url={`${process.env.NEXT_PUBLIC_HOME}/property-details-1/${id}`}><RiTwitterXFill size={24} className="hover:text-gray-600"/></TwitterShareButton>
+         <RedditShareButton url={`${process.env.NEXT_PUBLIC_HOME}/property-details-1/${id}`}> <FaRedditAlien size={24} className="hover:text-[#FF4500]"/></RedditShareButton>
+         <TelegramShareButton url={`${process.env.NEXT_PUBLIC_HOME}/property-details-1/${id}`}> <FaTelegramPlane size={24} className="hover:text-blue-500"/></TelegramShareButton>
+         <WhatsappShareButton url={`${process.env.NEXT_PUBLIC_HOME}/property-details-1/${id}`}><FaWhatsapp size={24} className="hover:text-[#25D366]"/></WhatsappShareButton>
+           <LinkedinShareButton url={`${process.env.NEXT_PUBLIC_HOME}/property-details-1/${id}`}><FaLinkedin size={24} className="hover:text-[#0077B5]"/></LinkedinShareButton>
+          <VKShareButton url={`${process.env.NEXT_PUBLIC_HOME}/property-details-1/${id}`}> <ImVk size={24} className="hover:text-[#0077FF]"/></VKShareButton>
+          <EmailShareButton url={`${process.env.NEXT_PUBLIC_HOME}/property-details-1/${id}`}><MdEmail size={24} className="hover:text-gray-600 "/></EmailShareButton>
          {isCopied? <MdCopyAll size={24} className="text-green-500"/> : <CiLink size={24} onClick={handleCopyPassword} className="hover:text-green-500"/>}
       </div>
     )
@@ -106,16 +106,17 @@ const social = () => {
     <div className="relative inline-block" ref={popupRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-1  border border-black rounded-3xl hover:bg-gray-50 transition-colors"
+               className="  hover:bg-gray-100 border-gray-300 border rounded-xl p-3"
+
       >
-        <Share2 className="w-4 h-4" />
-        <span>Share</span>
+        <Share2 size={32} />
+    
       </button>
 
       {isOpen && (
         <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10 overflow-hidden">
           <div className="p-4 border-b border-gray-200">
-            <h3 className="font-semibold text-lg font-playfair">Share this place</h3>
+            <h3 className="font-semibold text-xl font-playfair">شارك هذا العقار</h3>
           </div>
           <div className="p-3">
               {social()}

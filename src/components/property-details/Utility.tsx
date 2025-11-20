@@ -281,22 +281,11 @@ export default function PropertyUtility({ property }: { property: Property }) {
     };
 
     // Default utility items if no amenities from API
-    const defaultUtility: UtilityItem[] = [
-        { icon: amenityIcons['تكييف'] || <FaSnowflake className="text-lg text-sec h-8 w-8" />, title: "التدفئة", sttt: "غاز طبيعي" },
-        { icon: amenityIcons['تكييف'] || <FaSnowflake className="text-lg text-sec h-8 w-8" />, title: "تكييف الهواء", sttt: "نعم" },
-        { icon: amenityIcons['إنترنت مجاني'] || <FaWifi className="text-lg text-sec h-8 w-8" />, title: "واي فاي", sttt: "نعم" },
-        { icon: amenityIcons['مصعد'] || <PiElevatorFill className="text-lg text-sec h-8 w-8" />, title: "تسجيل دخول ذاتي", sttt: "نعم" },
-        { icon: amenityIcons['كاميرات المراقبة'] || <FaCamera className="text-lg text-sec h-8 w-8" />, title: "كاميرات المراقبة", sttt: "نعم" },
-        { icon: amenityIcons['تلفاز بشاشة مسطحة'] || <FaTv className="text-lg text-sec h-8 w-8" />, title: "تلفزيون بالكابل", sttt: "نعم" },
-        { icon: amenityIcons['إنذار أول أكسيد الكربون'] || <FaRecycle className="text-lg text-sec h-8 w-8" />, title: "إنذار أول أكسيد الكربون", sttt: "نعم" },
-        { icon: amenityIcons['طاقة شمسية'] || <FaRecycle className="text-lg text-sec h-8 w-8" />, title: "طاقة شمسية", sttt: "نعم" },
-        { icon: <FaRecycle className="text-lg text-sec h-8 w-8" />, title: "مدفأة", sttt: "نعم" },
-        { icon: <FaRecycle className="text-lg text-sec h-8 w-8" />, title: "تهوية", sttt: "نعم" },
-    ];
+
 
     // Use API data if available, otherwise use default
     const utility = mapAmenitiesToUtility(Amenitie);
-    const finalUtility = utility.length > 0 ? utility : defaultUtility;
+    const finalUtility = utility.length > 0 ? utility : [];
 
     console.log('Mapped utility:', utility.length, 'items');
     console.log('Final utility:', finalUtility.length, 'items');
