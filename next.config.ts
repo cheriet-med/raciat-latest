@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+   output: 'standalone',
+  // Webpack configuration for optimization and debugging
+
    webpack: (config) => {
     // Avoid disabling cache unless absolutely necessary
      config.cache = false;
