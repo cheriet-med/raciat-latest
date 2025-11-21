@@ -425,11 +425,11 @@ const sendVerificationEmail = async () => {
 <hr className="text-sec border-2"/>
       <div className="mt-8 pt-3 border-t border-gray-200">
 
-        
+        {session?.user.is_superuser? "" : 
         <div className="flex gap-2  mt-8">
           <AiOutlineUserDelete size={24} className="text-sec"/>
           <h3 className="font-medium text-gray-900 font-playfair hover:underline cursor-pointer text-3xl" onClick={handleDelete}>حذف الحساب</h3>
-        </div>
+        </div>}
         
         <div className="flex gap-2 items-center mt-8 ">
           <MdOutlineSecurity size={24} className="text-sec"/> 

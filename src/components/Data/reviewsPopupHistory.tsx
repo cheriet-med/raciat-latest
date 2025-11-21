@@ -409,7 +409,7 @@ const averageRating = Review && Review.length > 0
       {visibleCount < Review.length && (
         <div className="text-center pt-4 text-secondary">
           <Button variant="outline" className="w-full sm:w-auto" onClick={handleLoadMore}>
-            View all {Review.length} reviews
+            شاهد المزيد {Review.length}
           </Button>
         </div>
       )}
@@ -417,7 +417,7 @@ const averageRating = Review && Review.length > 0
     
     <div className="text-center py-8 text-gray-500">
     <Star className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-    <p>No reviews available yet.</p>
+    <p>لا توجد تقييمات متاحة حتى الآن.</p>
   </div>}</>
   );
 };

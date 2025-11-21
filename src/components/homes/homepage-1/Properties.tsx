@@ -13,12 +13,93 @@ import { useSession } from "next-auth/react";
 import LoginButton from "@/components/header/loginButton";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 
+// =============== SKELETON COMPONENTS ===============
+
+const PropertyCardSkeleton = () => (
+    <div className="card-house style-default animate-pulse">
+        <div className="img-style mb_20">
+            {/* Image Skeleton */}
+            <div className="w-full h-[308px] bg-gray-200 rounded-lg"></div>
+            
+            {/* Tags Skeleton */}
+            <div className="wrap-tag d-flex gap_8 mb_12 absolute top-4 left-4">
+                <div className="h-7 w-16 bg-gray-300 rounded"></div>
+                <div className="h-7 w-20 bg-gray-300 rounded"></div>
+            </div>
+            
+            {/* Wishlist Button Skeleton */}
+            <div className="absolute top-4 right-4">
+                <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+            </div>
+        </div>
+        
+        <div className="content space-y-3">
+            {/* Price Skeleton */}
+            <div className="h-8 bg-gray-200 rounded w-32 mb_12"></div>
+            
+            {/* Title Skeleton */}
+            <div className="h-6 bg-gray-200 rounded w-full mb_8"></div>
+            
+            {/* Location Skeleton */}
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            
+            {/* Info Items Skeleton */}
+            <ul className="info d-flex gap-4 pt-3">
+                <li className="flex items-center gap-2">
+                    <div className="w-5 h-5 bg-gray-200 rounded"></div>
+                    <div className="h-4 bg-gray-200 rounded w-16"></div>
+                </li>
+                <li className="flex items-center gap-2">
+                    <div className="w-5 h-5 bg-gray-200 rounded"></div>
+                    <div className="h-4 bg-gray-200 rounded w-16"></div>
+                </li>
+                <li className="flex items-center gap-2">
+                    <div className="w-5 h-5 bg-gray-200 rounded"></div>
+                    <div className="h-4 bg-gray-200 rounded w-20"></div>
+                </li>
+            </ul>
+        </div>
+    </div>
+);
+
+const CategoryButtonsSkeleton = () => (
+    <div className="flex gap-2 flex-wrap">
+        {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-12 w-36 bg-gray-200 rounded-lg animate-pulse"></div>
+        ))}
+    </div>
+);
+
+const PropertiesGridSkeleton = ({ isMobile }: { isMobile: boolean }) => {
+    if (isMobile) {
+        return (
+            <div className="tf-sw-mobile bg_1">
+                <PropertyCardSkeleton />
+            </div>
+        );
+    }
+
+    return (
+        <div className="tf-sw-mobile bg_1">
+            <div className="tf-grid-layout-md lg-col-3 md-col-2">
+                {[...Array(6)].map((_, idx) => (
+                    <div className="swiper-slide" key={idx}>
+                        <PropertyCardSkeleton />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+// =============== MAIN COMPONENT ===============
+
 export default function Properties() {
     const [isMobile, setIsMobile] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("الكل");
     const [wishlistItems, setWishlistItems] = useState<Record<number, boolean>>({});
     
-    const { listings } = useFetchListing(); 
+    const { listings, isLoading } = useFetchListing(); 
     const { data: session, status } = useSession();
 
     // Fetch wishlist status for all properties
@@ -51,7 +132,6 @@ export default function Properties() {
         fetchWishlistStatus();
     }, [status, session?.user?.id, listings]);
 
- 
     const toggleWishlist = async (propertyId: number) => {
         if (status !== "authenticated") return;
 
@@ -213,27 +293,36 @@ export default function Properties() {
                     <h2 className="split-text effect-blur-fade text-5xl lg:text-7xl font-extrabold">
                         إكتشف منزل أحلامك
                     </h2>              
-                    <div className="flex gap-2 flex-wrap">
-                        {categories.map((category) => (
-                            <button 
-                                key={category.name}
-                                onClick={() => setSelectedCategory(category.name)}
-                                className={`px-8 py-4 w-36 rounded-lg font-bold text-white transition-colors ${
-                                    selectedCategory === category.name 
-                                        ? "bg-sec" 
-                                        : "bg-prim hover:bg-sec"
-                                }`}
-                            >
-                                {category.label}
-                            </button>
-                        ))}
-                    </div>
+                    
+                    {/* Category Buttons with Skeleton */}
+                    {isLoading || !listings ? (
+                        <CategoryButtonsSkeleton />
+                    ) : (
+                        <div className="flex gap-2 flex-wrap">
+                            {categories.map((category) => (
+                                <button 
+                                    key={category.name}
+                                    onClick={() => setSelectedCategory(category.name)}
+                                    className={`px-8 py-4 w-36 rounded-lg font-bold text-white transition-colors ${
+                                        selectedCategory === category.name 
+                                            ? "bg-sec" 
+                                            : "bg-prim hover:bg-sec"
+                                    }`}
+                                >
+                                    {category.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                {!listings ? (
-                    <div className="text-center py-10">جاري التحميل...</div>
+                {/* Loading State */}
+                {isLoading || !listings ? (
+                    <PropertiesGridSkeleton isMobile={isMobile} />
                 ) : filteredListings?.length === 0 ? (
-                    <div className="text-center py-10">لا توجد عقارات في هذه الفئة</div>
+                    <div className="text-center py-10 text-2xl text-gray-500">
+                        لا توجد عقارات في هذه الفئة
+                    </div>
                 ) : isMobile ? (
                     <Swiper
                         modules={[Pagination]}
@@ -261,13 +350,17 @@ export default function Properties() {
                         </div>
                     </div>
                 )}
-                <Link
-                    href={`/listing-topmap-grid?q=${"الكل"}`}
-                    className="tf-btn btn-bg-1 mx-auto btn-px-32 scrolling-effect effectBottom"
-                >
-                    <span>عرض جميع العقارات</span>
-                    <span className="bg-effect"></span>
-                </Link>
+                
+                {/* View All Button - Only show when data is loaded */}
+                {!isLoading && listings && (
+                    <Link
+                        href={`/listing-topmap-grid?q=${"الكل"}`}
+                        className="tf-btn btn-bg-1 mx-auto btn-px-32 scrolling-effect effectBottom"
+                    >
+                        <span>عرض جميع العقارات</span>
+                        <span className="bg-effect"></span>
+                    </Link>
+                )}
             </div>
         </div>
     );

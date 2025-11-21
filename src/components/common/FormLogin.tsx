@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { FaEye, FaEyeSlash, FaCircleNotch } from "react-icons/fa";
-import MailChecker from "mailchecker";
 
 export default function FormLogin() {
   const handleTogglePassword = () => {
@@ -35,52 +34,47 @@ export default function FormLogin() {
     signIn("facebook", { callbackUrl: "/account" });
   };
 
-const isValidEmail = async (
-  email: string
-): Promise<{ valid: boolean; message?: string }> => {
-  if (!email || email.trim() === "") {
-    return { valid: false, message: "البريد الإلكتروني مطلوب" };
-  }
+  // Simplified email validation for login (removed MailChecker)
+  const isValidEmail = (
+    email: string
+  ): { valid: boolean; message?: string } => {
+    if (!email || email.trim() === "") {
+      return { valid: false, message: "البريد الإلكتروني مطلوب" };
+    }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return { valid: false, message: "صيغة البريد الإلكتروني غير صحيحة" };
-  }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return { valid: false, message: "صيغة البريد الإلكتروني غير صحيحة" };
+    }
 
-  if (!MailChecker.isValid(email)) {
-    return { valid: false, message: "لا يُسمح باستخدام عناوين البريد الإلكتروني المؤقتة" };
-  }
+    return { valid: true };
+  };
 
-  return { valid: true };
-};
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) {
+      return "يجب أن تكون كلمة المرور مكونة من 8 أحرف على الأقل";
+    }
 
-const validatePassword = (password: string): string | null => {
-  if (password.length < 8) {
-    return "يجب أن تكون كلمة المرور مكونة من 8 أحرف على الأقل";
-  }
+    if (!/[A-Z]/.test(password)) {
+      return "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل";
+    }
 
-  if (!/[A-Z]/.test(password)) {
-    return "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل";
-  }
+    if (!/[a-z]/.test(password)) {
+      return "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل";
+    }
 
-  if (!/[a-z]/.test(password)) {
-    return "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل";
-  }
+    if (!/[0-9]/.test(password)) {
+      return "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل";
+    }
 
-  if (!/[0-9]/.test(password)) {
-    return "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل";
-  }
+    if (!/[!@#$%^&*]/.test(password)) {
+      return "يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل";
+    }
 
-  if (!/[!@#$%^&*]/.test(password)) {
-    return "يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل";
-  }
-
-  return null;
-};
-
+    return null;
+  };
 
   const resetPassword = async () => {
- 
     // Reset all messages first
     setEmailsend(false);
     setEmailsenderror(false);
@@ -157,7 +151,8 @@ const validatePassword = (password: string): string | null => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    const emailValidation = await isValidEmail(email);
+    // Simplified validation - no async needed
+    const emailValidation = isValidEmail(email);
     if (!emailValidation.valid) {
       setError1(emailValidation.message || "Invalid email");
       setIsLoading(false);
@@ -179,12 +174,12 @@ const validatePassword = (password: string): string | null => {
       });
 
       if (result?.error) {
-        setError("Please verify your email or password");
+        setError("يرجى التحقق من بريدك الإلكتروني أو كلمة المرور");
       } else {
         router.push(`/account`);
       }
     } catch (err) {
-      setError("An error occurred during sign in");
+      setError("حدث خطأ أثناء تسجيل الدخول");
       console.error("Sign-in error:", err);
     } finally {
       setIsLoading(false);
@@ -315,6 +310,7 @@ const validatePassword = (password: string): string | null => {
             <button
               type="submit"
               className="btn-signup tf-btn btn-bg-1 w-full mb_12 flex items-center justify-center gap-2"
+              disabled={isLoading}
             >
               {isLoading ? (
                 <>

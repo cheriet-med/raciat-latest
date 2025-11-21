@@ -201,22 +201,6 @@ const menuItems: MenuItem[] = [
         {/* User Profile */}
         <div className="p-2 border-t border-gray-200">
           <div>
-            <div className="flex gap-2 items-center px-3 justify-center mr-6">
-              <div className="w-16 h-16 relative rounded-full overflow-hidden">
-                <Image
-                  src={Users?.profile_image == null ? "/profile.png" : `${process.env.NEXT_PUBLIC_IMAGE}/${Users?.profile_image}`}
-                  alt={Users?.full_name || "Profile image"}
-                  fill
-                  style={{ 
-                    objectFit: 'cover',
-                  }}
-                />
-              </div>
-
-              <div className="flex-1">
-                <p className="font-medium font-playfair text-white text-xl">{session?.user?.full_name}</p>
-              </div>
-            </div>
            
             <div className='flex gap-2 py-4 px-3 mr-6'>
               <div className='hover:bg-sec p-1 rounded-lg cursor-pointer' onClick={() => signOut({ callbackUrl: `/login` })}>

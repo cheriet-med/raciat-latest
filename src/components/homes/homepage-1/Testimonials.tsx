@@ -77,7 +77,7 @@ const stripHtml = (html: string) => {
                                            
                                            
 <div
-  className="text-6xl  font-meduim leading-tight"
+  className=" text-4xl md:text-5xl  font-meduim leading-tight"
   style={{ direction: 'rtl' }}
 >
   {stripHtml(testimonial?.about || '')}

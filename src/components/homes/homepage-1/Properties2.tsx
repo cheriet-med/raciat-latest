@@ -43,7 +43,7 @@ export default function Properties2() {
                                 <div className="property-item">
                                     <div className="dots"></div>
                                     <div className="content">
-                                        <h4 className="title mb_8 text-5xl font-bold">
+                                        <h4 className="title mb_8 text-4xl md:text-5xl font-bold">
                                             <Link
                                                 href={'/property-details-1/1'}
                                                 className="link"

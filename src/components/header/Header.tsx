@@ -50,6 +50,7 @@ export default function Header() {
                                             color: 'white',
                                             textDecoration: 'none'
                                         }}
+                                        
                                     >
                                        تسجيل الدخول
                                     </Link> }
@@ -65,12 +66,12 @@ export default function Header() {
                                     </Link>:
                                     <Link 
                                         href="/register" 
-                                        className="tf-btn bg-sec hidden md:flex"
-                                    
+                                        className="!hidden md:!flex tf-btn bg-sec"
                                     >
                                         <span>إنشاء حساب</span>
                                         <span className="bg-effect"></span>
-                                    </Link>}
+                                    </Link>
+                                    }
                                     <div
                                         className="mobile-button d-xl-none"
                                         onClick={() => setIsMenuOpen(true)}
@@ -90,25 +91,25 @@ export default function Header() {
             </header>
 
             {/* Offcanvas menu */}
-<div className="mobile-nav-wrap">
+<div className="mobile-nav-wrap bg-prim" style={{ backgroundColor: '#142B40' }}>
                 <Offcanvas
                     isOpen={isMenuOpen}
                     onClose={() => setIsMenuOpen(false)}
                     
                 >
-<div 
-    className="offcanvas-header top-nav-mobile"
-    style={{
-        backgroundColor: '#142B40 ',
-        color: '#1e3a8a',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        direction: 'rtl',
-        position: 'relative',
-        padding: '20px'
-    }}
->
+    <div 
+        className="offcanvas-header top-nav-mobile"
+        style={{
+            backgroundColor: '#142B40',
+            color: 'white',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            direction: 'rtl',
+            position: 'relative',
+            padding: '20px'
+        }}
+    >
     <div
         className="btn-close-menu"
         onClick={() => setIsMenuOpen(false)}
@@ -138,7 +139,7 @@ export default function Header() {
                     <div 
                         className="offcanvas-body inner-mobile-nav"
                         style={{
-                            backgroundColor: '#142B40 ',
+                            backgroundColor: '#142B40',
                             color: 'white',
                             direction: 'rtl'
                         }}
@@ -147,8 +148,8 @@ export default function Header() {
                             <MobileMenu />
                                 <div className="support">
                                   { status === "authenticated" ?  "":
-                                <a 
-                                    href="#" 
+                                <Link 
+                                    href="/register" 
                                     className="tf-btn"
                                     style={{
                                         backgroundColor: '#D9AA52',
@@ -162,15 +163,15 @@ export default function Header() {
                                     }}
                                  >إنشاء حساب</span>
                                     <span className="bg-effect"></span>
-                                </a>}
-                                <a 
-                                    href="#" 
+                                </Link>}
+                                <Link
+                                    href="contacts" 
                                     className="text-need"
                                     style={{ color: 'white' }}
                                 >
                                     {" "}
                                  هل تحتاج إلى مساعدة؟
-                                </a>
+                                </Link>
                                 <ul className="mb-info">
                                     <li style={{ color: 'white' }}>
                                         إتصل بناعلى الرقم:{" "}
