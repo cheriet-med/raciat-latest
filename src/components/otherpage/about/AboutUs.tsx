@@ -13,7 +13,7 @@ export default function AboutUs() {
                 className="parallaxie"
                 style={{
                     background:
-                        'url("/assets/images/section/5.png")',
+                        'url("/assets/images/section/5.avif")',
                 }}
             >
                 <div className="content">

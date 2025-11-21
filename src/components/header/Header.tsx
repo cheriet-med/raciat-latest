@@ -2,23 +2,18 @@
 import Image from "next/image";
 import Nav from "./Nav";
 import Link from "next/link";
-import MobileMenu from "./MobileMenu";
 import { useState } from "react";
 import Offcanvas from "../common/Offcanvas";
 import { useSession } from "next-auth/react";
-import { FaRegUser } from "react-icons/fa6";
 import { LuCircleUserRound } from "react-icons/lu";
-
-
+import { GrClose } from "react-icons/gr";
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-      const { data: session, status } = useSession();
+    const { data: session, status } = useSession();
+    
     return (
         <>
-            <header 
-                className={`header  header-fixed bg-prim`}
-                
-            >
+            <header className="header header-fixed bg-prim">
                 <div 
                     className="tf-container w-xxl"
                     style={{ backgroundColor: '#142B40' }}
@@ -26,10 +21,10 @@ export default function Header() {
                     <div className="row">
                         <div className="col-12">
                             <div 
-                                className="header-inner "
+                                className="header-inner"
                                 style={{ color: 'white' }}
                             >
-                                <Link href="/" className="site-logo ">
+                                <Link href="/" className="site-logo">
                                     <Image
                                         src="/logo.png"
                                         alt="logo"
@@ -38,32 +33,36 @@ export default function Header() {
                                         height={32}
                                     />
                                 </Link>
-                                <Nav />
+                                
+                                {/* Desktop Navigation - Show on xl screens and above */}
+                                <div className="hidden xl:block">
+                                    <Nav />
+                                </div>
+
                                 <div 
                                     className="header-right d-flex align-items-center gap_20"
                                     style={{ color: 'white' }}
                                 >
-                                   { status === "authenticated" ?  "":
+                                   {status === "authenticated" ? "" :
                                     <Link
                                         href="/login"
                                         style={{ 
                                             color: 'white',
                                             textDecoration: 'none'
                                         }}
-                                        
                                     >
                                        تسجيل الدخول
-                                    </Link> }
+                                    </Link>}
 
-                                     { status === "authenticated" ?   
+                                    {status === "authenticated" ?   
                                      <Link 
                                         href="/account" 
                                         className="font-extrabold group-hover:text-sec text-white flex gap-3 items-center justify-center"
                                     >
                                         <LuCircleUserRound size={24} />
-                                        <span >حسابي </span>
+                                        <span>حسابي</span>
                                         <span className="bg-effect"></span>
-                                    </Link>:
+                                    </Link> :
                                     <Link 
                                         href="/register" 
                                         className="!hidden md:!flex tf-btn bg-sec"
@@ -72,8 +71,10 @@ export default function Header() {
                                         <span className="bg-effect"></span>
                                     </Link>
                                     }
+
+                                    {/* Hamburger Menu - Show only on xl and below screens (mobile & laptop) */}
                                     <div
-                                        className="mobile-button d-xl-none"
+                                        className="mobile-button xl:hidden"
                                         onClick={() => setIsMenuOpen(true)}
                                         aria-label="Open menu"
                                     >
@@ -90,153 +91,120 @@ export default function Header() {
                 </div>
             </header>
 
-            {/* Offcanvas menu */}
-<div className="mobile-nav-wrap bg-prim" style={{ backgroundColor: '#142B40' }}>
-                <Offcanvas
-                    isOpen={isMenuOpen}
-                    onClose={() => setIsMenuOpen(false)}
-                    
-                >
-    <div 
-        className="offcanvas-header top-nav-mobile"
-        style={{
-            backgroundColor: '#142B40',
-            color: 'white',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            direction: 'rtl',
-            position: 'relative',
-            padding: '20px'
-        }}
-    >
-    <div
-        className="btn-close-menu"
-        onClick={() => setIsMenuOpen(false)}
-        style={{ 
-            color: 'white',
-            cursor: 'pointer',
-            position: 'absolute',
-            left: '20px',
-            top: '50%',
-            transform: 'translateY(-50%)'
-        }}
-    >
-        <i className="icon-times-solid"></i>
-    </div>
-    <div className="offcanvas-title">
-        <Link href="/" className="site-logo">
-            <Image
-                src="/raciat-logo.webp"
-                alt="logo"
-                className="main-logo"
-                width={193}
-                height={44}
-            />
-        </Link>
-    </div>
-</div>
-                    <div 
-                        className="offcanvas-body inner-mobile-nav"
-                        style={{
-                            backgroundColor: '#142B40',
-                            color: 'white',
-                            direction: 'rtl'
-                        }}
-                    >
-                        <div className="mb-body">
-                            <MobileMenu />
-                                <div className="support">
-                                  { status === "authenticated" ?  "":
-                                <Link 
-                                    href="/register" 
-                                    className="tf-btn"
-                                    style={{
-                                        backgroundColor: '#D9AA52',
-                                        color: 'white'
-                                    }}
-                                >
-                                 <span
-                                 style={{
-                                        backgroundColor: '#D9AA52',
-                                        
-                                    }}
-                                 >إنشاء حساب</span>
-                                    <span className="bg-effect"></span>
-                                </Link>}
+            {/* Offcanvas Menu for Mobile & Laptop */}
+            <Offcanvas isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)}>
+                <div className="bg-prim h-full p-6">
+                    {/* Mobile Menu Header */}
+                    <div className="flex justify-between items-center mb-8 border-b border-sec border-opacity-20 pb-4">
+                        <Link href="/" className="site-logo" onClick={() => setIsMenuOpen(false)}>
+                            <Image
+                                src="/logo.png"
+                                alt="logo"
+                                className="main-logo"
+                                width={140}
+                                height={52}
+                            />
+                        </Link>
+                        <button 
+                            onClick={() => setIsMenuOpen(false)}
+                            className="text-sec text-2xl"
+                        >
+                          <GrClose size={32}/>
+                        </button>
+                    </div>
+
+                    {/* Mobile Navigation Links */}
+                    <nav className="space-y-4">
+                        <Link
+                            href="/"
+                            className="block py-3 border-b border-sec border-opacity-10 text-sec font-playfair text-3xl font-semibold hover:text-opacity-80 transition-all duration-200"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+الرئيسية
+                        </Link>
+                        <hr />
+                        <Link
+                            href="/about-us"
+                            className="block py-3 border-b border-sec border-opacity-10 text-sec font-playfair text-3xl font-semibold hover:text-opacity-80 transition-all duration-200"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            معلومات عنا
+                        </Link>        <hr />
+                        <div className="border-b border-sec border-opacity-10 pb-3">
+                            <div className="text-sec font-playfair text-3xl font-semibold mb-2">
+                                العقارات
+                            </div>
+                            <div className="space-y-2 ml-4 mt-4">
                                 <Link
-                                    href="contacts" 
-                                    className="text-need"
-                                    style={{ color: 'white' }}
+                                    href={`/listing-topmap-grid?q=${"شقة"}`}
+                                    className="block py-2 text-white text-2xl text-opacity-80 hover:text-opacity-100 transition-all duration-200 font-montserrat"
+                                    onClick={() => setIsMenuOpen(false)}
                                 >
-                                    {" "}
-                                 هل تحتاج إلى مساعدة؟
+                                    شقق
                                 </Link>
-                                <ul className="mb-info">
-                                    <li style={{ color: 'white' }}>
-                                        إتصل بناعلى الرقم:{" "}
-                                        <span className="number" style={{ color: 'white' }}>
-                                             966547029710 
-                                        </span>
-                                    </li>
-                                    <li style={{ color: 'white' }}>
-                                        دعم 24/7:{" "}
-                                        <a 
-                                            href="#" 
-                                            className="link"
-                                            style={{ color: 'white' }}
-                                        >
-                                           info@raciat.com 
-                                        </a>
-                                    </li>
-                                    <li style={{ color: 'white' }}>
-                                        <div className="wrap-social">
-                                            <p style={{ color: 'white' }}>تابعنا:</p>
-                                            <ul className="social align-items-center d-flex gap_24">
-                                                <li>
-                                                    <a
-                                                        href="#"
-                                                        className="icon-FacebookLogo"
-                                                        style={{ color: 'white' }}
-                                                    ></a>
-                                                </li>
-                                                <li>
-                                                    <a
-                                                        href="#"
-                                                        className="icon-XLogo"
-                                                        style={{ color: 'white' }}
-                                                    ></a>
-                                                </li>
-                                                <li>
-                                                    <a
-                                                        href="#"
-                                                        className="icon-TiktokLogo"
-                                                        style={{ color: 'white' }}
-                                                    ></a>
-                                                </li>
-                                                <li>
-                                                    <a
-                                                        href="#"
-                                                        className="icon-InstagramLogo"
-                                                        style={{ color: 'white' }}
-                                                    ></a>
-                                                </li>
-                                                <li>
-                                                    <a
-                                                        href="#"
-                                                        className="icon-YoutubeLogo"
-                                                        style={{ color: 'white' }}
-                                                    ></a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                </ul>
+                                <Link
+                                    href={`/listing-topmap-grid?q=${"فلة"}`}
+                                    className="block py-2 text-white text-2xl text-opacity-80 hover:text-opacity-100 transition-all duration-200 font-montserrat"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+فلل                                </Link>
+                                <Link
+                                    href={`/listing-topmap-grid?q=${"مكتب"}`}
+                                    className="block py-2 text-white text-2xl text-opacity-80 hover:text-opacity-100 transition-all duration-200 font-montserrat"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                  مكاتب
+                                </Link>
+                                 <Link
+                                    href={`/listing-topmap-grid?q=${"بناء"}`}
+                                    className="block py-2 text-white text-2xl text-opacity-80 hover:text-opacity-100 transition-all duration-200 font-montserrat"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                  بناء
+                                </Link>
                             </div>
                         </div>
+        <hr />
+                        <Link
+                            href="/contacts"
+                            className="block py-3 border-b border-sec border-opacity-10 text-sec font-playfair text-3xl font-semibold hover:text-opacity-80 transition-all duration-200"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                         إتصل بنا
+                        </Link>        <hr />
+                    </nav>
+
+                    {/* Mobile Authentication Links */}
+                    <div className="absolute bottom-6 left-6 right-6 space-y-3">
+                        {status === "authenticated" ? (
+                            <Link
+                                href="/account"
+                                className="block w-full text-center py-3 bg-sec  hover:bg-prim hover:text-white text-prim font-montserrat font-semibold rounded-lg"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                حسابي
+                            </Link>
+                        ) : (
+                            <>
+                                <Link
+                                    href="/login"
+                                    className="block w-full text-center py-3 border border-sec text-sec font-montserrat font-semibold rounded-lg"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    تسجيل الدخول
+                                </Link>
+                                <Link
+                                    href="/register"
+                                    className="block w-full text-center py-3 bg-sec text-prim font-montserrat font-semibold rounded-lg"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    إنشاء حساب
+                                </Link>
+                            </>
+                        )}
                     </div>
-                </Offcanvas>
-            </div>
+                </div>
+            </Offcanvas>
         </>
     );
 }

@@ -268,7 +268,7 @@ const UserAccordionDisplay = () => {
                 )}
               </div>
 
-              <div className="flex-grow">
+              <div className="flex-grow flex-wrap">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className='flex gap-2 items-center flex-wrap'>
                     <h6 className="font-playfair text-2xl font-bold text-gray-600">
@@ -280,7 +280,7 @@ const UserAccordionDisplay = () => {
                     <p className="text-2xl text-gray-500">ID: {user.id}</p>
                   </div>
                   
-                  <div className="flex items-center space-x-4 justify-between">
+                  <div className="flex items-center flex-wrap gap-2 space-x-4 justify-between">
                     {user.is_superuser && (
                       <span className="inline-flex items-center select-none px-4 py-2 rounded-full text-xl font-bold bg-red-100 text-red-800">
                         <Shield className="h-3 w-3 ml-1" />

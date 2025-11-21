@@ -6,7 +6,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
-import { properties } from "@/data/properties";
 import Image from "next/image";
 import Link from "next/link";
 import useFetchListing from "@/components/requests/fetchListings";
@@ -14,7 +13,71 @@ import { useSession } from "next-auth/react";
 import LoginButton from "@/components/header/loginButton";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import Layout from "@/components/layouts/Layout-defaul";
-import { Suspense } from 'react'
+import { Suspense } from 'react';
+
+// Property Card Skeleton Component
+const PropertyCardSkeleton = () => (
+    <div className="card-house style-default">
+        <div className="img-style mb_20 relative">
+            <div className="bg-gray-200 animate-pulse" style={{ width: 410, height: 308, borderRadius: '8px' }}></div>
+            <div className="wrap-tag d-flex gap_8 mb_12 absolute top-4 left-4">
+                <div className="w-16 h-6 bg-gray-300 rounded animate-pulse"></div>
+                <div className="w-16 h-6 bg-gray-300 rounded animate-pulse"></div>
+            </div>
+        </div>
+        <div className="content">
+            <div className="h-8 bg-gray-200 rounded animate-pulse w-32 mb_12"></div>
+            <div className="h-6 bg-gray-200 rounded animate-pulse w-full mb_8"></div>
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4 mb-4"></div>
+            <ul className="info d-flex gap-4">
+                <li className="h-4 bg-gray-200 rounded animate-pulse w-20"></li>
+                <li className="h-4 bg-gray-200 rounded animate-pulse w-20"></li>
+                <li className="h-4 bg-gray-200 rounded animate-pulse w-24"></li>
+            </ul>
+        </div>
+    </div>
+);
+
+// Page Title Skeleton
+const PageTitleSkeleton = () => (
+    <div className="page-title style-default">
+        <div className="thumbs">
+            <div className="bg-gray-300 animate-pulse" style={{ width: '100%', height: 300 }}></div>
+        </div>
+        <div className="content text-center">
+            <div className="tf-container">
+                <div className="h-12 bg-gray-200 rounded animate-pulse w-48 mx-auto mb_12"></div>
+            </div>
+        </div>
+    </div>
+);
+
+// Full Page Skeleton
+const CategorySkeleton = ({ isMobile }: { isMobile: boolean }) => (
+    <Layout>
+        <PageTitleSkeleton />
+        <div className="section-features-property-4 tf-spacing-1 mt-6">
+            <div className="tf-container">
+                {isMobile ? (
+                    <div className="tf-sw-mobile bg_1">
+                        <PropertyCardSkeleton />
+                    </div>
+                ) : (
+                    <div className="tf-sw-mobile bg_1">
+                        <div className="tf-grid-layout-md lg-col-3 md-col-2">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <div className="swiper-slide" key={i}>
+                                    <PropertyCardSkeleton />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+                <div className="h-12 bg-gray-200 rounded animate-pulse w-48 mx-auto mt-8"></div>
+            </div>
+        </div>
+    </Layout>
+);
 
 // Create a separate component that uses useSearchParams
 function CategoryContent() {
@@ -26,7 +89,7 @@ function CategoryContent() {
     const searchParams = useSearchParams();
     const locationQuery = searchParams.get('q');
     
-    const { listings } = useFetchListing(); 
+    const { listings, isLoading } = useFetchListing(); 
     const { data: session, status } = useSession();
 
     // Fetch wishlist status for all properties
@@ -215,12 +278,17 @@ function CategoryContent() {
         </div>
     );
 
+    // Show skeleton while loading
+    if (isLoading || !listings) {
+        return <CategorySkeleton isMobile={isMobile} />;
+    }
+
     return (
         <Layout>
            <div className="page-title style-default">
                       <div className="thumbs">
                           <Image
-                              src="/hero7.png"
+                              src="/hero7.avif"
                               width={1920}
                               height={300}
                               alt=""
@@ -237,10 +305,8 @@ function CategoryContent() {
                   </div>
             <div className="section-features-property-4 tf-spacing-1 mt-6">
                 <div className="tf-container">
-                    {!listings ? (
-                        <div className="text-center py-10">جاري التحميل...</div>
-                    ) : filteredListings?.length === 0 ? (
-                        <div className="text-center py-10">لا توجد عقارات في هذه الفئة</div>
+                    {filteredListings?.length === 0 ? (
+                        <div className="text-center py-10">لا توجد عقارات في هذه المنطقة</div>
                     ) : isMobile ? (
                         <Swiper
                             modules={[Pagination]}
@@ -284,7 +350,13 @@ function CategoryContent() {
 // Main page component with Suspense boundary
 export default function Page() {
     return (
-        <Suspense fallback={<div>جاري التحميل...</div>}>
+        <Suspense fallback={
+            <Layout>
+                <div className="text-center py-20">
+                    <div className="h-8 bg-gray-200 rounded animate-pulse w-32 mx-auto"></div>
+                </div>
+            </Layout>
+        }>
             <CategoryContent />
         </Suspense>
     );

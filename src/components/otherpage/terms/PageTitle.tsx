@@ -6,7 +6,7 @@ export default function PageTitleTerms() {
         <div className="page-title style-default">
             <div className="thumbs">
                 <Image
-                    src="/hero7.png"
+                    src="/hero7.avif"
                     width={1920}
                     height={300}
                     alt=""

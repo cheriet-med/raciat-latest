@@ -274,7 +274,7 @@ const stripHtmlTags = (html: string | null | undefined) => {
           return (
             <div 
               key={order.id} 
-              className="bg-white shadow-sm rounded-md border first:rounded-t-lg last:rounded-b-lg overflow-hidden"
+              className="bg-white shadow-sm my-2 rounded-md border first:rounded-t-lg last:rounded-b-lg overflow-hidden"
             >
               {/* Order header */}
               <div 
@@ -300,7 +300,7 @@ const stripHtmlTags = (html: string | null | undefined) => {
                 </div>
 
                 {/* Order info */}
-                <div className="flex-grow">
+                <div className="flex-grow flex-wrap">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className='flex gap-2 items-center flex-wrap'>
                       <h6 className="font-playfair text-3xl font-medium text-gray-600">

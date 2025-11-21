@@ -43,7 +43,7 @@ export default function Location() {
                                     <Image
                                         width={300}
                                         height={300}
-                                        src="/assets/images/section/1.png"
+                                        src="/assets/images/section/1.avif"
                                         alt="location"
                                     />
                                 </a>
@@ -65,7 +65,7 @@ export default function Location() {
                                     <Image
                                         width={300}
                                         height={300}
-                                        src="/assets/images/section/2.png"
+                                        src="/assets/images/section/2.avif"
                                         alt="location"
                                     />
                                 </a>
@@ -88,7 +88,7 @@ export default function Location() {
                                 <Image
                                     width={630}
                                     height={300}
-                                    src="/assets/images/section/l1.png"
+                                    src="/assets/images/section/l1.avif"
                                     alt="location"
                                 />
                             </a>
@@ -112,7 +112,7 @@ export default function Location() {
                                 <Image
                                     width={630}
                                     height={300}
-                                    src="/assets/images/section/l2.png"
+                                    src="/assets/images/section/l2.avif"
                                     alt="location"
                                 />
                             </a>
@@ -135,7 +135,7 @@ export default function Location() {
                                     <Image
                                         width={300}
                                         height={300}
-                                        src="/assets/images/section/3.png"
+                                        src="/assets/images/section/3.avif"
                                         alt="location"
                                     />
                                 </a>
@@ -157,7 +157,7 @@ export default function Location() {
                                     <Image
                                         width={300}
                                         height={300}
-                                        src="/assets/images/section/4.png"
+                                        src="/assets/images/section/4.avif"
                                         alt="location"
                                     />
                                 </a>

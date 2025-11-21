@@ -230,9 +230,8 @@ export default function FormLogin() {
                 required
                 onFocus={handlePasswordFocus}
               />
-              {error2 && <p className="text-prim text-2xl">{error2}</p>}
-
-              {error && <p className="text-prim text-2xl text-center">{error}</p>}
+              {error2 && <p className="text-sec text-xl mt-4">{error2}</p>}
+              {error && <p className="text-sec text-xl mt-4 text-center">{error}</p>}
               <button
                 type="button"
                 className="toggle-password"

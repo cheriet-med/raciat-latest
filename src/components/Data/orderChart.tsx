@@ -1,355 +1,284 @@
-'use client'
-import { LuBadgeDollarSign } from "react-icons/lu";
-import { LuCalendarDays } from "react-icons/lu";
-import { GiConfirmed } from "react-icons/gi";
-import { TbCalendarCancel } from "react-icons/tb";
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useEffect, useState, useMemo } from 'react';
-import { ApexOptions } from 'apexcharts';
-import useFetchAllBookings from "@/components/requests/fetchAllBookings";
-import { useSession } from "next-auth/react";
-import moment from "moment";
-import ReservationsTable from "./reservationsTableAdmin";
-import NewsletterTable from "@/components/Data/newsletterTable";
-import { FaGlobeEurope } from "react-icons/fa";
-import { MdPendingActions } from "react-icons/md";
-import { RiPassValidLine } from "react-icons/ri";
-import useFetchAllUser from "../requests/fetchAllUsers";
+import useFetchAllBookings from '../requests/fetchAllBookings';
 
-// Dynamically import ApexCharts to avoid SSR issues
+// Dynamically import react-apexcharts
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
-type SeriesData = [number, number][];
 
-// Skeleton Components
-const MetricCardSkeleton = () => (
-  <article className="rounded-xl border border-gray-100 bg-white p-6 w-full shadow-sm animate-pulse">
-    <div className="flex items-center justify-between">
-      <div className="flex-1">
-        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-        <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-      </div>
-      <div className="w-8 h-8 bg-gray-200 rounded"></div>
-    </div>
-    <div className="mt-4 flex gap-1">
-      <div className="w-4 h-4 bg-gray-200 rounded"></div>
-      <div className="flex gap-2 flex-1">
-        <div className="h-3 bg-gray-200 rounded w-12"></div>
-        <div className="h-3 bg-gray-200 rounded w-16"></div>
-      </div>
-    </div>
-  </article>
-);
+interface Bookings {
+  id: number;
+  user: number;
+  name: string;
+  address?: string;
+  badrooms_number?: string;
+  created_at: string;
+  description?: string | null;
+  hurry?: string;
+  image?: string;
+  is_read: boolean;
+  latitude?: string;
+  location?: string;
+  longtitude?: string;
+  max_price?: string;
+  min_price?: string;
+  phone?: string;
+  potential_client?: any;
+  price: string;
+  reason: string;
+  region?: string;
+  representative?: any;
+  rooms_number?: string;
+  status: string;
+  surface?: string;
+  types?: string;
+  updated_at?: string;
+}
 
-const ChartSkeleton = ({ height = 300 }: { height?: number }) => (
-  <div className="animate-pulse">
-    <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
-    <div 
-      className="bg-gray-200 rounded-lg" 
-      style={{ height: `${height}px` }}
-    ></div>
-  </div>
-);
+interface ChartState {
+  series: Array<{ name: string; data: number[] }>;
+  options: ApexCharts.ApexOptions;
+}
 
-// Function to convert Arabic numerals to Western numerals
-const convertArabicToWesternNumerals = (dateString: string): string => {
-  if (!dateString) return '';
-  
-  const arabicToWestern: { [key: string]: string } = {
-    '٠': '0', '۰': '0',
-    '١': '1', '۱': '1',
-    '٢': '2', '۲': '2',
-    '٣': '3', '۳': '3',
-    '٤': '4', '۴': '4',
-    '٥': '5', '۵': '5',
-    '٦': '6', '۶': '6',
-    '٧': '7', '۷': '7',
-    '٨': '8', '۸': '8',
-    '٩': '9', '۹': '9',
-    '‏': '/', // Remove special characters
-    ' ': '/'
-  };
+// Arabic month names
+const arabicMonths = [
+  "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+  "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+];
 
-  return dateString
-    .split('')
-    .map(char => arabicToWestern[char] || char)
-    .join('')
-    .replace(/\/+/g, '/') // Replace multiple slashes with single slash
-    .replace(/^\/|\/$/g, ''); // Remove leading/trailing slashes
+// Function to convert Arabic numerals to English
+const convertArabicToEnglishNumbers = (arabicString: string): string => {
+  const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  return arabicString.replace(/[٠-٩]/g, (char) => {
+    return arabicNumbers.indexOf(char).toString();
+  });
 };
 
-// Function to parse Arabic date string to JavaScript Date
+// Function to parse Arabic date string
 const parseArabicDate = (dateString: string): Date | null => {
-  if (!dateString) return null;
-
   try {
-    // Convert Arabic numerals to Western numerals
-    const westernDateString = convertArabicToWesternNumerals(dateString);
+    // Remove any non-numeric characters except slashes
+    const cleanedDateString = dateString.replace(/[^٠-٩/]/g, '');
     
-    // Parse the date - assuming format is DD/MM/YYYY
-    const parts = westernDateString.split('/');
+    // Convert Arabic numerals to English
+    const englishDateString = convertArabicToEnglishNumbers(cleanedDateString);
+    
+    // Parse the date - assuming format like "١٩/١١/٢٠٢٥" becomes "19/11/2025"
+    const parts = englishDateString.split('/');
     if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JavaScript
-      const year = parseInt(parts[2], 10);
+      const day = parseInt(parts[0]);
+      const month = parseInt(parts[1]) - 1; // JavaScript months are 0-based
+      const year = parseInt(parts[2]);
       
-      // Create date object
-      const date = new Date(year, month, day);
-      
-      // Validate the date
-      if (isNaN(date.getTime())) {
-        console.log('Invalid date after conversion:', westernDateString);
-        return null;
+      // Validate date components
+      if (day >= 1 && day <= 31 && month >= 0 && month <= 11 && year >= 2000) {
+        return new Date(year, month, day);
       }
-      
-      return date;
     }
     
-    console.log('Unexpected date format:', westernDateString);
     return null;
   } catch (error) {
-    console.log('Error parsing date:', dateString, error);
+    console.error('Error parsing Arabic date:', error);
     return null;
   }
 };
 
-export default function OrderChart() {
-  const [bookingsSeries, setBookingsSeries] = useState<{ name: string; data: SeriesData }[]>([
-    { name: "الحجوزات", data: [] }
-  ]);
-  const [dealsSeries, setDealsSeries] = useState<{ name: string; data: SeriesData }[]>([
-    { name: "الصفقات", data: [] }
-  ]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { data: session, status } = useSession({ required: true });
-  const { AllBookings } = useFetchAllBookings();
-  const AllUsers = useFetchAllUser();
+const OrderChart = () => {
+  const { AllBookings, mutate, isLoading, error } = useFetchAllBookings();
+  const [chartState, setChartState] = useState<ChartState>({
+    series: [{ name: 'الحجوزات', data: [] }],
+    options: {}
+  });
 
-  // Process bookings and deals data by created_at date
   useEffect(() => {
-    if (!AllBookings) {
-      setIsLoading(false);
+    if (!AllBookings || AllBookings.length === 0) {
+      // Don't reset state here to avoid infinite loop
       return;
     }
 
-    console.log('Processing bookings data:', AllBookings);
+    const processBookingData = (bookings: Bookings[]) => {
+      const monthlyCounts = new Array(12).fill(0);
+      let hasValidData = false;
 
-    // Process all bookings per day
-    const bookingsByDay: { [key: string]: number } = {};
-    // Process completed deals per day
-    const dealsByDay: { [key: string]: number } = {};
-
-    AllBookings.forEach(booking => {
-      const bookingDate = booking.created_at;
-      if (bookingDate) {
-        try {
-          // Parse the Arabic date
-          const parsedDate = parseArabicDate(bookingDate);
+      bookings.forEach(booking => {
+        if (booking.created_at) {
+          console.log(`Original created_at: ${booking.created_at}`);
           
-          if (parsedDate) {
-            const formattedDate = moment(parsedDate).format('YYYY-MM-DD');
-            
-            // Count all bookings
-            bookingsByDay[formattedDate] = (bookingsByDay[formattedDate] || 0) + 1;
-            
-            // Count completed deals (status "منتهي")
-            if (booking.status === "منتهي") {
-              dealsByDay[formattedDate] = (dealsByDay[formattedDate] || 0) + 1;
-            }
-            
-            console.log(`Booking ${booking.id}:`, {
-              original: bookingDate,
-              converted: convertArabicToWesternNumerals(bookingDate),
-              parsed: parsedDate,
-              formatted: formattedDate
-            });
+          // Use the Arabic date parser for Arabic numeral dates
+          const date = parseArabicDate(booking.created_at);
+          
+          if (date && !isNaN(date.getTime())) {
+            const month = date.getMonth(); // 0-11
+            monthlyCounts[month]++;
+            hasValidData = true;
+            console.log(`Booking ${booking.id}: ${booking.created_at} -> Parsed: ${date} -> Month: ${month}`);
           } else {
-            console.log('Could not parse date:', bookingDate);
+            console.log(`Invalid Arabic date for booking ${booking.id}: ${booking.created_at}`);
+            
+            // Fallback: try regular date parsing if Arabic parsing fails
+            const fallbackDate = new Date(booking.created_at);
+            if (!isNaN(fallbackDate.getTime())) {
+              const month = fallbackDate.getMonth();
+              monthlyCounts[month]++;
+              hasValidData = true;
+              console.log(`Fallback parsing successful for booking ${booking.id}: Month: ${month}`);
+            }
           }
-        } catch (error) {
-          console.log('Error processing booking date:', bookingDate, error);
+        } else {
+          console.log(`No created_at for booking ${booking.id}`);
+        }
+      });
+
+      console.log('Monthly counts:', monthlyCounts);
+      console.log('Has valid data:', hasValidData);
+
+      return {
+        categories: arabicMonths,
+        data: monthlyCounts,
+        hasValidData: hasValidData
+      };
+    };
+
+    const { categories, data, hasValidData } = processBookingData(AllBookings);
+
+    if (!hasValidData) {
+      console.log('No valid date data found in bookings');
+      return;
+    }
+
+    const options: ApexCharts.ApexOptions = {
+      chart: {
+        height: 350,
+        type: 'bar',
+        toolbar: {
+          show: false
+        }
+      },
+      colors: ['#D9AA52'],
+      plotOptions: {
+        bar: {
+          borderRadius: 10,
+          dataLabels: {
+            position: 'top',
+          },
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: function (val: number) {
+          return val.toString();
+        },
+        offsetY: -20,
+        style: {
+          fontSize: '12px',
+          colors: ["#D9AA52"]
+        }
+      },
+      xaxis: {
+        categories: categories,
+        position: 'top',
+        axisBorder: {
+          show: false
+        },
+        axisTicks: {
+          show: false
+        },
+        labels: {
+          style: {
+            fontFamily: 'Arial, sans-serif',
+            cssClass: 'apexcharts-xaxis-label'
+          }
+        },
+        crosshairs: {
+          fill: {
+            type: 'gradient',
+            gradient: {
+              colorFrom: '#D8E3F0',
+              colorTo: '#D9AA52',
+              stops: [0, 100],
+              opacityFrom: 0.4,
+              opacityTo: 0.5,
+            }
+          }
+        },
+        tooltip: {
+          enabled: true,
+        }
+      },
+      yaxis: {
+        axisBorder: {
+          show: false
+        },
+        axisTicks: {
+          show: false,
+        },
+        labels: {
+          show: false,
+          formatter: function (val: number) {
+            return val.toString();
+          }
+        }
+      },
+      title: {
+        text: `رسم بياني يمثل عدد الطلبات شهريا (${new Date().getFullYear()})`,
+        floating: true,
+        offsetY: 330,
+        align: 'center',
+        style: {
+          color: '#D9AA52',
+          fontFamily: 'Arial, sans-serif'
+        }
+      },
+      tooltip: {
+        enabled: true,
+        style: {
+          fontFamily: 'Arial, sans-serif'
         }
       }
+    };
+
+    setChartState({
+      series: [{ name: 'الحجوزات', data: data }],
+      options: options
     });
-
-    console.log('Bookings by day:', bookingsByDay);
-    console.log('Deals by day:', dealsByDay);
-
-    // Get all unique dates from both datasets
-    const allDates = Array.from(new Set([
-      ...Object.keys(bookingsByDay),
-      ...Object.keys(dealsByDay)
-    ])).sort();
-
-    console.log('All dates:', allDates);
-
-    // Convert to series data format [timestamp, count]
-    const bookingsPerDay = allDates.map(date => [
-      moment(date).valueOf(),
-      bookingsByDay[date] || 0
-    ]) as [number, number][];
-
-    const dealsPerDay = allDates.map(date => [
-      moment(date).valueOf(),
-      dealsByDay[date] || 0
-    ]) as [number, number][];
-
-    console.log('Bookings per day series:', bookingsPerDay);
-    console.log('Deals per day series:', dealsPerDay);
-
-    // Update state
-    setBookingsSeries([{ name: "الحجوزات", data: bookingsPerDay }]);
-    setDealsSeries([{ name: "الصفقات", data: dealsPerDay }]);
-    setIsLoading(false);
   }, [AllBookings]);
 
-  const options1: ApexOptions = {
-    chart: {
-      id: "chart1",
-      type: "area",
-      foreColor: "#D9AA52",
-      toolbar: { autoSelected: "pan", show: false }
-    },
-    noData: {
-      text: "لا توجد بيانات للحجوزات",
-      align: "center",
-      verticalAlign: "middle",
-      style: { color: "#D9AA52", fontSize: "16px" }
-    },
-    colors: ["#142B40"],
-    stroke: { curve: "smooth", width: 2 },
-    grid: { borderColor: "#142B40", yaxis: { lines: { show: false } } },
-    dataLabels: { enabled: false },
-    fill: {
-      type: "gradient",
-      gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.1, stops: [0, 90, 100] }
-    },
-    markers: { size: 5, colors: ["#142B40"], strokeWidth: 3 },
-    tooltip: { 
-      theme: "dark", 
-      y: { 
-        formatter: function(val: number) {
-          return `${val} حجز`;
-        }
-      },
-      x: {
-        formatter: function(val: number) {
-          return moment(val).format('YYYY-MM-DD');
-        }
-      }
-    },
-    xaxis: { 
-      type: "datetime",
-      labels: {
-        formatter: function(val: number) {
-          return moment(val).format('YYYY-MM-DD');
-        }
-      }
-    },
-    yaxis: { 
-      min: 0, 
-      tickAmount: 4, 
-      labels: { 
-        formatter: function(val: number) {
-          return `${val}`;
-        }
-      } 
-    },
-    title: {
-      text: "عدد الحجوزات يومياً",
-      align: 'center',
-      style: {
-        fontSize: '16px',
-        color: '#D9AA52'
-      }
-    }
-  };
+  if (isLoading) {
+    return <div>جاري تحميل البيانات...</div>;
+  }
 
-  const options2: ApexOptions = {
-    chart: {
-      id: "chart2",
-      type: "bar",
-      foreColor: "#D9AA52",
-      brush: { target: "chart1", enabled: true },
-      selection: { enabled: true, fill: { color: "#fff", opacity: 0.4 } }
-    },
-    noData: {
-      text: "لا توجد بيانات للصفقات",
-      align: "center",
-      verticalAlign: "middle",
-      style: { color: "#D9AA52", fontSize: "16px" }
-    },
-    colors: ["#D9AA52"],
-    stroke: { width: 2 },
-    grid: { borderColor: "#444" },
-    markers: { size: 0 },
-    tooltip: { 
-      theme: "dark", 
-      y: { 
-        formatter: function(val: number) {
-          return `${val} صفقة`;
-        }
-      },
-      x: {
-        formatter: function(val: number) {
-          return moment(val).format('YYYY-MM-DD');
-        }
-      }
-    },
-    xaxis: { 
-      type: "datetime", 
-      tooltip: { enabled: false },
-      labels: {
-        formatter: function(val: number) {
-          return moment(val).format('YYYY-MM-DD');
-        }
-      }
-    },
-    yaxis: { 
-      tickAmount: 2,
-      labels: {
-        formatter: function(val: number) {
-          return `${val}`;
-        }
-      }
-    },
-    title: {
-      text: "عدد الصفقات المكتملة يومياً",
-      align: 'center',
-      style: {
-        fontSize: '16px',
-        color: '#D9AA52'
-      }
-    }
-  };
+  if (error) {
+    return <div>حدث خطأ في تحميل البيانات</div>;
+  }
 
-  // Calculate totals for display
-  const totalBookings = AllBookings?.length || 0;
-  const totalDeals = AllBookings?.filter(booking => booking.status === "منتهي").length || 0;
-  const activeBookings = AllBookings?.filter(booking => booking.status === "مقبول").length || 0;
-  const pendingBookings = AllBookings?.filter(booking => booking.status === "قيد الانتظار").length || 0;
+  if (!AllBookings || AllBookings.length === 0) {
+    return <div>لا توجد حجوزات لعرضها</div>;
+  }
 
   return (
-    <div className="mx-2 lg:mx-6 my-6">
-
-      {/* Charts */}
-      <div className="lg:col-span-2 rounded-xl border border-gray-100 bg-white shadow-sm">
-        {isLoading ? (
-          <div className="p-6">
-            <ChartSkeleton height={200} />
-            <div className="mt-8"><ChartSkeleton height={200} /></div>
+    <div className="chart-container" dir="rtl">
+      {typeof window !== 'undefined' && chartState.series[0].data.length > 0 ? (
+        <Chart
+          options={chartState.options}
+          series={chartState.series}
+          type="bar"
+          height={350}
+        />
+      ) : (
+        <div>
+          <p>عدد الحجوزات: {AllBookings.length}</p>
+          <p>جاري معالجة بيانات التواريخ العربية...</p>
+          <div style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
+            <p>تفاصيل الحجوزات:</p>
+            {AllBookings.map(booking => (
+              <div key={booking.id} style={{ margin: '5px 0' }}>
+                الحجز #{booking.id}: {booking.created_at || 'لا يوجد تاريخ'}
+              </div>
+            ))}
           </div>
-        ) : (
-          <>
-            <p className="font-playfair text-center p-6">رسم بياني يمثل عدد الحجوزات والصفقات المكتملة يومياً</p>
-            <div className="px-6">
-              <Chart options={options1} series={bookingsSeries} type="area" height={200} />
-            </div>
-            <div className="px-6 pb-6">
-              <Chart options={options2} series={dealsSeries} type="bar" height={200} />
-            </div>
-          </>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default OrderChart;
