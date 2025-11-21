@@ -96,7 +96,7 @@ export default function Properties2() {
                   <div className="content">
                     <h4 className="title mb_8 text-4xl md:text-5xl font-bold">
                       <Link
-                        href={'/property-details-1/1'}
+                        href={`/property-details-1/${property.id}`}
                         className="link"
                       >
                         {property.name}
@@ -116,7 +116,7 @@ export default function Properties2() {
                   +activeTab === property.id ? " active" : ""
                 }`}
               >
-                <Link href={'/property-details-1/1'} className="img-style">
+                <Link href={`/property-details-1/${property.id}`} className="img-style">
                   <Image
                     src={`${process.env.NEXT_PUBLIC_IMAGE}/${property.image}`}
                     width={645}
