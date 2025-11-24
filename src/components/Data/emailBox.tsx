@@ -399,8 +399,8 @@ const EmailClient: React.FC = () => {
     if (!isComposing) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="rounded-2xl bg-white p-6 max-w-5xl mx-auto ">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+        <div className="rounded-2xl bg-white p-6 max-w-5xl mx-auto overflow-y-auto">
           <div className="bg-gray-50 border-b border-gray-200 p-4 flex items-center justify-between">
             <h3 className="font-semibold text-sec font-playfair text-3xl">إنشاء بريد إلكتروني</h3>
             <button onClick={() => setIsComposing(false)} className="text-gray-500 hover:text-gray-700">
@@ -483,9 +483,9 @@ const EmailClient: React.FC = () => {
     <>
       <div className="flex h-screen bg-gray-50 font-montserrat" dir="rtl">
         {/* Right Sidebar (was Left) */}
-        <div className={`${isMobileView ? 'hidden md:block' : 'block'} w-32 sm:w-80 bg-gray-100 border-l border-gray-200 flex flex-col`}>
+        <div className={`${isMobileView ? 'hidden md:block' : 'block'} bg-gray-100 border-l border-gray-200 flex flex-col`}>
           {/* Header */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-gray-200 w-80">
             <h1 className="text-2xl font-bold text-gray-900 mb-4 font-playfair">البريد</h1>
             <button
               onClick={handleCompose}
@@ -547,8 +547,8 @@ const EmailClient: React.FC = () => {
 
           <div className="flex-1 flex">
             {/* Email List */}
-            <div className={`${selectedEmail ? 'hidden lg:block' : 'block'} w-full sm:w-60 lg:w-96 bg-white border-l border-gray-200 flex flex-col`}>
-              <div className="flex-1 overflow-y-auto">
+            <div className={`${selectedEmail ? 'hidden lg:block' : 'block'} w-full  bg-white border-l border-gray-200 flex flex-col`}>
+              <div className="flex-1 overflow-y-auto w-96">
                 {filteredEmails.length === 0 ? (
                   <div className="p-8 text-center text-gray-500">
                     <Mail className="w-12 h-12 mx-auto mb-4 text-gray-300" />
@@ -630,7 +630,7 @@ const EmailClient: React.FC = () => {
                   </div>
 
                   {/* Email Body */}
-                  <div className="flex-1 overflow-y-auto p-6 bg-gray-50 w-[400px] xl:w-[900px]">
+                  <div className="flex-1 overflow-y-auto p-6 bg-gray-50 w-96 xl:w-[900px]">
                     <div className="bg-white rounded-lg shadow-sm p-6">
                       {replyEmailId === currentEmail.id ? (
                         <div className="space-y-4">

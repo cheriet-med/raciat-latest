@@ -145,14 +145,14 @@ const ApexChart: React.FC = () => {
   }, [seriesData]);
 
   return (
-    <div className='flex justify-center items-center'> 
+    <div className='flex justify-center items-center '> 
       <div className="chart-container">
         <div id="chart">
           <ReactApexChart 
             options={chartState.options} 
             series={chartState.series} 
             type="donut" 
-            width={380} 
+            width={330} 
             height={370}
           />
         </div>
