@@ -548,7 +548,7 @@ const EmailClient: React.FC = () => {
           <div className="flex-1 flex">
             {/* Email List */}
             <div className={`${selectedEmail ? 'hidden lg:block' : 'block'} w-full  bg-white border-l border-gray-200 flex flex-col`}>
-              <div className="flex-1 overflow-y-auto w-96">
+              <div className="flex-1 overflow-y-auto ">
                 {filteredEmails.length === 0 ? (
                   <div className="p-8 text-center text-gray-500">
                     <Mail className="w-12 h-12 mx-auto mb-4 text-gray-300" />
@@ -595,7 +595,7 @@ const EmailClient: React.FC = () => {
               {currentEmail ? (
                 <>
                   {/* Email Header */}
-                  <div className="bg-white border-b border-gray-200 p-6 xl:w-[900px]">
+                  <div className="bg-white border-b border-gray-200 p-6 lg:w-[550px]">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-3 space-x-reverse">
                         <div>
@@ -630,7 +630,7 @@ const EmailClient: React.FC = () => {
                   </div>
 
                   {/* Email Body */}
-                  <div className="flex-1 overflow-y-auto p-6 bg-gray-50 w-96 xl:w-[900px]">
+                  <div className="flex-1 overflow-y-auto p-6 bg-gray-50 ">
                     <div className="bg-white rounded-lg shadow-sm p-6">
                       {replyEmailId === currentEmail.id ? (
                         <div className="space-y-4">
@@ -704,7 +704,7 @@ const EmailClient: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center bg-gray-50 w-[400px] xl:w-[900px] space-y-2">
+                <div className="flex-1 flex items-center justify-center bg-gray-50 w-[400px] lg:w-[550px] space-y-2">
                   <div className="text-center">
                     <div className="w-24 h-24 bg-sec rounded-full flex items-center justify-center mx-auto mb-4">
                       <Mail className="w-12 h-12 text-white" />

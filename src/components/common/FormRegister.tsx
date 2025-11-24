@@ -1,14 +1,8 @@
 "use client";
 import React, { useState, useCallback } from "react";
-import { registerAction } from "@/actions/registerAction";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
-import Image from "next/image";
-import { FaEye, FaEyeSlash, FaCircleNotch, FaCopy } from "react-icons/fa";
+import { FaCircleNotch } from "react-icons/fa";
 import MailChecker from "mailchecker";
-
-
 
 export default function FormRegister() {
     const [showPassword, setShowPassword] = useState(false);
@@ -27,13 +21,9 @@ export default function FormRegister() {
   const [error, setError] = useState<string | null>(null);
   const [error1, setError1] = useState("");
   const [error2, setError2] = useState("");
+  const [error3, setError3] = useState("");
 
-  const [passwordSuggestion, setPasswordSuggestion] = useState("");
-  const [isCopied, setIsCopied] = useState(false);
   const [email, setEmail] = useState('');
-  const [emailsend, setEmailsend] = useState(false);
-  const [emailsenderror, setEmailsenderror] = useState(false);
-  const [enteremail, setEnteremail] = useState(false);
 
   const isValidEmail = async (email: string): Promise<{ valid: boolean; message?: string }> => {
     if (!email || email.trim() === "") {
@@ -76,70 +66,20 @@ export default function FormRegister() {
     return null;
   };
 
-  const resetPassword = async () => {
-    if(!email){
-      setEnteremail(true);
-      return;
-    }
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}auth/users/reset_password/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-      
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-     
-      setEmailsend(true);
-      setEmailsenderror(false);
-      setEnteremail(false);
-    } catch {
-      setEmailsenderror(true);
-      setEmailsend(false);
-    }
-  };
-
-  const generatePasswordSuggestion = () => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-    let password = "";
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setPasswordSuggestion(password);
-  };
-
-  const handlePasswordFocus = () => {
-    generatePasswordSuggestion();
-  };
-
-  const handleCopyPassword = () => {
-    if (passwordSuggestion) {
-      navigator.clipboard.writeText(passwordSuggestion)
-        .then(() => {
-          setIsCopied(true);
-          setTimeout(() => setIsCopied(false), 2000);
-        })
-        .catch(() => {
-          console.error('Failed-to-copy-password');
-        });
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
     setError1("");
     setError2("");
+    setError3("");
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
 
+    // Validate email
     const emailValidation = await isValidEmail(email);
     if (!emailValidation.valid) {
       setError1(emailValidation.message || 'Invalid-email');
@@ -147,6 +87,7 @@ export default function FormRegister() {
       return;
     }
 
+    // Validate password
     const passwordError = validatePassword(password);
     if (passwordError) {
       setError2(passwordError);
@@ -154,41 +95,72 @@ export default function FormRegister() {
       return;
     }
 
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      setError3('Passwords-do-not-match');
+      setIsLoading(false);
+      return;
+    }
+
+    
     try {
-      const neo = await fetch(`${process.env.NEXT_PUBLIC_URL}auth/users/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}auth/users/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Token "+process.env.NEXT_PUBLIC_TOKEN,
         },
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Handle specific error messages from the API
+        if (data.email) {
+          setError1(data.email[0] || 'Email-error');
+        } else if (data.password) {
+          setError2(data.password[0] || 'Password-error');
+        } else {
+          setError(data.detail || 'Registration-failed');
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // Registration successful
+      console.log("success");
+      // Optionally redirect to login or dashboard
+      router.push('/login');
+      
     } catch (err) {
-      setError('An-error-occurred-during-sign-in');
-      console.error('Sign-in-error:', err);
+      setError('An-error-occurred-during-registration');
+      console.error('Registration-error:', err);
     } finally {
       setIsLoading(false);
-      router.push(`/login`)
     }
   };
-
-
 
     return (
         <div className="tf-container tf-spacing-1" dir="rtl">
             <div className="row justify-content-center">
                 <div className="col-lg-6">
-                    <form className="form-account" onSubmit={handleSubmit} >
-                        <h3 className="text-center mb_24  text-4xl  lg:text-5xl  font-bold">إنشاء حساب</h3>
+                    <form className="form-account" onSubmit={handleSubmit}>
+                        <h3 className="text-center mb_24 text-4xl lg:text-5xl font-bold">إنشاء حساب</h3>
 
-                        {/* اسم المستخدم أو البريد الإلكتروني */}
+                        {/* General error message */}
+                        {error && (
+                            <div className="alert alert-danger mb_20 text-center">
+                                {error}
+                            </div>
+                        )}
+
+                        {/* البريد الإلكتروني */}
                         <fieldset className="mb_20">
                             <label
                                 htmlFor="email"
                                 className="form-label text_primary-color text-button mb_8"
                             >
-                                   البريد الإلكتروني{" "}
+                                البريد الإلكتروني{" "}
                                 <span className="required">*</span>
                             </label>
                             <input
@@ -198,9 +170,9 @@ export default function FormRegister() {
                                 autoComplete="email"
                                 placeholder="أدخل بريدك الإلكتروني"
                                 required
-                                 onChange={(e) => setEmail(e.target.value)}
+                                onChange={(e) => setEmail(e.target.value)}
                             />
-                              {error1 && <p className="text-background text-sm mt-1">{error1}</p>}
+                            {error1 && <p className="text-background text-sm mt-1">{error1}</p>}
                         </fieldset>
 
                         {/* كلمة المرور */}
@@ -217,7 +189,6 @@ export default function FormRegister() {
                                 id="password"
                                 placeholder="أدخل كلمة المرور"
                                 required
-                                onFocus={handlePasswordFocus}
                             />
                             <button
                                 type="button"
@@ -244,7 +215,7 @@ export default function FormRegister() {
                                     }
                                 ></i>
                             </button>
-                             {error2 && <p className="text-background text-sm">{error2}</p>}
+                            {error2 && <p className="text-background text-sm mt-1">{error2}</p>}
                         </fieldset>
 
                         {/* تأكيد كلمة المرور */}
@@ -287,6 +258,7 @@ export default function FormRegister() {
                                     }
                                 ></i>
                             </button>
+                            {error3 && <p className="text-background text-sm mt-1">{error3}</p>}
                         </fieldset>
 
                         {/* الشروط */}
@@ -310,27 +282,26 @@ export default function FormRegister() {
                                 href="/login"
                                 className="hover-line-text forgot text-body-default"
                             >
-                              لدي حساب
+                                لدي حساب
                             </a>
                         </div>
 
                         {/* زر التسجيل */}
-<button
-  type="submit"
-  className="btn-signup tf-btn btn-bg-1 w-full mb_12 flex items-center justify-center gap-2"
->
-  {isLoading ? (
-    <>
-      <p className="text-white m-0">تسجيل</p>
-      <FaCircleNotch className="h-6 w-6 animate-spin text-white" />
-    </>
-  ) : (
-    <span>تسجيل</span>
-  )}
-
-  <span className="bg-effect"></span>
-</button>
-
+                        <button
+                            type="submit"
+                            className="btn-signup tf-btn btn-bg-1 w-full mb_12 flex items-center justify-center gap-2"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? (
+                                <>
+                                    <p className="text-white m-0">تسجيل</p>
+                                    <FaCircleNotch className="h-6 w-6 animate-spin text-white" />
+                                </>
+                            ) : (
+                                <span>تسجيل</span>
+                            )}
+                            <span className="bg-effect"></span>
+                        </button>
                     </form>
                 </div>
             </div>
