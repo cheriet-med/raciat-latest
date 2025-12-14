@@ -5,7 +5,6 @@ import DashboardAdmin from "@/components/admin-dashboard/dashboard";
 import DashboardUser from "@/components/user-dashboard/dashboarduser";
 import DashboardPartner from "@/components/partner-dashboard/partner-dashboard";
 
-import CalendarDashboardPartner from "@/components/partner-dashboard/calendar";
 
 export default function ProtectedPage() {
   const { data: session, status } = useSession({ required: true });
@@ -23,5 +22,5 @@ export default function ProtectedPage() {
     </div>  
     </div>);
   }
-  return session?.user?.is_superuser? <DashboardAdmin/> :  ( session?.user?.is_staff? <CalendarDashboardPartner/>:<CalendarDashboardPartner/>)
+  return session?.user?.is_superuser? <DashboardAdmin/> :  ""
 }

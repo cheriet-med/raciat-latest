@@ -1,8 +1,6 @@
 "use client";
 
 import { useSession} from "next-auth/react";
-
-import CalendarDashboardPartner from "@/components/partner-dashboard/calendar";
 import SocialAdmin from "@/components/admin-dashboard/social";
 
 
@@ -22,5 +20,5 @@ export default function ProtectedPage() {
     </div>  
     </div>);
   }
-  return session?.user?.is_superuser? <SocialAdmin/> :  ( session?.user?.is_staff? <CalendarDashboardPartner/>:<CalendarDashboardPartner/>)
+  return session?.user?.is_superuser? <SocialAdmin/> :""
 }
