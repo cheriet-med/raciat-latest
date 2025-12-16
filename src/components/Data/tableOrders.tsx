@@ -381,9 +381,9 @@ const stripHtmlTags = (html: string | null | undefined) => {
                           <div>الوصف: {stripHtmlTags(order.description) || 'غير متوفر'}</div>
                           <div>النوع: {order.types || 'غير متوفر'}</div>
                           <div>السبب: {order.reason}</div>
-                          <div>السعر: {order.price} دج</div>
+                          <div>السعر: {order.price}  SAR</div>
                           {order.min_price && order.max_price && (
-                            <div>نطاق السعر: {order.min_price} - {order.max_price} دج</div>
+                            <div>نطاق السعر: {order.min_price} - {order.max_price}  SAR</div>
                           )}
                           <div>المساحة: {order.surface} م²</div>
                           <div>عدد الغرف: {order.rooms_number}</div>
@@ -429,7 +429,7 @@ const stripHtmlTags = (html: string | null | undefined) => {
                             </select>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span>الممثل:</span>
+                            <span>موضف المبيعات:</span>
                             <select
                               value={order.representative || ""}
                               onChange={(e) => handleRepresentativeChange(order.id, e.target.value)}

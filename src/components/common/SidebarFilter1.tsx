@@ -26,6 +26,11 @@ interface AllPropsType {
     setMaxSize: (maxSize: string) => void;
     features: string[];
     setFeatures: (feature: string) => void;
+    // Add price range props
+    minPrice?: number;
+    setMinPrice?: (price: number) => void;
+    maxPrice?: number;
+    setMaxPrice?: (price: number) => void;
 }
 
 interface Props {
@@ -51,7 +56,7 @@ function SidebarFilter1(props: Props) {
         ddContainer,
         advanceBtnRef,
         toggleAdvancedFilter,
-        category = "إيجار",
+        category = "بيع",
         setCategory,
     } = props;
 
@@ -62,7 +67,11 @@ function SidebarFilter1(props: Props) {
         setBathrooms,
         setGarages,
         setMinSize,
-        setMaxSize
+        setMaxSize,
+        minPrice,
+        setMinPrice,
+        maxPrice,
+        setMaxPrice
     } = allProps;
     
     const [activeTab, setActiveTab] = useState<"إيجار" | "بيع">(category as "إيجار" | "بيع");
@@ -71,14 +80,14 @@ function SidebarFilter1(props: Props) {
     useEffect(() => {
         const timer = setTimeout(() => {
             // Trigger search automatically when any filter changes
-            if (searchKeyword || city || bedrooms || budget) {
+            if (searchKeyword || city || bedrooms || budget || minPrice || maxPrice) {
                 const syntheticEvent = { preventDefault: () => {} } as React.FormEvent;
                 handleSearch(syntheticEvent);
             }
         }, 500); // 500ms debounce
 
         return () => clearTimeout(timer);
-    }, [searchKeyword, city, bedrooms, budget]);
+    }, [searchKeyword, city, bedrooms, budget, minPrice, maxPrice]);
 
     const handleTabChange = (tabCategory: "إيجار" | "بيع") => {
         setActiveTab(tabCategory);
@@ -90,28 +99,34 @@ function SidebarFilter1(props: Props) {
         handleSearch(syntheticEvent);
     };
 
-    const handleInputChange = (field: string, value: string) => {
+    const handleInputChange = (field: string, value: string | number) => {
         switch (field) {
             case "city":
-                setCity(value);
+                setCity(value as string);
                 break;
             case "bedrooms":
-                setBedrooms(value);
+                setBedrooms(value as string);
                 break;
             case "budget":
-                setBudget(value);
+                setBudget(value as string);
                 break;
             case "bathrooms":
-                setBathrooms(value);
+                setBathrooms(value as string);
                 break;
             case "garages":
-                setGarages(value);
+                setGarages(value as string);
                 break;
             case "minSize":
-                setMinSize(value);
+                setMinSize(value as string);
                 break;
             case "maxSize":
-                setMaxSize(value);
+                setMaxSize(value as string);
+                break;
+            case "minPrice":
+                if (setMinPrice) setMinPrice(value as number);
+                break;
+            case "maxPrice":
+                if (setMaxPrice) setMaxPrice(value as number);
                 break;
         }
     };
@@ -122,25 +137,6 @@ function SidebarFilter1(props: Props) {
                 className="nav-tab-form style-1 justify-content-center"
                 role="tablist"
             >
-                <li
-                    className="nav-tab-item text-title fw-6"
-                    role="presentation"
-                >
-                    <button
-                        type="button"
-                        className={`nav-link-item ${activeTab === "إيجار" ? "bg-black text-white" : "bg-white text-black"}`}
-                        onClick={() => handleTabChange("إيجار")}
-                        style={{
-                            border: 'none',
-                            cursor: 'pointer',
-                            width: '100%',
-                            textAlign: 'center',
-                            transition: 'all 0.3s ease'
-                        }}
-                    >
-                        للإيجار
-                    </button>
-                </li>
                 <li
                     className="nav-tab-item text-title fw-6"
                     role="presentation"
@@ -160,12 +156,31 @@ function SidebarFilter1(props: Props) {
                         للبيع
                     </button>
                 </li>
+                <li
+                    className="nav-tab-item text-title fw-6"
+                    role="presentation"
+                >
+                    <button
+                        type="button"
+                        className={`nav-link-item ${activeTab === "إيجار" ? "bg-black text-white" : "bg-white text-black"}`}
+                        onClick={() => handleTabChange("إيجار")}
+                        style={{
+                            border: 'none',
+                            cursor: 'pointer',
+                            width: '100%',
+                            textAlign: 'center',
+                            transition: 'all 0.3s ease'
+                        }}
+                    >
+                        للإيجار
+                    </button>
+                </li>
             </ul>
 
             <div className="wg-filter">
                 <div className="widget-content-inner active">
                     <div className="form-title">
-                        <div className="wrap-fill tf-grid-layout lg-col-4 md-col-2">
+                        <div className="wrap-fill tf-grid-layout lg-col-3 md-col-2">
                             <form className="w-full" onSubmit={handleSearch}>
                                 <label
                                     htmlFor="lookingFor"
@@ -194,7 +209,6 @@ function SidebarFilter1(props: Props) {
                                 <SimpleDropdown
                                     options={cityOptions}
                                     onSelect={(value) => handleInputChange("city", value)}
-                                 
                                 />
                             </div>
                             <div>
@@ -204,17 +218,6 @@ function SidebarFilter1(props: Props) {
                                 <SimpleDropdown
                                     options={bedroomOptions}
                                     onSelect={(value) => handleInputChange("bedrooms", value)}
-                                  
-                                />
-                            </div>
-                            <div>
-                                <div className="text-button text_primary-color mb_8">
-                                    السعر
-                                </div>
-                                <SimpleDropdown
-                                    options={budgetOptions}
-                                    onSelect={(value) => handleInputChange("budget", value)}
-                                   
                                 />
                             </div>
                         </div>

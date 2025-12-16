@@ -126,7 +126,7 @@ const connectWebSocket = useCallback(() => {
   
   try {
     ws.current = new WebSocket(
-      `wss://api.goamico.com/ws/chat/?token=${session.accessToken}`
+      `wss://api.raciat.com/ws/chat/?token=${session.accessToken}`
     );
 
     ws.current.onopen = () => {

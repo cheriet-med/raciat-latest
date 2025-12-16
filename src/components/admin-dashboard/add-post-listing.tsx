@@ -27,7 +27,10 @@ import { HiTicket } from "react-icons/hi2";
 import PostListings from '../Data/postlistings';
 import AnalyticsAdmin from '../Data/analyticsAdmin';
 import RestaurantForm from '../requests/addRestaurantListing';
-
+import { RiHomeGearFill } from "react-icons/ri";
+import { TbReorder } from "react-icons/tb";
+import { LuMessagesSquare } from "react-icons/lu";
+import { FaChartLine } from "react-icons/fa";
 interface MenuItem {
   id: string;
   label: string;
@@ -80,19 +83,26 @@ export default function AddPostListing() {
  
 
 
-  const menuItems: MenuItem[] = [
-    { id: 'لوحة التحكم', label: 'لوحة التحكم', icon: <MdDashboard size={24} className='text-white'/>, href: '/account' },
-     { id: 'العقارات', label: 'العقارات', icon: <BsBuildingsFill size={24} className='text-white'/>, href: '/account/listings' },
-      { id: 'المدونة', label: 'المدونة', icon: <RiArticleFill size={24} className='text-white'/>, href: '/account/posts' },
-            { id: 'التذاكر والطلبات', label: 'التذاكر والطلبات', icon: <HiTicket size={24} className='text-white'/>, href: '/account/orders' },
-  { id: 'إعدادات الطلبات', label: 'إعدادات الطلبات', icon: <RiChatSettingsFill size={24} className='text-white'/>, href: '/account/trips' },
   
-   
-    { id: 'صندوق البريد الإلكتروني', label: 'صندوق البريد الإلكتروني', icon:  <MdOutlineAttachEmail size={24} className='text-white'/>, href: '/account/emails' },
-     { id: 'إعدادت الحساب', label: 'أعدادات الحساب', icon:<IoSettingsOutline size={24} className='text-white'/>, href: '/account/personal-information' },
-    { id: 'الصفحة الرئيسية', label: 'الصفحة الرئيسية', icon: <IoHomeOutline size={24} className='text-white'/>, href: '/' },
-  ];
-
+    const menuItems: MenuItem[] = [
+      { id: 'لوحة التحكم', label: 'لوحة التحكم', icon: <MdDashboard size={24} className='text-white'/>, href: '/account' },
+       { id: 'العقارات', label: 'العقارات', icon: <BsBuildingsFill size={24} className='text-white'/>, href: '/account/listings' },
+        { id: 'المدونة', label: 'المدونة', icon: <RiArticleFill size={24} className='text-white'/>, href: '/account/posts' },
+         { id: 'التذاكر والطلبات', label: 'التذاكر والطلبات', icon: <HiTicket size={24} className='text-white'/>, href: '/account/orders' },
+    
+      { id: 'إعدادات الطلبات', label: 'إعدادات الطلبات', icon: <RiChatSettingsFill size={24} className='text-white'/>, href: '/account/trips' },
+      { id: 'صندوق البريد الإلكتروني', label: 'صندوق البريد الإلكتروني', icon:  <MdOutlineAttachEmail size={24} className='text-white'/>, href: '/account/emails' },
+      
+  
+     { id: 'اﻹحصائيات ', label: ' اﻹحصائيات', icon:<FaChartLine size={24} className='text-white'/>, href: '/account/statistics' },
+     { id: 'الطلبات السريعة ', label: ' الطلبات السريعة', icon:<TbReorder size={24} className='text-white'/>, href: '/account/fast-order' },
+     { id: 'الرسائل ', label: ' الرسائل', icon:<LuMessagesSquare size={24} className='text-white'/>, href: '/account/messages' },   
+     { id: 'إعدادت الصفحة الرئيسية ', label: ' إعدادات الصفحة الرئيسية', icon:<RiHomeGearFill size={24} className='text-white'/>, href: '/account/edite-home-page' },
+  
+      { id: 'إعدادت الحساب', label: 'أعدادات الحساب', icon:<IoSettingsOutline size={24} className='text-white'/>, href: '/account/personal-information' },
+      { id: 'الصفحة الرئيسية', label: 'الصفحة الرئيسية', icon: <IoHomeOutline size={24} className='text-white'/>, href: '/' },
+    ];
+  
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);

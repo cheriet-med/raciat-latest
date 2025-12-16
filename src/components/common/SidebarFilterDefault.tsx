@@ -11,7 +11,7 @@ import AdvanceSearchDefault from "./AdvanceSearchDefault";
 export default function SidebarFilterDefault() {
     const ddContainer = useRef<HTMLDivElement>(null);
     const advanceBtnRef = useRef<HTMLDivElement>(null);
-    const [activeTab, setActiveTab] = useState<"إيجار" | "بيع">("إيجار");
+    const [activeTab, setActiveTab] = useState<"إيجار" | "بيع">("بيع"); // Changed from "إيجار" to "بيع"
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [formData, setFormData] = useState({
         keyword: "",
@@ -22,7 +22,7 @@ export default function SidebarFilterDefault() {
         minSize: "",
         maxSize: "",
         garages: "",
-        listingType: activeTab
+        listingType: "بيع" // Changed from activeTab to "بيع"
     });
  
 
@@ -92,6 +92,28 @@ export default function SidebarFilterDefault() {
                     className="nav-tab-form style-1 justify-content-center"
                     role="tablist"
                 >
+                          <li
+                        className="nav-tab-item text-title fw-6"
+                        role="presentation"
+                    >
+                        <button
+                            type="button"
+                            className={`nav-link-item ${activeTab === "بيع" ? "active" : ""}`}
+                            onClick={() => handleTabChange("بيع")}
+                            style={{
+                                border: 'none',
+                                cursor: 'pointer',
+                                width: '100%',
+                                textAlign: 'center',
+                                transition: 'all 0.3s ease',
+                                padding: '12px',
+                                backgroundColor: activeTab === "بيع" ? '#000' : '#fff',
+                                color: activeTab === "بيع" ? '#fff' : '#000'
+                            }}
+                        >
+                            للبيع
+                        </button>
+                    </li>
                     <li
                         className="nav-tab-item text-title fw-6"
                         role="presentation"
@@ -114,34 +136,13 @@ export default function SidebarFilterDefault() {
                             للإيجار
                         </button>
                     </li>
-                    <li
-                        className="nav-tab-item text-title fw-6"
-                        role="presentation"
-                    >
-                        <button
-                            type="button"
-                            className={`nav-link-item ${activeTab === "بيع" ? "active" : ""}`}
-                            onClick={() => handleTabChange("بيع")}
-                            style={{
-                                border: 'none',
-                                cursor: 'pointer',
-                                width: '100%',
-                                textAlign: 'center',
-                                transition: 'all 0.3s ease',
-                                padding: '12px',
-                                backgroundColor: activeTab === "بيع" ? '#000' : '#fff',
-                                color: activeTab === "بيع" ? '#fff' : '#000'
-                            }}
-                        >
-                            للبيع
-                        </button>
-                    </li>
+              
                 </ul>
 
                 <div className="wg-filter">
                     <div className="widget-content-inner active">
                         <div className="form-title">
-                            <div className="wrap-fill tf-grid-layout lg-col-4 md-col-2">
+                            <div className="wrap-fill tf-grid-layout lg-col-3 md-col-2">
                                 <form className="w-full" onSubmit={handleSubmit}>
                                     <label
                                         htmlFor="lookingFor"
@@ -186,16 +187,7 @@ export default function SidebarFilterDefault() {
                                         placeholder="اختر عدد الغرف"
                                     />
                                 </div>
-                                <div>
-                                    <div className="text-button text_primary-color mb_8">
-                                        ميزانيتك
-                                    </div>
-                                    <SimpleDropdown 
-                                        options={budgetOptions} 
-                                        onSelect={(value) => handleInputChange("budget", value)}
-                                        placeholder="اختر الميزانية"
-                                    />
-                                </div>
+
                             </div>
                             <div className="wrap-btn">
                                 <div

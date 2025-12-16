@@ -34,7 +34,10 @@ import useFetchUser from '../requests/fetchUser';
 import ProfileCard from '../Data/userProfile';
 import AnalyticsAdmin from '../Data/analyticsAdmin';
 import SocialMediaForm from '../Data/socialMediaForm';
-
+import { RiHomeGearFill } from "react-icons/ri";
+import { TbReorder } from "react-icons/tb";
+import { LuMessagesSquare } from "react-icons/lu";
+import { FaChartLine } from "react-icons/fa";
 interface MenuItem {
   id: string;
   label: string;

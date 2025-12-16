@@ -195,17 +195,6 @@ const UserAccordionDisplay = () => {
             المدونين
           </button>
 
-          <button
-            onClick={() => setFilterByStatus(filterByStatus === 'persperctive' ? null : 'persperctive')}
-            className={`py-3 px-6 rounded flex gap-2 items-center justify-center transition-colors ${
-              filterByStatus === 'persperctive' 
-                ? 'bg-sec/90 text-white' 
-                : 'bg-sec hover:bg-sec/90 text-white'
-            }`}
-          >
-            <FiFilter className='h-5 w-5 text-white'/>
-            العملاء المحتملين
-          </button>
 
           <button
             onClick={() => setFilterByStatus(filterByStatus === 'seller' ? null : 'seller')}
@@ -303,11 +292,7 @@ const UserAccordionDisplay = () => {
                         موظف ميداني
                       </span>
                     )}
-                    {user.status == "persperctive" && (
-                      <span className="inline-flex items-center select-none px-4 py-2 rounded-full text-xl font-bold bg-sec text-white">
-                        عميل محتمل
-                      </span>
-                    )}                  
+               
                       {user.stars == "trusted" && (
                     <div className='flex gap-1 mx-4'>
                         <FaStar className=' text-sec' size={18}/>
@@ -424,6 +409,20 @@ const UserAccordionDisplay = () => {
                         <div>مهووس: {user.obsessed || 'غير متوفر'}</div>
                         <div>الحيوانات الأليفة: {user.pets || 'غير متوفر'}</div>
                         <div>الوقت المستغرق: {user.time_spend || 'غير متوفر'}</div>
+                      </div>
+                    </div>
+
+                     <div className="bg-prim p-4 rounded-lg shadow-sm">
+                      <h6 className="font-playfair font-bold text-sec mb-3 flex items-center">
+                        <FaCircleInfo className="h-8 w-8 ml-2 text-sec" />
+                       اﻹحصائيات الشخصية
+                      </h6>
+                      <div className="space-y-3 text-2xl text-white">
+                        <div>عدد التداكر: {user.location || 'غير متوفر'}</div>
+                        <div>عدد الصفقات: {user.want_to_go || 'غير متوفر'}</div>
+                        <div>إجمالي مبلغ الصفقات المحصل:  {user.obsessed || 'غير متوفر'}</div>
+                        <div>إجمالي مبلغ التداكر: {user.want_to_go || 'غير متوفر'}</div>
+                       <div>إجمالي المبلغ الغير محصل: {user.want_to_go || 'غير متوفر'}</div>
                       </div>
                     </div>
                   </div>
@@ -558,17 +557,7 @@ const UserAccordionDisplay = () => {
                 صلاحيات مدون
               </button>
 
-              <button
-                onClick={() => setSelectedStatus('persperctive')}
-                className={`w-full py-3 px-6 rounded-lg text-xl font-bold transition-all flex items-center justify-center gap-2 ${
-                  selectedStatus === 'persperctive' 
-                    ? 'bg-sec text-white ring-4 ring-sec/30' 
-                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
-              >
-                {selectedStatus === 'persperctive' && <MdCheckCircle className="h-6 w-6" />}
-                عميل محتمل
-              </button>
+
 
               <button
                 onClick={() => setSelectedStatus('seller')}

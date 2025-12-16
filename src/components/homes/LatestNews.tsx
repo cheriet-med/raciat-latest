@@ -103,7 +103,7 @@ export default function LatestNews() {
                             اخر اﻷخبار
                         </span>
                         <h3 className="split-text effect-blur-fade text-5xl lg:text-7xl font-bold">
-                            دليل راسيات المساعد
+                            راسيات الماسية
                         </h3>
                     </div>
                     <div className="text-center py-10 text-2xl text-gray-500">
@@ -122,7 +122,7 @@ export default function LatestNews() {
                        اخر اﻷخبار
                     </span>
                     <h3 className="split-text effect-blur-fade text-5xl lg:text-7xl font-bold">
-                        دليل راسيات المساعد
+                       راسيات الماسية
                     </h3>
                 </div>
                 <Swiper

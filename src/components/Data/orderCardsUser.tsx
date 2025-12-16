@@ -16,6 +16,7 @@ import { FaBuildingCircleArrowRight } from "react-icons/fa6";
 import ManageListing from "@/components/Data/manageListing";
 import useFetchBooking from "../requests/fetchBooking";
 import ManageOrder from "./manageOrder";
+import { FaHome } from "react-icons/fa"; //
 import useFetchAllBookings from "../requests/fetchAllBookings";
 // Skeleton Components
 const PropertyCardSkeleton = () => {
@@ -101,7 +102,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     return intPart + roundedFirst / 10;
   }
 
- 
+  const [imageError, setImageError] = useState(false);
 
 
   // Handle heart icon click
@@ -115,13 +116,21 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   return (
     <div className="flex flex-col rounded-lg p-4 shadow-xs shadow-black border border-1  font-montserrat text-secondary bg-prim text-sec ">
       <div className="relative">
-     <Image
-          alt="Property"
-          src={imageUrl}
-          height={500}
-          width={500}
-          className="h-80 lg:h-96  rounded-md object-cover"
-        />
+ {!imageError && imageUrl ? (
+          <Image
+            alt="Property"
+            src={imageUrl}
+            height={500}
+            width={500}
+            className="h-80 lg:h-96 rounded-md object-cover"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="h-80 lg:h-96 rounded-md bg-gray-200 flex flex-col items-center justify-center">
+            <FaHome className="w-32 h-32 text-gray-400 mb-4" />
+            
+          </div>
+        )}
       </div>
       <div className="mt-2  ">
      <div className="flex justify-between "> 
@@ -153,11 +162,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 export default function OrderCart() {
   const { data: session, status } = useSession({ required: true });
    const userId = session?.user?.id;
-  const { listings, isLoading, error, mutate } = useFetchListing(); 
+  const { listings, isLoading, error,  } = useFetchListing(); 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
    const {Booking} = useFetchBooking(userId)
-  const {AllBookings} = useFetchAllBookings();
+  const {AllBookings, mutate} = useFetchAllBookings();
   const ord = AllBookings?.filter(
   booking => +booking.user === +userId
 ) || [];

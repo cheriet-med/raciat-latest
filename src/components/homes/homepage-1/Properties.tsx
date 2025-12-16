@@ -186,8 +186,7 @@ export default function Properties() {
         { name: "الكل", label: "الكل" },
         { name: "شقة", label: "شقق" },
         { name: "فلة", label: "فلل" },
-        { name: "بناء", label: "بناء" },
-        { name: "مكتب", label: "مكاتب" }
+        { name: "إنشاء", label: "تحت اﻹنشاء" }
     ];
 
     const WishlistButton = ({ propertyId }: { propertyId: number }) => {
@@ -235,7 +234,7 @@ export default function Properties() {
                     <div
                         className="tag text-button-small fw-6 text_primary-color"
                         style={{
-                            backgroundColor: property.category === "بيع" ? "#dc3545" : "#28a745",
+                            backgroundColor: property.category === "بيع" ? "#dc3545" : (property.category === "مباع" ? "#D9AA52" : "#28a745"),
                             color: "#fff"
                         }}
                     >
@@ -303,7 +302,7 @@ export default function Properties() {
                                 <button 
                                     key={category.name}
                                     onClick={() => setSelectedCategory(category.name)}
-                                    className={`px-8 py-4 w-36 rounded-lg font-bold text-white transition-colors ${
+                                    className={`px-12 py-4 w-fit rounded-lg font-bold text-white transition-colors ${
                                         selectedCategory === category.name 
                                             ? "bg-sec" 
                                             : "bg-prim hover:bg-sec"

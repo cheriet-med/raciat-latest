@@ -250,5 +250,9 @@ header.header.style-default.header-fixed .tf-btn {
 
 
 
-
+/* Add to your CSS file */
+.wd-search-form .SimpleDropdown,
+.wd-search-form .SimpleDropdown > div {
+    width: 100% !important;
+}
 

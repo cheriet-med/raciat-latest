@@ -809,8 +809,7 @@ export default function EditeHotelForm() {
                             <option value="">إختر النوع</option>
                             <option value="فلة">فلة</option>
                             <option value="شقة">شقة</option>
-                            <option value="بناء">بناء</option>
-                            <option value="مكتب">مكتب</option>
+                            <option value="إنشاء">تحت اﻹنشاء</option>
                           </select>
                           {errortype && <p className="text-xl mt-2 text-sec">{errortype}</p>}
                         </div>
@@ -871,6 +870,7 @@ export default function EditeHotelForm() {
                               <option value="بيع">بيع</option>
                               <option value="إيجار">إيجار</option>
                               <option value="تمويل">تمويل</option>
+                              <option value="مباع">تم البيع</option>
                             </select>
                             {errortype && <p className="text-xl mt-2 text-sec">{errortype}</p>}
                           </div>

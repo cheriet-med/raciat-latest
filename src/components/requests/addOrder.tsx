@@ -123,15 +123,7 @@ export default function AddOrderForm() {
       return;
     }
 
-    if (!order.image) {
-      setErrorimage('الرجاء تحميل صورة العقار');
-      return;
-    }
 
-    if (!order.description.trim()) {
-      setErrordescription('الرجاء إدخال وصف العقار');
-      return;
-    }
 
     if (!order.reason.trim()) {
       setErrorreason('الرجاء اختيار السبب');
@@ -525,13 +517,13 @@ export default function AddOrderForm() {
                       <div className="bg-gray-50 rounded-xl p-6">
                  <div className="mt-6">
                       <label className="block text-xl font-semibold text-gray-700 mb-2">
-                        الوصف *
+                    الوصف
                       </label>
                       <TiptapEditor
                         content={order.description}
                         onChange={handleDescriptionChange}
                       />
-                      {errordescription && <p className="text-xl mt-2 text-red-600">{errordescription}</p>}
+                      {errordescription && <p className="text-xl mt-2 text-sec">{errordescription}</p>}
                     </div>
                   </div>
                   <div className="bg-gray-50 rounded-xl p-6">

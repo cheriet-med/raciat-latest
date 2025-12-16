@@ -3,11 +3,14 @@ import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { FaCircleNotch } from "react-icons/fa";
 import MailChecker from "mailchecker";
+import { signIn } from "next-auth/react";
 
 export default function FormRegister() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+ const handleGoogleLogin = () => {
+    signIn("google", { callbackUrl: "/account" });
+  };
     const handleTogglePassword = useCallback(() => {
         setShowPassword((prev) => !prev);
     }, []);
@@ -285,7 +288,6 @@ export default function FormRegister() {
                                 لدي حساب
                             </a>
                         </div>
-
                         {/* زر التسجيل */}
                         <button
                             type="submit"
@@ -302,6 +304,22 @@ export default function FormRegister() {
                             )}
                             <span className="bg-effect"></span>
                         </button>
+            <div className="or">
+              <span className="text-body-default">أو سجل الدخول عبر</span>
+            </div>
+            <div className="signin-with d-grid gap_9 mb_24">
+              <div
+                onClick={handleGoogleLogin}
+                className="tf-btn btn-border w-full cursor-pointer"
+              >
+                <span className="d-flex align-items-center gap_12">
+                  <img src="/assets/images/logo/google.svg" alt="logo" />
+                  المتابعة باستخدام جوجل
+                </span>
+                <span className="bg-effect"></span>
+              </div>
+            </div>
+
                     </form>
                 </div>
             </div>

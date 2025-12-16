@@ -8,7 +8,6 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "../../public/assets/icons/icomoon/style.css";
 import "../../public/assets/scss/app.scss";
-import Preloader from "@/components/Preloader";
 import BackToTop from "@/components/common/BackToTop";
 import ClientScripts from "@/components/common/ClientScripts";
 import { Providers } from "./providers";
@@ -28,7 +27,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ar" dir="rtl">
       <body className={manrope.variable}>
         <Providers>
-          <Preloader />
           <div id="wrapper">{children}</div>
           <ClientScripts />
           <BackToTop />

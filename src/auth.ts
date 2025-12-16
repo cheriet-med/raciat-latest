@@ -63,7 +63,7 @@ async function refreshAccessToken(token: any) {
       return { ...token, error: "NoRefreshToken" };
     }
 
-    const response = await fetch("https://api.7azzani-support.com/auth/jwt/refresh/", {
+    const response = await fetch("https://api.raciat.com/auth/jwt/refresh/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refresh: token.refreshToken }),
@@ -124,7 +124,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           // Step 1: Fetch JWT token
           const tokenResponse = await fetch(
-            "https://api.7azzani-support.com/auth/jwt/create/",
+            "https://api.raciat.com/auth/jwt/create/",
             {
               method: "POST",
               headers: {
@@ -148,7 +148,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           // Step 2: Fetch user data using the token
           const userResponse = await fetch(
-            "https://api.7azzani-support.com/api/user/",
+            "https://api.raciat.com/api/user/",
             {
               method: "GET",
               headers: {
@@ -203,7 +203,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           // Check if user exists in Django backend
           const response = await fetch(
-            "https://api.7azzani-support.com/auth/o/google-oauth2/",
+            "https://api.raciat.com/auth/o/google-oauth2/",
             {
               method: "POST",
               headers: {
@@ -213,7 +213,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 access_token: account?.access_token,
                 id_token: account?.id_token,
                 code: account?.code,
-                redirect_uri: "https://api.7azzani-support.com/api/auth/callback/google"
+                redirect_uri: "https://api.raciat.com/api/auth/callback/google"
               })
             }
           );
@@ -222,7 +222,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           
           // Fetch user details from Django
           const userResponse = await fetch(
-            "https://api.7azzani-support.com/auth/email-login-register-cbv/",
+            "https://api.raciat.com/auth/email-login-register-cbv/",
             {
               method: "POST",
               headers: {
@@ -266,7 +266,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (account?.provider === "facebook") {
         try {
           const response = await fetch(
-            "https://api.7azzani-support.com/auth/o/facebook/",
+            "https://api.raciat.com/auth/o/facebook/",
             {
               method: "POST",
               headers: {
@@ -283,7 +283,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             
             // Fetch user details from Django
             const userResponse = await fetch(
-              "https://api.7azzani-support.com/api/user/",
+              "https://api.raciat.com/api/user/",
               {
                 method: "GET",
                 headers: {
