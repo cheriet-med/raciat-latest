@@ -15,9 +15,11 @@ type Property = {
 };
 
 export default function BoxSeller1({ property }: { property: Property }) {
+   
     const [formData, setFormData] = useState({
         name: "",
         phone_number: "",
+        listing_id: property.id.toString(),
         date: new Date().toLocaleDateString('ar-SA')
     });
 
@@ -40,18 +42,19 @@ export default function BoxSeller1({ property }: { property: Property }) {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+                    "Authorization": "Token " +process.env.NEXT_PUBLIC_TOKEN,
                 },
                 body: JSON.stringify(formData),
             });
 
             if (response.ok) {
-                console.log("Form submitted successfully:", formData);
+               
                 setShowSuccess(true);
                 // Reset form
                 setFormData({
                     name: "",
                     phone_number: "",
+                    listing_id: property.id.toString(),
                     date: new Date().toLocaleDateString('ar-SA')
                 });
                 

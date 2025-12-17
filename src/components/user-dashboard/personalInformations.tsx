@@ -23,6 +23,9 @@ import ProfileCard from '../Data/userProfile';
 import { RiArticleFill } from "react-icons/ri";
 import { HiTicket } from "react-icons/hi2";
 
+import { TbReorder } from "react-icons/tb";
+import { LuMessagesSquare } from "react-icons/lu";
+
 interface MenuItem {
   id: string;
   label: string;
@@ -76,31 +79,46 @@ export default function DashboardUser() {
 
 
 
- const menuItems: MenuItem[] = [
-   { id: 'الملف الشخصي', label: 'الملف الشخصي', icon: <CgProfile size={24} className='text-white'/>, href: '/account' },
-   { id: 'قائمة الرغبات', label: 'قائمة الرغبات', icon: <FaRegHeart size={24} className='text-white'/>, href: '/account/wishlist' },
+
+const menuItems: MenuItem[] = [
+  { id: 'الملف الشخصي', label: 'الملف الشخصي', icon: <CgProfile size={24} className='text-white'/>, href: '/account' },
+  { id: 'قائمة الرغبات', label: 'قائمة الرغبات', icon: <FaRegHeart size={24} className='text-white'/>, href: '/account/wishlist' },
+
  
-  
-   ...(Users?.status === "blogger"
-     ? [{ id: 'المدونة', label: 'المدونة', icon: <RiArticleFill size={24} className='text-white'/>, href: '/account/posts' }]
-     : []
-   ),
- 
- 
-     ...(Users?.status === "seller"
-     ? [{id: 'التذاكر والطلبات', label: 'التذاكر والطلبات', icon: <HiTicket size={24} className='text-white'/>, href: '/account/orders' },]
-     : []
-   ),
-       ...(Users?.status === "field"
-     ? [{id: 'التذاكر ', label: 'التذاكر ', icon: <HiTicket size={24} className='text-white'/>, href: '/account/ticket' },]
-     : []
-   ),
- 
-   { id: 'الطلبات', label: 'الطلبات', icon: <FaFirstOrder size={24} className='text-white'/>, href: '/account/trips' },
-   { id: 'إعدادت الحساب', label: 'أعدادات الحساب', icon:<IoSettingsOutline size={24} className='text-white'/>, href: '/account/personal-information' },
-   { id: 'الصفحة الرئيسية', label: 'الصفحة الرئيسية', icon: <IoHomeOutline size={24} className='text-white'/>, href: '/' },
- ];
- 
+  ...(Users?.status === "blogger"
+    ? [{ id: 'المدونة', label: 'المدونة', icon: <RiArticleFill size={24} className='text-white'/>, href: '/account/posts' }]
+    : []
+  ),
+
+
+    ...(Users?.status === "seller"
+    ? [{id: 'التذاكر والطلبات', label: 'التذاكر والطلبات', icon: <HiTicket size={24} className='text-white'/>, href: '/account/orders' },]
+    : []
+  ),
+      ...(Users?.status === "field"
+    ? [{id: 'التذاكر ', label: 'التذاكر ', icon: <HiTicket size={24} className='text-white'/>, href: '/account/ticket' },]
+    : []
+  ),
+
+ ...(Users?.status === "seller"
+    ? [{ id: 'الطلبات السريعة ', label: ' الطلبات السريعة', icon:<TbReorder size={24} className='text-white'/>, href: '/account/fast-order' },]
+    : []
+  ),
+  ...(Users?.status === "seller"
+    ? [{ id: 'الرسائل ', label: ' الرسائل', icon:<LuMessagesSquare size={24} className='text-white'/>, href: '/account/messages' },]
+    : []
+  ),
+    ...(Users?.status === "field"
+    ? [{ id: 'الرسائل ', label: ' الرسائل', icon:<LuMessagesSquare size={24} className='text-white'/>, href: '/account/messages' },]
+    : []
+  ),
+
+  { id: 'الطلبات', label: 'الطلبات', icon: <FaFirstOrder size={24} className='text-white'/>, href: '/account/trips' },
+  { id: 'إعدادت الحساب', label: 'أعدادات الحساب', icon:<IoSettingsOutline size={24} className='text-white'/>, href: '/account/personal-information' },
+  { id: 'الصفحة الرئيسية', label: 'الصفحة الرئيسية', icon: <IoHomeOutline size={24} className='text-white'/>, href: '/' },
+];
+
+
 
 
   const toggleMobileMenu = () => {

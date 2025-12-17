@@ -598,7 +598,7 @@ const sendMessage = async () => {
         </div>
         <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-gray-50">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
-          <p className="mt-4 text-gray-500">Loading...</p>
+          <p className="mt-4 text-gray-500">جاري التحميل...</p>
         </div>
       </div>
     );
@@ -627,8 +627,8 @@ const sendMessage = async () => {
       >
         <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
           isOwn 
-            ? 'bg-accent text-white rounded-br-md' 
-            : 'bg-white text-gray-800 rounded-bl-md shadow-sm'
+            ? 'bg-sec text-white rounded-br-md' 
+            : 'bg-white text-prim rounded-bl-md shadow-sm'
         }`}>
           <p className="text-sm leading-relaxed">{message.content}</p>
           <p className={`text-xs mt-1 ${
@@ -663,7 +663,7 @@ const sendMessage = async () => {
             </button>
             <div className="relative">
               <img
-                src={`${process.env.NEXT_PUBLIC_IMAGE}/${selectedContact.profile_image}`|| '/profile.webp'}
+                src={`${process.env.NEXT_PUBLIC_IMAGE}/${selectedContact.profile_image}`|| '/profile.png'}
                 alt={selectedContact.full_name}
                 className="w-10 h-10 rounded-full object-cover"
               />
@@ -708,12 +708,12 @@ const sendMessage = async () => {
                 onClick={() => selectedContact && fetchMessages(selectedContact.id)}
                 className="text-sm bg-highlights text-white px-3 py-1 rounded hover:bg-red-200"
               >
-                Retry
+                أعد المحاولة
               </button>
             </div>
           ) : messages.length === 0 ? (
             <div className="flex justify-center items-center h-32 text-gray-500">
-              No messages yet. Start a conversation!
+              لا توجد رسائل حتى الآن. ابدأ محادثة!
             </div>
           ) : (
             <>
@@ -777,7 +777,6 @@ const sendMessage = async () => {
     );
   };
 
-console.log(filteredConversations)
 
   return (
     <>
@@ -785,17 +784,17 @@ console.log(filteredConversations)
         {/* Desktop Left Sidebar / Mobile Full Screen */}
         <div className={`${
           isMobileView ? 'hidden md:block' : 'block'
-        } w-full md:w-80 bg-white border-r border-gray-200 flex flex-col`}>
+        } w-full md:w-48 bg-white border-r border-gray-200 flex flex-col`}>
           {/* Header */}
           <div className="p-4 md:p-6 border-b border-gray-200">
-            <h1 className="text-2xl md:text-xl font-bold text-gray-900 mb-4 font-playfair">Messages</h1>
+            <h1 className="text-2xl font-bold text-sec mb-4 font-playfair">الرسائل</h1>
             
             {/* Search */}
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search"
+                placeholder="بحث عن جهة اتصال أو رسالة"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-accent focus:bg-white border border-transparent focus:border-accent"
@@ -823,12 +822,12 @@ console.log(filteredConversations)
                   className="text-sm bg-highlights text-white px-3 py-1 rounded hover:bg-secondary hover:text-white"
 
                 >
-                  Retry
+                  أعد المحاولة
                 </button>
               </div>
             ) : filteredConversations.length === 0 ? (
               <div className="p-4 text-center text-gray-500">
-                {searchTerm ? 'No conversations found' : 'No conversations yet'}
+                {searchTerm ? 'لم يتم العثور على أي محادثات' : 'لا توجد محادثات حتى الآن'}
               </div>
             ) : (
               filteredConversations.map((conversation) => (
@@ -842,7 +841,7 @@ console.log(filteredConversations)
                   <div className="flex items-center space-x-3">
                     <div className="relative">
                       <img
-                        src={`${process.env.NEXT_PUBLIC_IMAGE}/${conversation.user.profile_image}`|| '/profile.webp'}
+                        src={`${process.env.NEXT_PUBLIC_IMAGE}/${conversation.user.profile_image}`|| '/profile.png'}
                         alt={conversation.user.full_name}
                         className="w-12 h-12 md:w-10 md:h-10 rounded-full object-cover"
                       />
@@ -883,7 +882,7 @@ console.log(filteredConversations)
                 <div className="flex items-center space-x-3">
                   <div className="relative">
                     <img
-                      src={`${process.env.NEXT_PUBLIC_IMAGE}/${selectedContact.profile_image}`|| '/profile.webp'}
+                      src={`${process.env.NEXT_PUBLIC_IMAGE}/${selectedContact.profile_image}`|| '/profile.png'}
                       alt={selectedContact.full_name}
                       className="w-10 h-10 rounded-full object-cover"
                     />
@@ -940,7 +939,7 @@ console.log(filteredConversations)
               </div>
 
               {/* Desktop Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 w-[500px]">
                 {isLoadingMessages ? (
                   <div className="space-y-4">
                     {[...Array(8)].map((_, i) => (
@@ -954,12 +953,12 @@ console.log(filteredConversations)
                       onClick={() => selectedContact && fetchMessages(selectedContact.id)}
                       className="bg-highlights text-white px-4 py-2 rounded hover:bg-secondary hover:text-white"
                     >
-                      Retry
+                      أعد المحاولة
                     </button>
                   </div>
                 ) : messages.length === 0 ? (
                   <div className="flex justify-center items-center h-full text-gray-500">
-                    No messages yet. Start a conversation!
+                    لا توجد رسائل حتى الآن. ابدأ محادثة!
                   </div>
                 ) : (
                   <>
@@ -1007,7 +1006,7 @@ console.log(filteredConversations)
                   <button
                     onClick={sendMessage}
                     disabled={!newMessage.trim() || isSendingMessage || !wsConnected}
-                    className="p-3 bg-accent text-white rounded-full hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative"
+                    className="p-3 bg-sec text-white rounded-full hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative"
                   >
                     {isSendingMessage ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -1021,13 +1020,13 @@ console.log(filteredConversations)
               </div>
             </>
           ) : (
-            <div className="flex-1 flex items-center justify-center bg-gray-50">
+            <div className="flex-1 flex items-center justify-center bg-gray-50 w-[500px]">
               <div className="text-center">
-                <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-sec rounded-full flex items-center justify-center mx-auto mb-4">
                   <Search className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2 font-playfair">Select a conversation</h3>
-                <p className="text-gray-500">Choose a contact to start messaging</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2 font-playfair">حدد محادثة</h3>
+                <p className="text-gray-500">اختر جهة اتصال لبدء المراسلة</p>
               </div>
             </div>
           )}

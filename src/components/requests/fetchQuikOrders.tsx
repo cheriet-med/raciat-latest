@@ -30,6 +30,8 @@ interface Orders {
   id: number;
   name: string;
   phone_number: string;
+  listing_id: string;
+  agent:string;
   date: string | null;
   is_read: boolean;
 }

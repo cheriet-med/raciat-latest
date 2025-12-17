@@ -4,27 +4,36 @@ import { Search, Download } from 'lucide-react';
 import useFetchAllNewsLetterEmails from '../requests/fetchAllNewsletters';
 import NewsletterTable from './newsletterTable';
 import useFetchQuikeOrders from '../requests/fetchQuikOrders';
+import { useSession } from 'next-auth/react';
 import { FaEye } from "react-icons/fa";
 import Link from 'next/link';
 
-const QuikeOrderTable = () => {
+const QuikeOrderUser = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [lastUpdated, setLastUpdated] = useState('');
   const { AllNewsLetters } = useFetchAllNewsLetterEmails();
+  const { data: session, status } = useSession({ required: true });
+
   const { orders } = useFetchQuikeOrders();
 
   useEffect(() => {
     setLastUpdated(new Date().toLocaleString());
   }, []);
 
+  // Filter orders by agent ID first
+  const userOrders = useMemo(() => {
+    if (!orders || !session?.user?.id) return [];
+    return orders.filter(order => order.agent === session.user.id);
+  }, [orders, session?.user?.id]);
+
   const filteredSubscribers = useMemo(() => {
-    if (!searchTerm) return orders || [];
-    return orders?.filter(subscriber =>
+    if (!searchTerm) return userOrders;
+    return userOrders.filter(subscriber =>
       subscriber.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       subscriber.phone_number.includes(searchTerm) ||
       subscriber.date?.includes(searchTerm)
-    ) || [];
-  }, [orders, searchTerm]);
+    );
+  }, [userOrders, searchTerm]);
 
   const exportToCSV = () => {
     const csvContent = [
@@ -62,8 +71,7 @@ const QuikeOrderTable = () => {
     <div dir="rtl" className="w-full max-w-4xl mx-auto pt-6 px-2 rounded-xl bg-gray-50">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-sec mb-4 font-playfair text-right">
-         طلبات من صفحة العقار
-        </h1>
+طلبات سريعة        </h1>
 
         {/* أدوات البحث والتصدير */}
         <div className="flex flex-col sm:flex-row-reverse gap-4 mb-4">
@@ -80,7 +88,7 @@ const QuikeOrderTable = () => {
 
           <button
             onClick={exportToCSV}
-            className="flex items-center gap-2 px-4 py-2 bg-sec text-white rounded-lg hover:bg-prim transition-colors duration-200 font-bold text-xl"
+            className="flex items-center gap-2 px-4 py-2 bg-sec text-white rounded-lg hover:bg-prim transition-colors duration-200 font-bold text-2xl"
           >
             <Download className="w-6 h-6" />
             تصدير كملف CSV
@@ -97,44 +105,44 @@ const QuikeOrderTable = () => {
         <table className="w-full table-auto">
           <thead className="bg-prim" style={{ direction: 'rtl' }}>
             <tr>
-              <th className="px-6 py-3 text-xl font-bold text-sec uppercase tracking-wider text-right">
+              <th className="px-6 py-3 text-2xl font-bold text-sec uppercase tracking-wider text-center">
                 اﻹسم
               </th>
-              <th className="px-6 py-3 text-xl font-bold text-sec uppercase tracking-wider text-right">
+              <th className="px-6 py-3 text-2xl font-bold text-sec uppercase tracking-wider text-center">
                 رقم الهاتف
               </th>
-              <th className="px-6 py-3 text-xl font-bold text-sec uppercase tracking-wider text-right">
+              <th className="px-6 py-3 text-2xl font-bold text-sec uppercase tracking-wider text-center">
                 تاريخ ووقت الطلب
               </th>
-              <th className="px-6 py-3 text-xl font-bold text-sec uppercase tracking-wider text-right">
+              <th className="px-6 py-3 text-2xl font-bold text-sec uppercase tracking-wider text-center">
                رقم العقار
               </th>
             </tr>
           </thead>
-          <tbody className='bg-sec'>
+          <tbody className='bg-neutral'>
             {filteredSubscribers.length > 0 ? (
               filteredSubscribers.map((subscriber, index) => (
                 <tr
                   key={index}
                   className=" transition-colors duration-150 border-b last:border-0 border-gray-50"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-xl font-bold text-white" style={{ textAlign: 'right' }}>
+                  <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold text-prim" style={{ textAlign: 'center' }}>
                     {subscriber.name}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xl font-bold text-white" style={{ textAlign: 'right' }}>
+                  <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold text-prim" style={{ textAlign: 'center' }}>
                     {subscriber.phone_number}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xl font-bold text-white" style={{ textAlign: 'right' }}>
+                  <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold text-prim" style={{ textAlign: 'center' }}>
                     {subscriber.date}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-xl font-bold text-white" style={{ textAlign: 'right' }}>
-                    ID: {subscriber.listing_id}   <Link href={`/property-details-1/${subscriber.listing_id}`}><FaEye className="inline-block ml-2 cursor-pointer hover:text-sec " size={18} /></Link> 
+                  <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold text-prim" style={{ textAlign: 'center' }}>
+                    ID: {subscriber.listing_id} <Link href={`/property-details-1/${subscriber.listing_id}`}><FaEye className="inline-block ml-2 cursor-pointer hover:text-sec " size={18} /></Link> 
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="px-6 py-8 text-center text-white text-xl">
+                <td colSpan={4} className="px-6 py-8 text-center text-white text-2xl">
                   لم يتم العثور على نتائج .
                 </td>
               </tr>
@@ -144,13 +152,12 @@ const QuikeOrderTable = () => {
       </div>
 
       {/* الفوتر */}
-      <div className="mt-4 text-xl text-gray-500 text-center">
+      <div className="mt-4 text-2xl text-gray-500 text-center">
         يتم تحديث البيانات في الوقت الفعلي {lastUpdated && `• آخر تحديث: ${lastUpdated}`}
       </div>
-      <div className='py-4'></div>
-      <NewsletterTable/>
+    
     </div>
   );
 };
 
-export default QuikeOrderTable;
+export default QuikeOrderUser;

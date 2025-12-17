@@ -1,0 +1,337 @@
+'use client';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Search, Download, Upload } from 'lucide-react';
+import useFetchAllNewsLetterEmails from '../requests/fetchAllNewsletters';
+import NewsletterTable from './newsletterTable';
+import useFetchQuikeOrders from '../requests/fetchQuikOrders';
+import useFetchAllUser from '../requests/fetchAllUsers';
+import * as XLSX from 'xlsx';
+import { FaEye } from "react-icons/fa";
+import Link from 'next/link';
+
+
+const QuikeOrderTableAdmin = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [lastUpdated, setLastUpdated] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string>('');
+  const { AllNewsLetters } = useFetchAllNewsLetterEmails();
+  const { orders, mutate } = useFetchQuikeOrders();
+  const { AllUsers } = useFetchAllUser();
+
+  const staffUsers = useMemo(() => {
+    return AllUsers?.filter(user => user.status === "seller") || [];
+  }, [AllUsers]);
+
+  useEffect(() => {
+    setLastUpdated(new Date().toLocaleString());
+  }, []);
+
+  const filteredSubscribers = useMemo(() => {
+    if (!searchTerm) return orders || [];
+    return orders?.filter(subscriber =>
+      subscriber.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      subscriber.phone_number.includes(searchTerm) ||
+      subscriber.date?.includes(searchTerm)
+    ) || [];
+  }, [orders, searchTerm]);
+
+  const exportToCSV = () => {
+    const csvContent = [
+      [' اﻹسم', 'التاريخ', 'رقم الهاتف', 'رقم العقار', 'رقم موضف المبيعات'],
+      ...filteredSubscribers.map(sub => [sub.name, sub.date, sub.phone_number, sub.listing_id, sub.agent])
+    ];
+
+    const csvString = csvContent
+      .map(row => row.map(field => `"${field}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `النشرة-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const downloadTemplate = () => {
+    const templateContent = [
+      ['name', 'phone_number', 'date', 'listing_id', 'agent'],
+      ['محمد أحمد', '0123456789', '2024-01-15', '101', ''],
+      ['فاطمة علي', '0987654321', '2024-01-16', '102', '']
+    ];
+
+    const csvString = templateContent
+      .map(row => row.map(field => `"${field}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `قالب-الرفع-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleRepresentativeChange = async (orderId: number, representativeId: string) => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}testid/${orderId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+        },
+        body: JSON.stringify({ agent: representativeId === "" ? null : parseInt(representativeId) })
+      });
+
+      if (!res.ok) throw new Error('فشل في تحديث الممثل');
+      mutate();
+    
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const formatDateTime = (dateTime: string) => {
+    const date = new Date(dateTime);
+    return date.toLocaleString('ar-EG', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadStatus('جاري قراءة الملف...');
+
+    try {
+      // Check if it's CSV or Excel
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      let jsonData: any[] = [];
+
+      if (fileExtension === 'csv') {
+        // Handle CSV
+        const text = await file.text();
+        const rows = text.split('\n').map(row => row.split(',').map(cell => cell.replace(/^"|"$/g, '').trim()));
+        const headers = rows[0];
+        
+        jsonData = rows.slice(1)
+          .filter(row => row.some(cell => cell)) // Remove empty rows
+          .map(row => {
+            const obj: any = {};
+            headers.forEach((header, index) => {
+              obj[header] = row[index] || '';
+            });
+            return obj;
+          });
+      } else {
+        // Handle Excel
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data);
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        jsonData = XLSX.utils.sheet_to_json(worksheet);
+      }
+
+      setUploadStatus(`تم العثور على ${jsonData.length} صف. جاري الرفع...`);
+
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (const row of jsonData) {
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_URL}test/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+            },
+            body: JSON.stringify(row)
+          });
+
+          if (res.ok) {
+            successCount++;
+          } else {
+            errorCount++;
+          }
+        } catch (err) {
+          errorCount++;
+          console.error('خطأ في رفع الصف:', err);
+        }
+      }
+
+      setUploadStatus(`اكتمل الرفع! نجح: ${successCount}, فشل: ${errorCount}`);
+      mutate();
+      
+      setTimeout(() => {
+        setUploadStatus('');
+      }, 5000);
+    } catch (error) {
+      console.error('خطأ في معالجة الملف:', error);
+      setUploadStatus('فشل في معالجة الملف');
+    } finally {
+      setIsUploading(false);
+      event.target.value = '';
+    }
+  };
+
+  return (
+    <div dir="rtl" className="w-full max-w-4xl mx-auto pt-6 px-2 rounded-xl bg-gray-50">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-sec mb-4 font-playfair text-center">
+        طلبات سريعة مع تحديد المهام لموضف المبيعات
+        </h1>
+
+        {/* أدوات البحث والتصدير */}
+        <div className="flex flex-col sm:flex-row-reverse gap-4 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+            <input
+              type="text"
+              placeholder="ابحث بالبريد الإلكتروني أو التاريخ..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg  focus:border-transparent outline-none text-right"
+            />
+          </div>
+
+          <button
+            onClick={exportToCSV}
+            className="flex items-center gap-2 px-4 py-2 bg-sec text-white rounded-lg hover:bg-prim transition-colors duration-200 font-bold text-2xl"
+          >
+            <Download className="w-6 h-6" />
+            تصدير كملف CSV
+          </button>
+
+          <button
+            onClick={downloadTemplate}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-bold text-2xl"
+          >
+            <Download className="w-6 h-6" />
+            تحميل القالب
+          </button>
+
+          <label className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-bold text-2xl cursor-pointer">
+            <Upload className="w-6 h-6" />
+            رفع من ملف
+            <input
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              onChange={handleFileUpload}
+              className="hidden"
+              disabled={isUploading}
+            />
+          </label>
+        </div>
+
+        {/* حالة الرفع */}
+        {uploadStatus && (
+          <div className={`p-4 rounded-lg mb-4 text-center ${
+            uploadStatus.includes('فشل') ? 'bg-red-100 text-red-700' : 
+            uploadStatus.includes('اكتمل') ? 'bg-green-100 text-green-700' : 
+            'bg-blue-100 text-blue-700'
+          }`}>
+            {uploadStatus}
+          </div>
+        )}
+      </div>
+
+      {/* الجدول */}
+      <div
+        dir="rtl"
+        className="overflow-x-auto rounded-lg bg-white "
+        style={{ direction: 'rtl', textAlign: 'center' }}
+      >
+        <table className="w-full table-auto">
+          <thead className="bg-prim" style={{ direction: 'rtl' }}>
+            <tr>
+              <th className="px-6 py-3 text-2xl font-bold text-sec uppercase tracking-wider text-center">
+                اﻹسم
+              </th>
+              <th className="px-6 py-3 text-2xl font-bold text-sec uppercase tracking-wider text-center">
+                رقم الهاتف
+              </th>
+              <th className="px-6 py-3 text-2xl font-bold text-sec uppercase tracking-wider text-center">
+                تاريخ ووقت الطلب
+              </th>
+              <th className="px-6 py-3 text-2xl font-bold text-sec uppercase tracking-wider text-center">
+               رقم العقار
+              </th>
+              <th className="px-6 py-3 text-2xl font-bold text-sec uppercase tracking-wider text-center">
+                موضف المبيعات
+              </th>
+            </tr>
+          </thead>
+          <tbody className='bg-neutral'>
+            {filteredSubscribers.length > 0 ? (
+              filteredSubscribers.map((subscriber, index) => (
+                <tr
+                  key={index}
+                  className=" transition-colors duration-150 border-b last:border-0 border-gray-50"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold text-prim" style={{ textAlign: 'center' }}>
+                    {subscriber.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold text-prim" style={{ textAlign: 'center' }}>
+                    {subscriber.phone_number}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold text-prim" style={{ textAlign: 'center' }}>
+                    {subscriber.date}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold text-prim" style={{ textAlign: 'center' }}>
+                   ID: {subscriber.listing_id}  <Link href={`/property-details-1/${subscriber.listing_id}`}><FaEye className="inline-block ml-2 cursor-pointer hover:text-sec " size={18} /></Link> 
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold text-prim" style={{ textAlign: 'center' }}>
+                    <div className="flex items-center justify-center gap-3">
+                      <span>موضف المبيعات:</span>
+                      <select
+                        value={subscriber.agent?.toString() || ""}
+                        onChange={(e) => handleRepresentativeChange(subscriber.id, e.target.value)}
+                        className="px-3  rounded-lg bg-sec text-prim border border-sec focus:outline-none focus:ring-2 focus:ring-sec text-2xl"
+                      >
+                        <option value="">لا يوجد ممثل</option>
+                        {staffUsers.map((staff:any) => (
+                          <option key={staff.id} value={staff.id.toString()}>
+                            {staff.full_name || staff.username || `المستخدم ${staff.id}`}
+                          </option>
+                        ))}
+                      </select>
+                    </div>                             
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="px-6 py-8 text-center text-white text-2xl">
+                  لم يتم العثور على نتائج .
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* الفوتر */}
+      <div className="mt-4 text-2xl text-gray-500 text-center">
+        يتم تحديث البيانات في الوقت الفعلي {lastUpdated && `• آخر تحديث: ${lastUpdated}`}
+      </div>
+    
+    </div>
+  );
+};
+
+export default QuikeOrderTableAdmin;

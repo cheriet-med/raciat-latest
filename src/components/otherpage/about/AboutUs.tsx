@@ -1,6 +1,11 @@
+'use client'
+
 import React from "react";
 import OdometerCounter from "@/components/common/Odometer";
+import useFetchHomepage from "@/components/requests/frtchHomepage";
+
 export default function AboutUs() {
+    const { post, isLoading } = useFetchHomepage();
     return (
         <div className="tf-container section-about">
             <div className="heading-section justify-content-center text-center mb_48">
@@ -21,7 +26,7 @@ export default function AboutUs() {
                         <div className="tf-box-icon style-1">
                             <div className="heading d-flex justify-content-between mb_19">
                                 <div className="counter-item style-default h2">
-                                    <OdometerCounter value={112} />
+                                    <OdometerCounter value={post?.awards} />
                                 </div>
                                 <div className="icon">
                                     <i className="icon-Certificate"></i>
@@ -35,7 +40,7 @@ export default function AboutUs() {
                             <div className="tf-box-icon style-1">
                                 <div className="heading d-flex justify-content-between mb_19">
                                     <div className="counter-item style-default h2">
-                                        <OdometerCounter value={85} />
+                                        <OdometerCounter value={post?.agents} />
                                     </div>
                                     <div className="icon">
                                         <i className="icon-BuildingOffice"></i>
@@ -48,7 +53,7 @@ export default function AboutUs() {
                             <div className="tf-box-icon style-1">
                                 <div className="heading d-flex justify-content-between mb_19">
                                     <div className="counter-item style-default h2">
-                                        <OdometerCounter value={66} />
+                                        <OdometerCounter value={post?.visites} />
                                     </div>
                                     <div className="icon">
                                         <i className="icon-ChartDonut"></i>

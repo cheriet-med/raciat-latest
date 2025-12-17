@@ -429,7 +429,7 @@ const stripHtmlTags = (html: string | null | undefined) => {
                             </select>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span>موضف المبيعات:</span>
+                            <span> الموضف الميداني:</span>
                             <select
                               value={order.representative || ""}
                               onChange={(e) => handleRepresentativeChange(order.id, e.target.value)}

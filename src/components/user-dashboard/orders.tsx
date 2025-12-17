@@ -24,6 +24,10 @@ import OrdersAnalyticsAdmin from '../Data/OrdersAnalyticsAdmin';
 import { RiArticleFill } from "react-icons/ri";
 import { HiTicket } from "react-icons/hi2";
 
+import { TbReorder } from "react-icons/tb";
+import { LuMessagesSquare } from "react-icons/lu";
+
+
 interface MenuItem {
   id: string;
   label: string;
@@ -95,10 +99,24 @@ const menuItems: MenuItem[] = [
     : []
   ),
 
+ ...(Users?.status === "seller"
+    ? [{ id: 'الطلبات السريعة ', label: ' الطلبات السريعة', icon:<TbReorder size={24} className='text-white'/>, href: '/account/fast-order' },]
+    : []
+  ),
+  ...(Users?.status === "seller"
+    ? [{ id: 'الرسائل ', label: ' الرسائل', icon:<LuMessagesSquare size={24} className='text-white'/>, href: '/account/messages' },]
+    : []
+  ),
+    ...(Users?.status === "field"
+    ? [{ id: 'الرسائل ', label: ' الرسائل', icon:<LuMessagesSquare size={24} className='text-white'/>, href: '/account/messages' },]
+    : []
+  ),
+
   { id: 'الطلبات', label: 'الطلبات', icon: <FaFirstOrder size={24} className='text-white'/>, href: '/account/trips' },
   { id: 'إعدادت الحساب', label: 'أعدادات الحساب', icon:<IoSettingsOutline size={24} className='text-white'/>, href: '/account/personal-information' },
   { id: 'الصفحة الرئيسية', label: 'الصفحة الرئيسية', icon: <IoHomeOutline size={24} className='text-white'/>, href: '/' },
 ];
+
 
 
 

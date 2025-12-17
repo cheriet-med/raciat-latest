@@ -17,6 +17,10 @@ import { MdCheckCircle } from "react-icons/md";
 import { MdSecurity } from "react-icons/md";
 import { MdWarning } from "react-icons/md";
 import { FaStar } from "react-icons/fa";
+import { IoChatboxEllipses } from "react-icons/io5";
+import { useRouter } from 'next/navigation';
+
+
 const UserAccordionDisplay = () => {
   const { AllUsers, mutate } = useFetchAllUser();
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,7 +33,7 @@ const UserAccordionDisplay = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [trustUserId, setTrustUserId] = useState<number | null>(null);
   const [selectedTrust, setSelectedTrust] = useState<string>('');
-
+  const router = useRouter();
   const filteredUsers = useMemo(() => {
     if (!AllUsers) return [];
     const searchLower = searchTerm.toLowerCase();
@@ -398,21 +402,11 @@ const UserAccordionDisplay = () => {
                       </div>
                     </div>
 
-                    <div className="bg-prim p-4 rounded-lg shadow-sm">
-                      <h6 className="font-playfair font-bold text-sec mb-3 flex items-center">
-                        <FaCircleInfo className="h-8 w-8 ml-2 text-sec" />
-                        معلومات إضافية
-                      </h6>
-                      <div className="space-y-3 text-2xl text-white">
-                        <div>الموقع: {user.location || 'غير متوفر'}</div>
-                        <div>يريد الذهاب: {user.want_to_go || 'غير متوفر'}</div>
-                        <div>مهووس: {user.obsessed || 'غير متوفر'}</div>
-                        <div>الحيوانات الأليفة: {user.pets || 'غير متوفر'}</div>
-                        <div>الوقت المستغرق: {user.time_spend || 'غير متوفر'}</div>
-                      </div>
-                    </div>
 
-                     <div className="bg-prim p-4 rounded-lg shadow-sm">
+
+                  </div>
+
+                     <div className="bg-prim p-4 rounded-lg shadow-sm w-full mt-8">
                       <h6 className="font-playfair font-bold text-sec mb-3 flex items-center">
                         <FaCircleInfo className="h-8 w-8 ml-2 text-sec" />
                        اﻹحصائيات الشخصية
@@ -425,10 +419,22 @@ const UserAccordionDisplay = () => {
                        <div>إجمالي المبلغ الغير محصل: {user.want_to_go || 'غير متوفر'}</div>
                       </div>
                     </div>
-                  </div>
                 </div>
                 
                 <div className='flex justify-end gap-4 p-4'>
+                    {user.status == "blogger" && (
+                       <IoChatboxEllipses className='text-sec hover:text-prim cursor-pointer' size={32} onClick={()=>router.push(`/account/messages/?id=10`)}/>
+                    )}
+
+                    {user.status == "seller" && (
+                       <IoChatboxEllipses className='text-sec hover:text-prim cursor-pointer' size={32} onClick={()=>router.push(`/account/messages/?id=10`)}/>
+                    )}
+
+                    {user.status == "field" && (
+                       <IoChatboxEllipses className='text-sec hover:text-prim cursor-pointer' size={32} onClick={()=>router.push(`/account/messages/?id=10`)}/>
+                    )}
+                 
+
                   <button 
                     className='w-48 bg-blue-600 text-white rounded-md py-3 hover:bg-blue-700 flex gap-2 items-center justify-center transition-colors'
                     onClick={() => setTrustUserId(user.id)}
@@ -452,6 +458,7 @@ const UserAccordionDisplay = () => {
                     <RiDeleteBin6Line className='h-6 w-6 text-white'/>
                     حذف
                   </button>
+                  
                 </div>
               </div>
             )}

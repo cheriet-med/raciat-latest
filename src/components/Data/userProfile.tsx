@@ -401,7 +401,7 @@ const ProfileCard: React.FC = () => {
             </div>
 
             {/* Profile Section */}
-            <div className="flex items-center gap-10 p-4">
+            <div className="flex items-center  gap-10 p-4">
               <div className="shrink-0 relative group mr-auto">
                 <input
                   ref={fileInputRef}
@@ -463,51 +463,7 @@ const ProfileCard: React.FC = () => {
             <hr className='mt-8'/>
 
             {/* Contact Info Grid - RTL Fixed */}
-            <div className="my-5 grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="flex items-center gap-x-2.5 text-white">
-                <MdOutlineTravelExplore size={24} className="flex-shrink-0 text-sec"/>
-                <p className="text-2xl hover:text-sec hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
-                  أريد الذهاب إلى: {profileData.want_to_go && ( profileData.want_to_go )}
-                </p>
-              </div>
-           
-              {profileData.language && (
-                <div className="flex items-center gap-x-2.5 text-white">
-                  <IoLanguage size={24} className="flex-shrink-0 text-sec"/>
-                  <p className="text-2xl hover:text-sec hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
-                    يتحدث {profileData.language}
-                  </p>
-                </div>
-              )}
 
-              <div className="flex items-center gap-x-2.5 text-white">
-                <CiLocationOn size={24} className="flex-shrink-0 text-sec"/>
-                <p className="text-2xl hover:text-sec hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
-                  يعيش في  {profileData.location && (profileData.location)}
-                </p>
-              </div>
-            
-              <div className="flex items-center gap-x-2.5 text-white">
-                <MdAccessTime size={24} className="flex-shrink-0 text-sec"/>
-                <p className="text-2xl hover:text-sec hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
-                  أقضي الكثير من الوقت:  {profileData.time_spend && (profileData.time_spend )}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-x-2.5 text-white">
-                <LiaBirthdayCakeSolid size={24} className="flex-shrink-0 text-sec"/>
-                <p className="text-2xl hover:text-sec hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
-                  ولد في {profileData.born && (profileData.born)}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-x-2.5 text-white">
-                <MdOutlinePets size={24} className="flex-shrink-0 text-sec"/>
-                <p className="text-2xl hover:text-sec hover:decoration-2 focus:outline-hidden focus:decoration-2 dark:text-neutral-500 dark:hover:text-neutral-400 text-right">
-                  الحيوانات الأليفة:  {profileData.pets && (profileData.pets)}
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* Map */}
@@ -519,7 +475,7 @@ const ProfileCard: React.FC = () => {
                   : [51.505, -0.09]
               }
               zoom={profileData.latitude && profileData.longtitude ? 15 : 9}
-              height="400px"
+              height="300px"
               markers={
                 profileData.latitude && profileData.longtitude
                   ? [{

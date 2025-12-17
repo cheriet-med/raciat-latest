@@ -116,6 +116,7 @@ export default function Calculator({ property }: { property: Property }) {
                 <option value="60">60 شهرًا</option>
                 <option value="40">40 شهرًا</option>
                 <option value="30">30 شهرًا</option>
+                <option value="360">360 شهرًا</option>
               </select>
             </div>
             <fieldset>

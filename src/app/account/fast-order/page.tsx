@@ -5,8 +5,10 @@ import DashboardAdmin from "@/components/admin-dashboard/dashboard";
 import DashboardUser from "@/components/user-dashboard/orderUser";
 import DashboardPartner from "@/components/partner-dashboard/partner-dashboard";
 import OrdersAdminDashboard from "@/components/admin-dashboard/orders";
-
+import QuikOrders from "@/components/admin-dashboard/quikorders";
 import DashboardUserOrders from "@/components/user-dashboard/orders";
+import QuikOrderUser from "@/components/user-dashboard/quikorders";
+
 export default function ProtectedPage() {
   const { data: session, status } = useSession({ required: true });
 
@@ -23,5 +25,5 @@ export default function ProtectedPage() {
     </div>  
     </div>);
   }
-  return session?.user?.is_superuser? <OrdersAdminDashboard/> :  ( session?.user?.is_staff? <DashboardPartner/>:<DashboardUserOrders/>)
+  return session?.user?.is_superuser? <QuikOrders/> :  <QuikOrderUser/>
 }

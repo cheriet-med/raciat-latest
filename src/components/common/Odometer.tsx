@@ -5,7 +5,7 @@ import type Odometer from "odometer";
 import "odometer/themes/odometer-theme-default.css"
 
 type Props = {
-    value: number;
+    value: any;
 };
 
 export default function OdometerOnScroll({ value }: Props) {

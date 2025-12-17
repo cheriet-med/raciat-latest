@@ -9,7 +9,7 @@ import { FaFirstOrder } from "react-icons/fa";
 import { 
   X,
 } from 'lucide-react';
-import WishlistView from '../Data/wishlistShow';
+
 import { CgProfile } from "react-icons/cg";
 import { FaRegHeart } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -19,14 +19,18 @@ import { HiOutlineMenuAlt1 } from "react-icons/hi";
 import { useSession } from 'next-auth/react';
 import useFetchUser from '../requests/fetchUser';
 import ProfileCard from '../Data/userProfile';
-import OrderCart from '../Data/orderCardsUser';
-import AddOrderForm from '../requests/addOrder';
-import EditeOrderForm from '../requests/editeOrder';
+import PostListings from '../Data/postlistings';
+import RestaurantForm from '../requests/addRestaurantListing';
+import EditRestaurantForm from '../requests/editeRestaurantListing';
 import { RiArticleFill } from "react-icons/ri";
 import { HiTicket } from "react-icons/hi2";
+import MessagesComponent from '../Data/chat';
+import QuikeOrderUser from '../Data/quikordersuserpage';
+
 
 import { TbReorder } from "react-icons/tb";
 import { LuMessagesSquare } from "react-icons/lu";
+
 
 interface MenuItem {
   id: string;
@@ -62,7 +66,7 @@ interface Conversation {
 
 
 
-export default function EditeOrderDashboard() {
+export default function QuikOrderUser() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
     
@@ -77,7 +81,7 @@ export default function EditeOrderDashboard() {
   }, []);
 
 
-
+ 
 
 
 const menuItems: MenuItem[] = [
@@ -218,7 +222,7 @@ const menuItems: MenuItem[] = [
         {/* User Profile */}
         <div className="p-2 border-t border-gray-200">
           <div>
- 
+           
             <div className='flex gap-2 py-4 px-3 mr-6'>
               <div className='hover:bg-sec p-1 rounded-lg cursor-pointer' onClick={() => signOut({ callbackUrl: `/login` })}>
                 <FiLogOut size={24} className='text-white' />
@@ -232,7 +236,7 @@ const menuItems: MenuItem[] = [
       {/* Main Content Area */}
       <div className="min-h-screen flex flex-col lg:mr-80 pt-16 lg:pt-0">
         <main className="flex-grow p-4 md:p-6">
-          <EditeOrderForm />
+          <QuikeOrderUser/>
         </main>
       
         {/* Footer */}

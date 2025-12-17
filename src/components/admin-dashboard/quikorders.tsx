@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { signOut } from "next-auth/react";
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { FaFirstOrder } from "react-icons/fa";
+import { MdOutlineAttachEmail } from "react-icons/md";
 import { 
   X,
 } from 'lucide-react';
-import WishlistView from '../Data/wishlistShow';
+import PersonalInformation from '../Data/personalInfo';
+import { MdDashboard } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
 import { FaRegHeart } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -19,15 +20,16 @@ import { HiOutlineMenuAlt1 } from "react-icons/hi";
 import { useSession } from 'next-auth/react';
 import useFetchUser from '../requests/fetchUser';
 import ProfileCard from '../Data/userProfile';
-import OrderCart from '../Data/orderCardsUser';
-import AddOrderForm from '../requests/addOrder';
-import EditeOrderForm from '../requests/editeOrder';
+import { BsBuildingsFill } from "react-icons/bs";
 import { RiArticleFill } from "react-icons/ri";
 import { HiTicket } from "react-icons/hi2";
-
+import AnalyticsAdmin from '../Data/analyticsAdmin';
+import { RiChatSettingsFill } from "react-icons/ri";
+import { RiHomeGearFill } from "react-icons/ri";
 import { TbReorder } from "react-icons/tb";
 import { LuMessagesSquare } from "react-icons/lu";
-
+import { FaChartLine } from "react-icons/fa";
+import QuikeOrderTableAdmin from '../Data/quikorderadminpage';
 interface MenuItem {
   id: string;
   label: string;
@@ -62,7 +64,7 @@ interface Conversation {
 
 
 
-export default function EditeOrderDashboard() {
+export default function AccountInfo() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
     
@@ -77,48 +79,26 @@ export default function EditeOrderDashboard() {
   }, []);
 
 
-
-
-
-const menuItems: MenuItem[] = [
-  { id: 'الملف الشخصي', label: 'الملف الشخصي', icon: <CgProfile size={24} className='text-white'/>, href: '/account' },
-  { id: 'قائمة الرغبات', label: 'قائمة الرغبات', icon: <FaRegHeart size={24} className='text-white'/>, href: '/account/wishlist' },
-
  
-  ...(Users?.status === "blogger"
-    ? [{ id: 'المدونة', label: 'المدونة', icon: <RiArticleFill size={24} className='text-white'/>, href: '/account/posts' }]
-    : []
-  ),
 
+  const menuItems: MenuItem[] = [
+    { id: 'لوحة التحكم', label: 'لوحة التحكم', icon: <MdDashboard size={24} className='text-white'/>, href: '/account' },
+     { id: 'العقارات', label: 'العقارات', icon: <BsBuildingsFill size={24} className='text-white'/>, href: '/account/listings' },
+      { id: 'المدونة', label: 'المدونة', icon: <RiArticleFill size={24} className='text-white'/>, href: '/account/posts' },
+       { id: 'التذاكر والطلبات', label: 'التذاكر والطلبات', icon: <HiTicket size={24} className='text-white'/>, href: '/account/orders' },
+  
+    { id: 'إعدادات الطلبات', label: 'إعدادات الطلبات', icon: <RiChatSettingsFill size={24} className='text-white'/>, href: '/account/trips' },
+    { id: 'صندوق البريد الإلكتروني', label: 'صندوق البريد الإلكتروني', icon:  <MdOutlineAttachEmail size={24} className='text-white'/>, href: '/account/emails' },
+    
 
-    ...(Users?.status === "seller"
-    ? [{id: 'التذاكر والطلبات', label: 'التذاكر والطلبات', icon: <HiTicket size={24} className='text-white'/>, href: '/account/orders' },]
-    : []
-  ),
-      ...(Users?.status === "field"
-    ? [{id: 'التذاكر ', label: 'التذاكر ', icon: <HiTicket size={24} className='text-white'/>, href: '/account/ticket' },]
-    : []
-  ),
+   { id: 'اﻹحصائيات ', label: ' اﻹحصائيات', icon:<FaChartLine size={24} className='text-white'/>, href: '/account/statistics' },
+   { id: 'الطلبات السريعة ', label: ' الطلبات السريعة', icon:<TbReorder size={24} className='text-white'/>, href: '/account/fast-order' },
+   { id: 'الرسائل ', label: ' الرسائل', icon:<LuMessagesSquare size={24} className='text-white'/>, href: '/account/messages' },   
+   { id: 'إعدادت الصفحة الرئيسية ', label: ' إعدادات الصفحة الرئيسية', icon:<RiHomeGearFill size={24} className='text-white'/>, href: '/account/edite-home-page' },
 
- ...(Users?.status === "seller"
-    ? [{ id: 'الطلبات السريعة ', label: ' الطلبات السريعة', icon:<TbReorder size={24} className='text-white'/>, href: '/account/fast-order' },]
-    : []
-  ),
-  ...(Users?.status === "seller"
-    ? [{ id: 'الرسائل ', label: ' الرسائل', icon:<LuMessagesSquare size={24} className='text-white'/>, href: '/account/messages' },]
-    : []
-  ),
-    ...(Users?.status === "field"
-    ? [{ id: 'الرسائل ', label: ' الرسائل', icon:<LuMessagesSquare size={24} className='text-white'/>, href: '/account/messages' },]
-    : []
-  ),
-
-  { id: 'الطلبات', label: 'الطلبات', icon: <FaFirstOrder size={24} className='text-white'/>, href: '/account/trips' },
-  { id: 'إعدادت الحساب', label: 'أعدادات الحساب', icon:<IoSettingsOutline size={24} className='text-white'/>, href: '/account/personal-information' },
-  { id: 'الصفحة الرئيسية', label: 'الصفحة الرئيسية', icon: <IoHomeOutline size={24} className='text-white'/>, href: '/' },
-];
-
-
+    { id: 'إعدادت الحساب', label: 'أعدادات الحساب', icon:<IoSettingsOutline size={24} className='text-white'/>, href: '/account/personal-information' },
+    { id: 'الصفحة الرئيسية', label: 'الصفحة الرئيسية', icon: <IoHomeOutline size={24} className='text-white'/>, href: '/' },
+  ];
 
 
   const toggleMobileMenu = () => {
@@ -151,7 +131,7 @@ const menuItems: MenuItem[] = [
       {/* Sidebar - Always expanded */}
       <aside
         className={`
-          fixed right-0 top-0 h-full bg-prim border-l border-gray-200 z-50 transition-all duration-300 ease-in-out overflow-y-auto w-80
+          fixed right-0 top-0 h-full bg-prim border-l border-gray-200 z-50 transition-all duration-300 ease-in-out overflow-y-auto w-96
           ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
         `}
       >
@@ -218,7 +198,8 @@ const menuItems: MenuItem[] = [
         {/* User Profile */}
         <div className="p-2 border-t border-gray-200">
           <div>
- 
+
+           
             <div className='flex gap-2 py-4 px-3 mr-6'>
               <div className='hover:bg-sec p-1 rounded-lg cursor-pointer' onClick={() => signOut({ callbackUrl: `/login` })}>
                 <FiLogOut size={24} className='text-white' />
@@ -230,9 +211,9 @@ const menuItems: MenuItem[] = [
       </aside>
 
       {/* Main Content Area */}
-      <div className="min-h-screen flex flex-col lg:mr-80 pt-16 lg:pt-0">
+      <div className="min-h-screen flex flex-col lg:mr-96 pt-16 lg:pt-0">
         <main className="flex-grow p-4 md:p-6">
-          <EditeOrderForm />
+          <QuikeOrderTableAdmin />
         </main>
       
         {/* Footer */}
