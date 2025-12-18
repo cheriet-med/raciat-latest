@@ -7,6 +7,7 @@ import useFetchQuikeOrders from '../requests/fetchQuikOrders';
 import useFetchAllUser from '../requests/fetchAllUsers';
 import * as XLSX from 'xlsx';
 import { FaEye } from "react-icons/fa";
+import { IoTrashOutline } from "react-icons/io5";
 import Link from 'next/link';
 
 
@@ -15,6 +16,10 @@ const QuikeOrderTableAdmin = () => {
   const [lastUpdated, setLastUpdated] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteOrderId, setDeleteOrderId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
   const { AllNewsLetters } = useFetchAllNewsLetterEmails();
   const { orders, mutate } = useFetchQuikeOrders();
   const { AllUsers } = useFetchAllUser();
@@ -99,6 +104,39 @@ const QuikeOrderTableAdmin = () => {
     
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleDeleteClick = (orderId: number) => {
+    setDeleteOrderId(orderId);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteOrderId) return;
+    
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}testid/${deleteOrderId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+        }
+      });
+
+      if (res.ok) {
+        mutate();
+        setShowDeleteModal(false);
+        setDeleteOrderId(null);
+      } else {
+        throw new Error('فشل في حذف الطلب');
+      }
+    } catch (err) {
+      console.error('خطأ في حذف الطلب:', err);
+      alert('حدث خطأ أثناء حذف الطلب');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -274,6 +312,9 @@ const QuikeOrderTableAdmin = () => {
               <th className="px-6 py-3 text-2xl font-bold text-sec uppercase tracking-wider text-center">
                 موضف المبيعات
               </th>
+              <th className="px-6 py-3 text-2xl font-bold text-sec uppercase tracking-wider text-center">
+                الإجراءات
+              </th>
             </tr>
           </thead>
           <tbody className='bg-neutral'>
@@ -312,11 +353,20 @@ const QuikeOrderTableAdmin = () => {
                       </select>
                     </div>                             
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold text-prim" style={{ textAlign: 'center' }}>
+                    <button
+                      onClick={() => handleDeleteClick(subscriber.id)}
+                      className="text-prim hover:text-sec transition-colors duration-200"
+                      title="حذف الطلب"
+                    >
+                      <IoTrashOutline size={24} />
+                    </button>
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-white text-2xl">
+                <td colSpan={6} className="px-6 py-8 text-center text-white text-2xl">
                   لم يتم العثور على نتائج .
                 </td>
               </tr>
@@ -329,6 +379,38 @@ const QuikeOrderTableAdmin = () => {
       <div className="mt-4 text-2xl text-gray-500 text-center">
         يتم تحديث البيانات في الوقت الفعلي {lastUpdated && `• آخر تحديث: ${lastUpdated}`}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="rounded-2xl p-6 max-w-md mx-auto bg-white">
+            <h3 className="text-3xl font-bold text-sec mb-4 font-playfair">تأكيد الحذف</h3>
+            <p className="mb-6 text-gray-600 text-2xl">
+              هل أنت متأكد أنك تريد حذف هذا الطلب؟ هذا الإجراء لا يمكن التراجع عنه.
+            </p>
+            
+            <div className="flex justify-end space-x-3 gap-2">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteOrderId(null);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-md text-2xl font-medium text-gray-700 hover:bg-gray-50"
+                disabled={isDeleting}
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 bg-prim rounded-md text-2xl font-medium text-white hover:bg-sec disabled:bg-red-400"
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'جاري الحذف...' : 'حذف'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     
     </div>
   );

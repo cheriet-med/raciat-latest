@@ -12,6 +12,10 @@ import { VscUnverified } from "react-icons/vsc";
 import { FiFilter } from "react-icons/fi";
 import { GrClearOption } from "react-icons/gr";
 import { FaCircleUser } from "react-icons/fa6";
+import { useSession } from 'next-auth/react';
+import { MdViewCompactAlt } from "react-icons/md";
+import { useRouter } from 'next/navigation';
+import { IoChatboxEllipses } from "react-icons/io5";
 
 // Define interfaces for type safety
 interface Booking {
@@ -61,8 +65,8 @@ import useFetchAllBookings from '../requests/fetchAllBookings';
 
 const OrdersTable = () => {
   const { AllUsers } = useFetchAllUser();
- const { AllBookings, mutate, isLoading, error } = useFetchAllBookings();
-  
+  const { AllBookings, mutate, isLoading, error } = useFetchAllBookings();
+  const router = useRouter();
   // Extract the array from the hook response
 
   
@@ -73,9 +77,13 @@ const OrdersTable = () => {
   const [filterByReason, setFilterByReason] = useState<string | null>(null);
   const [expandedOrder, setExpandedOrder] = useState<number | null>(null);
   const [deleteOrderId, setDeleteOrderId] = useState<number | null>(null);
-
+  const { data: session, status } = useSession({ required: true });
   // Get user data for a specific user ID
   const getUserData = (userId: number) => {
+    return AllUsers?.find(user => user.id === userId) || null;
+  };
+
+  const getUserResponsable = (userId: any) => {
     return AllUsers?.find(user => user.id === userId) || null;
   };
 
@@ -122,7 +130,7 @@ const OrdersTable = () => {
           'Content-Type': 'application/json',
           "Authorization": "Token " +process.env.NEXT_PUBLIC_TOKEN,
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus , responsable:session?.user?.id })
       });
 
       if (!res.ok) throw new Error('فشل في تحديث الحالة');
@@ -144,7 +152,7 @@ const OrdersTable = () => {
           'Content-Type': 'application/json',
           "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
         },
-        body: JSON.stringify({ representative: representativeId === "" ? null : parseInt(representativeId) })
+        body: JSON.stringify({ representative: representativeId === "" ? null : parseInt(representativeId), responsable:session?.user?.id })
       });
 
       if (!res.ok) throw new Error('فشل في تحديث الممثل');
@@ -368,6 +376,22 @@ const stripHtmlTags = (html: string | null | undefined) => {
               {expandedOrder === order.id && (
                 <div className="border-t border-gray-200 bg-gray-50">
                   <div className="p-6">
+                     <div className="bg-prim p-4 my-4 rounded-lg shadow-sm">
+                        <h6 className="font-playfair font-medium text-sec mb-3 flex items-center">
+                          <MdViewCompactAlt className="h-8 w-8 ml-2 text-sec" />
+تفاصيل معاينة الطلب                        </h6>
+                        <div className="space-y-3 text-2xl text-white">
+                          <div>موضف المبيعات المسؤول عن دراسة الطلب والتعيين :     {order.responsable
+  ? getUserResponsable(Number(order.responsable))?.full_name
+  : 'غير متوفر'}</div>
+ {session?.user?.id === order.responsable ? "":
+  order.responsable && ( <div className="space-y-3 text-2xl text-white flex gap-2">
+                        فتح دردشة  <IoChatboxEllipses className='text-sec hover:text-white cursor-pointer' size={32} onClick={()=>router.push(`/account/messages/?id=${order.responsable}`)}/>
+                        </div>)}
+                        </div>
+
+
+                      </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       
                       {/* Property details */}
@@ -443,6 +467,11 @@ const stripHtmlTags = (html: string | null | undefined) => {
                               ))}
                             </select>
                           </div>
+                          {order.representative && (
+                            <div className='flex gap-2 py-2'> فتح دردشة مع الموضف الميداني <IoChatboxEllipses className='text-sec hover:text-white cursor-pointer' size={32} onClick={()=>router.push(`/account/messages/?id=${order.representative}`)} />
+                         </div>
+                          )}
+
                           <div>الاستعجال: {order.hurry || 'عادي'}</div>
                           <div>تاريخ الإنشاء: {order.created_at}</div>
                           <div>آخر تحديث: {order.updated_at || 'لا يوجد'}</div>

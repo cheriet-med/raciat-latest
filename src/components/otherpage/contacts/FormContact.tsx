@@ -147,19 +147,19 @@ export default function FormContact() {
                         <h5 className="mb_12">تابعنا:</h5>
                         <ul className="tf-social d-flex gap_24">
                             <li>
-                                <a href="#" className="icon-FacebookLogo"></a>
+                                <a href="https://web.facebook.com/" className="icon-FacebookLogo"></a>
                             </li>
                             <li>
-                                <a href="#" className="icon-XLogo"></a>
+                                <a href="https://x.com/" className="icon-XLogo"></a>
                             </li>
                             <li>
-                                <a href="#" className="icon-TiktokLogo"></a>
+                                <a href="https://www.tiktok.com/" className="icon-TiktokLogo"></a>
                             </li>
                             <li>
-                                <a href="#" className="icon-InstagramLogo"></a>
+                                <a href="https://www.instagram.com/" className="icon-InstagramLogo"></a>
                             </li>
                             <li>
-                                <a href="#" className="icon-YoutubeLogo"></a>
+                                <a href="https://www.youtube.com/" className="icon-YoutubeLogo"></a>
                             </li>
                         </ul>
                     </div>

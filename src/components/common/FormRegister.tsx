@@ -27,47 +27,46 @@ export default function FormRegister() {
   const [error3, setError3] = useState("");
 
   const [email, setEmail] = useState('');
-
-  const isValidEmail = async (email: string): Promise<{ valid: boolean; message?: string }> => {
+const isValidEmail = async (email: string): Promise<{ valid: boolean; message?: string }> => {
     if (!email || email.trim() === "") {
-      return { valid: false, message: 'Email-is-required' };
+        return { valid: false, message: 'البريد الإلكتروني مطلوب' };
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return { valid: false, message: 'Invalid-email-format' };
+        return { valid: false, message: 'صيغة البريد الإلكتروني غير صالحة' };
     }
 
     if (!MailChecker.isValid(email)) {
-      return { valid: false, message: 'Disposable-emails' };
+        return { valid: false, message: 'البريد الإلكتروني المؤقت غير مسموح به' };
     }
 
     return { valid: true };
-  };
+};
 
-  const validatePassword = (password: string): string | null => {
+const validatePassword = (password: string): string | null => {
     if (password.length < 8) {
-      return '8-characters';
+        return 'يجب أن تتكون كلمة المرور من 8 أحرف على الأقل';
     }
 
     if (!/[A-Z]/.test(password)) {
-      return 'uppercase';
+        return 'يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل';
     }
 
     if (!/[a-z]/.test(password)) {
-      return 'lowercase';
+        return 'يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل';
     }
 
     if (!/[0-9]/.test(password)) {
-      return 'number';
+        return 'يجب أن تحتوي كلمة المرور على رقم واحد على الأقل';
     }
 
     if (!/[!@#$%^&*]/.test(password)) {
-      return 'character';
+        return 'يجب أن تحتوي كلمة المرور على رمز خاص واحد على الأقل (!@#$%^&*)';
     }
 
     return null;
-  };
+};
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -82,67 +81,64 @@ export default function FormRegister() {
     const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
 
-    // Validate email
-    const emailValidation = await isValidEmail(email);
-    if (!emailValidation.valid) {
-      setError1(emailValidation.message || 'Invalid-email');
-      setIsLoading(false);
-      return;
-    }
+// التحقق من صحة البريد الإلكتروني
+const emailValidation = await isValidEmail(email);
+if (!emailValidation.valid) {
+    setError1(emailValidation.message || 'بريد إلكتروني غير صالح');
+    setIsLoading(false);
+    return;
+}
 
-    // Validate password
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-      setError2(passwordError);
-      setIsLoading(false);
-      return;
-    }
+// التحقق من صحة كلمة المرور
+const passwordError = validatePassword(password);
+if (passwordError) {
+    setError2(passwordError);
+    setIsLoading(false);
+    return;
+}
 
-    // Check if passwords match
-    if (password !== confirmPassword) {
-      setError3('Passwords-do-not-match');
-      setIsLoading(false);
-      return;
-    }
+// التحقق من تطابق كلمات المرور
+if (password !== confirmPassword) {
+    setError3('كلمات المرور غير متطابقة');
+    setIsLoading(false);
+    return;
+}
 
-    
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}auth/users/`, {
+try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}auth/users/`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-      });
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-        // Handle specific error messages from the API
+    if (!response.ok) {
+        // معالجة رسائل الخطأ المحددة من API
         if (data.email) {
-          setError1(data.email[0] || 'Email-error');
+            setError1(data.email[0] || 'خطأ في البريد الإلكتروني');
         } else if (data.password) {
-          setError2(data.password[0] || 'Password-error');
+            setError2(data.password[0] || 'خطأ في كلمة المرور');
         } else {
-          setError(data.detail || 'Registration-failed');
+            setError(data.detail || 'فشل في التسجيل');
         }
         setIsLoading(false);
         return;
-      }
-
-      // Registration successful
-      console.log("success");
-      // Optionally redirect to login or dashboard
-      router.push('/login');
-      
-    } catch (err) {
-      setError('An-error-occurred-during-registration');
-      console.error('Registration-error:', err);
-    } finally {
-      setIsLoading(false);
     }
-  };
 
+    // التسجيل ناجح
+    console.log("تم التسجيل بنجاح");
+    // يمكن إعادة التوجيه إلى صفحة تسجيل الدخول أو لوحة التحكم
+    router.push('/login');
+    
+} catch (err) {
+    setError('حدث خطأ أثناء عملية التسجيل');
+    console.error('خطأ في التسجيل:', err);
+} finally {
+    setIsLoading(false);
+}};
     return (
         <div className="tf-container tf-spacing-1" dir="rtl">
             <div className="row justify-content-center">

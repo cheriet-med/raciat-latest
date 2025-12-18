@@ -38,8 +38,8 @@ export default function Map3() {
                 markerElement.innerHTML = `<i class="icon-HouseLine"></i>`;
                 const popupContent = `
                     <div class="office-popup">
-                        <div class="text-title text_primary-color fw-6 mb_4">My Office</div>
-                        <p>101 E 129th St, East Chicago, 2nd Floor, NY</p>
+                        <div class="text-title text_primary-color fw-6 mb_4">موقعنا</div>
+                        <p>شجاع بن وهب، عبدالرحمن السديري، جدة 23436، المملكة العربية السعودية</p>
                     </div>
                 `;
 

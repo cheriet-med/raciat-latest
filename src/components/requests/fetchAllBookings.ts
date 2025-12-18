@@ -55,6 +55,7 @@ interface Bookings {
   surface?: string;
   types?: string;
   updated_at?: string;
+  responsable?: string;
 }
 
 

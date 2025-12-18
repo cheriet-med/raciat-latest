@@ -19,7 +19,7 @@ import { MdWarning } from "react-icons/md";
 import { FaStar } from "react-icons/fa";
 import { IoChatboxEllipses } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
-
+import useFetchAllBookings from '../requests/fetchAllBookings';
 
 const UserAccordionDisplay = () => {
   const { AllUsers, mutate } = useFetchAllUser();
@@ -33,6 +33,8 @@ const UserAccordionDisplay = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [trustUserId, setTrustUserId] = useState<number | null>(null);
   const [selectedTrust, setSelectedTrust] = useState<string>('');
+  const { AllBookings, isLoading, error } = useFetchAllBookings();
+
   const router = useRouter();
   const filteredUsers = useMemo(() => {
     if (!AllUsers) return [];
@@ -154,6 +156,8 @@ const UserAccordionDisplay = () => {
   const getDisplayTitle = (user: any) => {
     return user.title || user.types || 'مستخدم';
   };
+
+
 
   if (!AllUsers || AllUsers.length === 0) {
     return (
@@ -412,20 +416,72 @@ const UserAccordionDisplay = () => {
                        اﻹحصائيات الشخصية
                       </h6>
                       <div className="space-y-3 text-2xl text-white">
-                        <div>عدد التداكر: {user.location || 'غير متوفر'}</div>
-                        <div>عدد الصفقات: {user.want_to_go || 'غير متوفر'}</div>
-                        <div>إجمالي مبلغ الصفقات المحصل:  {user.obsessed || 'غير متوفر'}</div>
-                        <div>إجمالي مبلغ التداكر: {user.want_to_go || 'غير متوفر'}</div>
-                       <div>إجمالي المبلغ الغير محصل: {user.want_to_go || 'غير متوفر'}</div>
+                        <div>عدد التذاكر: {
+  AllBookings.filter(booking =>
+    booking.user === user.id ||
+    (booking.representative && +booking.representative === user.id) ||
+    (booking.responsable && +booking.responsable === user.id)
+  ).length || 'غير متوفر'
+}
+
+
+
+
+</div>
+                        <div>عدد الصفقات: {
+  AllBookings.filter(booking =>
+    booking.status === "منتهي" && (
+      booking.user === user.id ||
+      Number(booking.representative) === user.id ||
+      Number(booking.responsable) === user.id
+    )
+  ).length || 'غير متوفر'
+}
+</div>
+                        <div>إجمالي مبلغ الصفقات المحصل:  SAR{
+  AllBookings
+    .filter(booking =>
+      booking.status === "منتهي" && (
+        booking.user === user.id ||
+        Number(booking.representative) === user.id ||
+        Number(booking.responsable) === user.id
+      )
+    )
+    .reduce((sum, booking) => sum + (Number(booking.price) || 0), 0) || 'غير متوفر'
+}
+</div>
+                        <div>إجمالي مبلغ التذاكر:  SAR{
+  AllBookings.reduce((sum, booking) => {
+    const isRelatedUser =
+      booking.user === user.id ||
+      Number(booking.representative) === user.id ||
+      Number(booking.responsable) === user.id;
+
+    return isRelatedUser ? sum + (Number(booking.price) || 0) : sum;
+  }, 0) || 'غير متوفر'
+}
+</div>
+                       <div>إجمالي المبلغ الغير محصل: SAR{
+  (() => {
+    const result = AllBookings
+      .filter(booking =>
+        booking.status !== "منتهي" && (
+          booking.user === user.id ||
+          Number(booking.representative) === user.id ||
+          Number(booking.responsable) === user.id
+        )
+      )
+      .reduce((sum, booking) => sum + (Number(booking.price) || 0), 0);
+
+    return result > 0 ? result : 'غير متوفر';
+  })()
+}
+</div>
                       </div>
                     </div>
                 </div>
                 
                 <div className='flex justify-end gap-4 p-4'>
-                    {user.status == "blogger" && (
-                       <IoChatboxEllipses className='text-sec hover:text-prim cursor-pointer' size={32} onClick={()=>router.push(`/account/messages/?id=10`)}/>
-                    )}
-
                     {user.status == "seller" && (
                        <IoChatboxEllipses className='text-sec hover:text-prim cursor-pointer' size={32} onClick={()=>router.push(`/account/messages/?id=10`)}/>
                     )}

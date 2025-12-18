@@ -69,6 +69,8 @@ interface AlUsers {
   time_spend:string;
   is_superuser:string;
   premium_plan:string;
+  representative:string;
+  responsable:string
 }
 
 const useFetchAllUser = () => {

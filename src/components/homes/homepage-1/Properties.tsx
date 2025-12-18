@@ -13,7 +13,7 @@ import { useSession } from "next-auth/react";
 import LoginButton from "@/components/header/loginButton";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 
-// =============== SKELETON COMPONENTS ===============
+
 
 const PropertyCardSkeleton = () => (
     <div className="card-house style-default animate-pulse">
@@ -92,7 +92,6 @@ const PropertiesGridSkeleton = ({ isMobile }: { isMobile: boolean }) => {
     );
 };
 
-// =============== MAIN COMPONENT ===============
 
 export default function Properties() {
     const [isMobile, setIsMobile] = useState(false);
@@ -102,10 +101,19 @@ export default function Properties() {
     const { listings, isLoading } = useFetchListing(); 
     const { data: session, status } = useSession();
 
+  
+
+    // Filter visible listings - Simple boolean check
+    const visibleListings = listings?.filter(listing => {
+        console.log(`Checking listing ${listing.id}: is_visible =`, listing.is_visible, "type:", typeof listing.is_visible);
+        return listing.is_visible === true;
+    });
+
+
     // Fetch wishlist status for all properties
     useEffect(() => {
         const fetchWishlistStatus = async () => {
-            if (status === "authenticated" && listings) {
+            if (status === "authenticated" && visibleListings) {
                 try {
                     const response = await fetch(
                         `${process.env.NEXT_PUBLIC_URL}wishlist/${session?.user?.id}/`,
@@ -120,6 +128,7 @@ export default function Properties() {
                         // Create a map of product IDs that are in wishlist
                         const wishlistMap: Record<number, boolean> = {};
                         data.forEach((item: any) => {
+                            // Only add to wishlist map if the property is visible
                             wishlistMap[item.product.id] = true;
                         });
                         setWishlistItems(wishlistMap);
@@ -130,7 +139,7 @@ export default function Properties() {
             }
         };
         fetchWishlistStatus();
-    }, [status, session?.user?.id, listings]);
+    }, [status, session?.user?.id, visibleListings]);
 
     const toggleWishlist = async (propertyId: number) => {
         if (status !== "authenticated") return;
@@ -178,9 +187,10 @@ export default function Properties() {
         return () => window.removeEventListener("resize", checkScreen);
     }, []);
 
+    // Apply category filter to visible listings only
     const filteredListings = selectedCategory === "الكل" 
-        ? listings 
-        : listings?.filter(property => property.types === selectedCategory);
+        ? visibleListings 
+        : visibleListings?.filter(property => property.types === selectedCategory);
 
     const categories = [
         { name: "الكل", label: "الكل" },
@@ -350,8 +360,8 @@ export default function Properties() {
                     </div>
                 )}
                 
-                {/* View All Button - Only show when data is loaded */}
-                {!isLoading && listings && (
+                {/* View All Button - Only show when data is loaded and there are visible listings */}
+                {!isLoading && visibleListings && visibleListings.length > 0 && (
                     <Link
                         href={`/listing-topmap-grid?q=${"الكل"}`}
                         className="tf-btn btn-bg-1 mx-auto btn-px-32 scrolling-effect effectBottom"

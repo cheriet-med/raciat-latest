@@ -256,7 +256,7 @@ const connectWebSocket = useCallback(() => {
       });
       //console.log('Response status:', response.status);
       if (!response.ok) {
-        throw new Error('Failed to fetch conversations');
+        throw new Error('فشل في جلب المحادثات');
       }
       
       const data = await response.json();
@@ -279,7 +279,7 @@ const connectWebSocket = useCallback(() => {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch messages');
+        throw new Error('فشل في جلب الرسائل');
       }
       
       const data = await response.json();
@@ -318,7 +318,7 @@ const connectWebSocket = useCallback(() => {
           : convo
       ));
     } catch (err) {
-      console.error('Failed to mark messages as read:', err);
+      console.error('فشل في وضع علامة "مقروء" على الرسائل:', err);
     }
   };
 
@@ -597,7 +597,7 @@ const sendMessage = async () => {
           </div>
         </div>
         <div className="hidden md:flex flex-1 flex-col items-center justify-center bg-gray-50">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sec"></div>
           <p className="mt-4 text-gray-500">جاري التحميل...</p>
         </div>
       </div>
@@ -706,7 +706,7 @@ const sendMessage = async () => {
               <p className="mb-2">{error}</p>
               <button 
                 onClick={() => selectedContact && fetchMessages(selectedContact.id)}
-                className="text-sm bg-highlights text-white px-3 py-1 rounded hover:bg-red-200"
+                className="text-sm bg-sec text-white px-3 py-1 rounded hover:bg-red-200"
               >
                 أعد المحاولة
               </button>
@@ -819,7 +819,7 @@ const sendMessage = async () => {
                 <div className="text-secondary mb-2">{error}</div>
                 <button 
                   onClick={fetchConversations}
-                  className="text-sm bg-highlights text-white px-3 py-1 rounded hover:bg-secondary hover:text-white"
+                  className="text-sm bg-sec text-white px-3 py-1 rounded hover:bg-secondary hover:text-white"
 
                 >
                   أعد المحاولة

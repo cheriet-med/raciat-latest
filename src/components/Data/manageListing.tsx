@@ -2,10 +2,11 @@
 
 import { CiCircleChevDown } from "react-icons/ci";
 import React, { useState, useRef, useEffect } from 'react';
-import { IoSettingsOutline, IoCreateOutline, IoTrashOutline, IoEyeOutline } from "react-icons/io5";
+import { IoSettingsOutline, IoCreateOutline, IoTrashOutline, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { AiOutlineDownCircle } from "react-icons/ai";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from 'next-auth/react';
 
 interface DropdownItem {
   label: string;
@@ -126,11 +127,23 @@ const Dropdown: React.FC<DropdownProps> = ({
   );
 };
 
-const ManageListing = ({ id, category, mutate }: { id: string; category: string | null, mutate?: () => Promise<any> }) => {
+const ManageListing = ({ 
+  id, 
+  category, 
+  isVisible = true,
+  mutate 
+}: { 
+  id: string; 
+  category: string | null;
+  isVisible?: boolean;
+  mutate?: () => Promise<any>;
+}) => {
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-
+  const [isToggling, setIsToggling] = useState(false);
+  const [visible, setVisible] = useState(isVisible);
+  const { data: session, status } = useSession({ required: true });
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
@@ -154,6 +167,54 @@ const ManageListing = ({ id, category, mutate }: { id: string; category: string 
       setShowDeleteModal(false);
     }
   };
+const handleToggleVisibility = async () => {
+  setIsToggling(true);
+  try {
+    // First, get the current listing data
+    const getResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}productid/${id}`, {
+      method: "GET",
+      headers: {
+        "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!getResponse.ok) {
+      throw new Error('فشل في جلب بيانات العقار');
+    }
+
+    const currentData = await getResponse.json();
+    
+    // Create the updated data with all required fields
+    const updatedData = {
+      ...currentData, // Keep all existing fields
+      is_visible: !visible // Toggle the visibility
+    };
+
+    // Send the PUT request with complete data
+    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}productid/${id}`, {
+      method: "PUT",
+      headers: {
+        "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedData),
+    });
+
+    if (response.ok) {
+      setVisible(!visible);
+      if (mutate) await mutate();
+      console.log('تم تغيير حالة الظهور بنجاح');
+    } else {
+      const errorData = await response.json();
+      console.error('فشل في تغيير حالة الظهور:', errorData);
+    }
+  } catch (error) {
+    console.error('حدث خطأ أثناء تغيير حالة الظهور:', error);
+  } finally {
+    setIsToggling(false);
+  }
+};
 
   const dropdownItems: DropdownItem[] = [
     { 
@@ -161,6 +222,12 @@ const ManageListing = ({ id, category, mutate }: { id: string; category: string 
       href: `/account/edit-hotel-listing?q=${id}`, 
       type: 'link',
       icon: <IoCreateOutline className="h-6 w-6" />
+    },
+    { 
+      label: visible ? 'إخفاء' : 'إظهار', 
+      onClick: handleToggleVisibility, 
+      type: 'button',
+      icon: visible ? <IoEyeOffOutline className="h-6 w-6" /> : <IoEyeOutline className="h-6 w-6" />
     },
     { 
      label: 'حذف', 

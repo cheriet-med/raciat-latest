@@ -13,16 +13,9 @@ export default function Hero() {
 
   return (
     <div className="page-title style-1">
-      <div className="thumbs effect-content-slide" style={{ height: '650px', maxHeight: '650px' }}>
-        {isLoading ? (
-          // Skeleton loader
-          <div className="relative w-full h-full bg-gray-200 animate-pulse">
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-shimmer"></div>
-            {/* Navigation button skeletons */}
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-gray-300 rounded-full"></div>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-gray-300 rounded-full"></div>
-          </div>
-        ) : (
+      {/* Mobile: 400px, Tablet+: 650px */}
+      <div className="thumbs effect-content-slide h-[400px] md:h-[650px] max-h-[650px]">
+
           <Swiper
             modules={[Navigation, Autoplay]}
             navigation={{
@@ -32,11 +25,10 @@ export default function Hero() {
             autoplay={{ delay: 4000, disableOnInteraction: false }}
             spaceBetween={10}
             loop={true}
-            className="swiper"
-            style={{ height: '100%' }}
+            className="swiper h-full"
           >
             <SwiperSlide>
-              <div className="slide-inner effect-img-zoom" style={{ height: '100%' }}>
+              <div className="slide-inner effect-img-zoom h-full">
                 <Image
                   className="img-zoom"
                   src={post?.hero_1 ? `${process.env.NEXT_PUBLIC_IMAGE}/${post?.hero_1}` : "/hero1.avif"}
@@ -49,7 +41,7 @@ export default function Hero() {
               </div>
             </SwiperSlide>
             <SwiperSlide>
-              <div className="slide-inner effect-img-zoom" style={{ height: '100%' }}>
+              <div className="slide-inner effect-img-zoom h-full">
                 <Image
                   className="img-zoom"
                   src={post?.hero_2 ? `${process.env.NEXT_PUBLIC_IMAGE}/${post?.hero_2}` : "/hero3.avif"}
@@ -68,7 +60,7 @@ export default function Hero() {
               <i className="icon-CaretRight"></i>
             </div>
           </Swiper>
-        )}
+        
       </div>
       <SidebarFilterDefault />
       
