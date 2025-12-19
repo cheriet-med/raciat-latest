@@ -3,6 +3,16 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 
+// Helper to get the correct API URL based on environment
+const getApiUrl = () => {
+  // For server-side calls in Docker, use internal URL
+  if (typeof window === 'undefined') {
+    return process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_URL;
+  }
+  // For client-side calls, use public URL
+  return process.env.NEXT_PUBLIC_URL;
+};
+
 // Extend the User and Session types in next-auth
 declare module "next-auth" {
   interface User {
@@ -20,7 +30,6 @@ declare module "next-auth" {
     phoneNumber?: string | null;
     access_token?: string;
     refresh_token?: string;
-
   }
 
   interface Session {
@@ -63,7 +72,8 @@ async function refreshAccessToken(token: any) {
       return { ...token, error: "NoRefreshToken" };
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}auth/jwt/refresh/`, {
+    const API_URL = getApiUrl();
+    const response = await fetch(`${API_URL}auth/jwt/refresh/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refresh: token.refreshToken }),
@@ -80,8 +90,7 @@ async function refreshAccessToken(token: any) {
     return {
       ...token,
       accessToken: refreshedTokens.access,
-      // Set expiration to 23 hours (just before session expires)
-      accessTokenExpires: Date.now() + 23 * 60 * 60 * 1000,
+      accessTokenExpires: Date.now() + 23 * 60 * 60 * 1000, // 23 hours
       refreshToken: refreshedTokens.refresh ?? token.refreshToken,
       error: undefined,
     };
@@ -97,8 +106,8 @@ async function refreshAccessToken(token: any) {
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
           scope: "openid email profile",
@@ -122,9 +131,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async authorize(credentials) {
         try {
+          const API_URL = getApiUrl();
+          console.log("Using API URL for credentials login:", API_URL);
+
           // Step 1: Fetch JWT token
           const tokenResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_URL}auth/jwt/create/`,
+            `${API_URL}auth/jwt/create/`,
             {
               method: "POST",
               headers: {
@@ -138,7 +150,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           );
 
           if (!tokenResponse.ok) {
-            console.error("Failed to fetch token:", tokenResponse.statusText);
+            const errorText = await tokenResponse.text();
+            console.error("Failed to fetch token:", tokenResponse.status, errorText);
             return null;
           }
 
@@ -146,9 +159,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const accessToken = tokenData.access;
           const refreshToken = tokenData.refresh;
 
+          console.log("Successfully received tokens");
+
           // Step 2: Fetch user data using the token
           const userResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_URL}api/user/`,
+            `${API_URL}api/user/`,
             {
               method: "GET",
               headers: {
@@ -158,11 +173,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           );
 
           if (!userResponse.ok) {
-            console.error("Failed to fetch user:", userResponse.statusText);
+            const errorText = await userResponse.text();
+            console.error("Failed to fetch user:", userResponse.status, errorText);
             return null;
           }
 
           const user = await userResponse.json();
+          console.log("Successfully fetched user data");
 
           // Return the user object with all fields including tokens
           return {
@@ -198,12 +215,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     async signIn({ user, account, profile }) {
+      const API_URL = getApiUrl();
+      
       // Handle Google OAuth sign-in
       if (account?.provider === "google") {
         try {
-          // Check if user exists in Django backend
+          console.log("Processing Google OAuth sign-in");
+          
+          // Authenticate with Django backend
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_URL}auth/o/google-oauth2/`,
+            `${API_URL}auth/o/google-oauth2/`,
             {
               method: "POST",
               headers: {
@@ -213,21 +234,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 access_token: account?.access_token,
                 id_token: account?.id_token,
                 code: account?.code,
-                redirect_uri: `${process.env.NEXT_PUBLIC_URL}api/auth/callback/google`
+                redirect_uri: `${process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback/google`
               })
             }
           );
 
+          if (!response.ok) {
+            console.error("Google OAuth backend error:", response.status);
+            return false;
+          }
+
           const data = await response.json();
+          console.log("Google OAuth backend response received");
           
           // Fetch user details from Django
           const userResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_URL}auth/email-login-register-cbv/`,
+            `${API_URL}auth/email-login-register-cbv/`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: "Token 01cd78564b89c883bfa1e55bc3f890d6bb6f916b",
+                Authorization: `Token ${process.env.NEXT_PUBLIC_TOKEN}`,
               },
               body: JSON.stringify({ email: user?.email || data?.email })
             } 
@@ -237,6 +264,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             const userData = await userResponse.json();
             const djangoUser = userData.user;
             const tokens = userData.tokens;
+
+            console.log("Successfully fetched Django user data for Google OAuth");
 
             // Update user object with Django data
             user.id = djangoUser.id;
@@ -258,15 +287,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return true;
         } catch (error) {
           console.error("Google OAuth error:", error);
-          return true;
+          return false;
         }
       }
 
       // Handle Facebook OAuth sign-in
       if (account?.provider === "facebook") {
         try {
+          console.log("Processing Facebook OAuth sign-in");
+          
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_URL}auth/o/facebook/`,
+            `${API_URL}auth/o/facebook/`,
             {
               method: "POST",
               headers: {
@@ -278,37 +309,46 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             }
           );
 
-          if (response.ok) {
-            const data = await response.json();
-            
-            // Fetch user details from Django
-            const userResponse = await fetch(
-              `${process.env.NEXT_PUBLIC_URL}api/user/`,
-              {
-                method: "GET",
-                headers: {
-                  Authorization: `JWT ${data.access}`,
-                },
-              }
-            );
-
-            if (userResponse.ok) {
-              const userData = await userResponse.json();
-              // Update user object with Django data
-              user.id = userData.id;
-              user.full_name = userData.full_name;
-              user.is_superuser = userData.is_superuser;
-              user.address_line_1 = userData.address_line_1;
-              user.address_line_2 = userData.address_line_2;
-              user.city = userData.city;
-              user.state = userData.state;
-              user.postalCode = userData.postalCode;
-              user.countryCode = userData.countryCode;
-              user.phoneNumber = userData.phoneNumber;
-              user.access_token = data.access;
-              user.refresh_token = data.refresh;
-            }
+          if (!response.ok) {
+            console.error("Facebook OAuth backend error:", response.status);
+            return false;
           }
+
+          const data = await response.json();
+          console.log("Facebook OAuth backend response received");
+          
+          // Fetch user details from Django
+          const userResponse = await fetch(
+            `${API_URL}api/user/`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `JWT ${data.access}`,
+              },
+            }
+          );
+
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            console.log("Successfully fetched Django user data for Facebook OAuth");
+            
+            // Update user object with Django data
+            user.id = userData.id;
+            user.email = userData.email;
+            user.full_name = userData.full_name;
+            user.is_superuser = userData.is_superuser;
+            user.is_staff = userData.is_staff;
+            user.address_line_1 = userData.address_line_1;
+            user.address_line_2 = userData.address_line_2;
+            user.city = userData.city;
+            user.state = userData.state;
+            user.postalCode = userData.postalCode;
+            user.countryCode = userData.countryCode;
+            user.phoneNumber = userData.phoneNumber;
+            user.access_token = data.access;
+            user.refresh_token = data.refresh;
+          }
+          
           return true;
         } catch (error) {
           console.error("Facebook OAuth error:", error);
@@ -338,8 +378,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.phoneNumber = user.phoneNumber;
         token.accessToken = user.access_token;
         token.refreshToken = user.refresh_token;
-        // Set token to expire in 23 hours (before session expires)
-        token.accessTokenExpires = Date.now() + 23 * 60 * 60 * 1000;
+        token.accessTokenExpires = Date.now() + 23 * 60 * 60 * 1000; // 23 hours
         token.error = undefined;
         
         return token;
@@ -390,4 +429,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: "/login", 
   },
+  debug: process.env.NODE_ENV === "development",
 });
