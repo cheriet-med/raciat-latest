@@ -106,7 +106,7 @@ export default function Properties() {
     // Filter visible listings - Simple boolean check
     const visibleListings = listings?.filter(listing => {
         console.log(`Checking listing ${listing.id}: is_visible =`, listing.is_visible, "type:", typeof listing.is_visible);
-        return listing.is_visible === true;
+        return listing.is_visible === false;
     });
 
 
