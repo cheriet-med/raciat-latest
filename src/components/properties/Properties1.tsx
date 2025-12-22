@@ -1,10 +1,8 @@
 "use client";
-import { allProperties } from "@/data/properties";
 import Image from "next/image";
 import React, { useEffect, useRef, useState, useReducer, Suspense } from "react";
-import { initialState, reducer } from "@/context/propertiesFilterReduce";
+import { initialState, reducer, Listing } from "@/context/propertiesFilterReduce";
 import Pagination from "@/components/common/Pagination";
-import type { Property } from "@/data/properties";
 import SidebarFilter1 from "../common/SidebarFilter1";
 import Map from "../common/Map";
 import DropdownSelect2 from "../common/DropdownSelect2";
@@ -21,6 +19,25 @@ function parseSizeValue(val: string) {
     if (val === "Min (SqFt)" || val === "Max (SqFt)") return val;
     return val.replace(/[^0-9]/g, "");
 }
+
+// Helper function to check if a property is visible
+const isPropertyVisible = (property: Listing) => {
+    return property.is_visible === true ||
+           String(property.is_visible).toLowerCase() === "true";
+};
+
+// Helper function to safely convert string | null to number
+const safeParseInt = (value: string | null, defaultValue: number = 0): number => {
+    if (!value) return defaultValue;
+    const parsed = parseInt(value, 10);
+    return isNaN(parsed) ? defaultValue : parsed;
+};
+
+// Helper function to safely convert price number | null to number
+const safeParsePrice = (value: number | null, defaultValue: number = 0): number => {
+    if (value === null || value === undefined) return defaultValue;
+    return value;
+};
 
 // Separate component for search params
 function PropertiesContent() {
@@ -142,7 +159,9 @@ function PropertiesContent() {
     useEffect(() => {
         if (!listings) return;
 
-        let filteredList: any[] = [...listings];
+        // Cast listings to Listing[] type and apply visibility filter first
+        const listingsArray = listings as unknown as Listing[];
+        let filteredList = listingsArray.filter(property => isPropertyVisible(property));
 
         // Category filter from tabs (للإيجار or للبيع)
         if (category) {
@@ -165,31 +184,31 @@ function PropertiesContent() {
             );
         }
 
-        // Bedrooms filter
+        // Bedrooms filter - FIXED: safe conversion from string|null to number
         if (bedrooms && bedrooms !== "Any Bedrooms") {
             if (bedrooms === "4+") {
-                filteredList = filteredList.filter((p) => Number(p.rooms_number) >= 4);
+                filteredList = filteredList.filter((p) => safeParseInt(p.rooms_number) >= 4);
             } else {
                 const bedroomNum = parseInt(bedrooms, 10);
                 filteredList = filteredList.filter(
-                    (p) => p.rooms_number === bedroomNum
+                    (p) => safeParseInt(p.rooms_number) === bedroomNum
                 );
             }
         }
 
-        // Bathrooms filter
+        // Bathrooms filter - FIXED: safe conversion from string|null to number
         if (bathrooms && bathrooms !== "Any Bathrooms") {
             if (bathrooms === "4+") {
-                filteredList = filteredList.filter((p) => Number(p.badrooms_number) >= 4);
+                filteredList = filteredList.filter((p) => safeParseInt(p.badrooms_number) >= 4);
             } else {
                 const bathroomNum = parseInt(bathrooms, 10);
                 filteredList = filteredList.filter(
-                    (p) => p.badrooms_number === bathroomNum
+                    (p) => safeParseInt(p.badrooms_number) === bathroomNum
                 );
             }
         }
 
-        // Budget filter
+        // Budget filter - FIXED: use safeParsePrice for number | null
         if (budget && budget !== "Max. Price") {
             let maxBudget = 0;
             if (budget.startsWith("Under $")) {
@@ -198,7 +217,7 @@ function PropertiesContent() {
                     10
                 );
                 filteredList = filteredList.filter(
-                    (p) => Number(p.price) <= maxBudget
+                    (p) => safeParsePrice(p.price) <= maxBudget
                 );
             } else if (budget.startsWith("$")) {
                 maxBudget = parseInt(
@@ -206,7 +225,7 @@ function PropertiesContent() {
                     10
                 );
                 filteredList = filteredList.filter(
-                    (p) => Number(p.price) <= maxBudget
+                    (p) => safeParsePrice(p.price) <= maxBudget
                 );
             } else if (budget.startsWith("Above $")) {
                 maxBudget = parseInt(
@@ -214,27 +233,27 @@ function PropertiesContent() {
                     10
                 );
                 filteredList = filteredList.filter(
-                    (p) => Number(p.price) > maxBudget
+                    (p) => safeParsePrice(p.price) > maxBudget
                 );
             }
         }
 
-        // Min size filter
+        // Min size filter - FIXED: safe conversion from string|null to number
         if (minSize && minSize !== "Min (SqFt)") {
             const min = parseInt(parseSizeValue(minSize), 10);
             if (!isNaN(min)) {
                 filteredList = filteredList.filter(
-                    (p) => p.size !== undefined && Number(p.size) >= min
+                    (p) => p.size !== undefined && safeParseInt(p.size) >= min
                 );
             }
         }
 
-        // Max size filter
+        // Max size filter - FIXED: safe conversion from string|null to number
         if (maxSize && maxSize !== "Max (SqFt)") {
             const max = parseInt(parseSizeValue(maxSize), 10);
             if (!isNaN(max)) {
                 filteredList = filteredList.filter(
-                    (p) => p.size !== undefined && Number(p.size) <= max
+                    (p) => p.size !== undefined && safeParseInt(p.size) <= max
                 );
             }
         }
@@ -266,13 +285,13 @@ function PropertiesContent() {
         category,
     ]);
 
-    // Sorting logic
+    // Sorting logic - FIXED: use safeParsePrice for number comparison
     useEffect(() => {
         const sortedList = [...filtered];
         if (sortingOption === "السعر تصاعدي") {
-            sortedList.sort((a, b) => a.price - b.price);
+            sortedList.sort((a, b) => safeParsePrice(a.price) - safeParsePrice(b.price));
         } else if (sortingOption === "السعر تنازلي") {
-            sortedList.sort((a, b) => b.price - a.price);
+            sortedList.sort((a, b) => safeParsePrice(b.price) - safeParsePrice(a.price));
         }
         dispatch({ type: "SET_SORTED", payload: sortedList });
         dispatch({ type: "SET_CURRENT_PAGE", payload: 1 });
@@ -369,7 +388,7 @@ function PropertiesContent() {
         <>
             <div className="flat-map">
                 <div className="mapbox-3">
-                    <Map sorted={sorted as []} />
+                    <Map sorted={sorted} />
                 </div>
                 <div className="tf-container">
                     <SidebarFilter1
@@ -401,7 +420,6 @@ function PropertiesContent() {
                             <h4 className="text-4xl lg:text-5xl font-bold">عقارات</h4>
                         </div>
                         <div className="w-80">
-
                             <DropdownSelect2
                                 onChange={(value) =>
                                     dispatch({
@@ -426,116 +444,30 @@ function PropertiesContent() {
                                 role="tabpanel"
                             >
                                 <div className="tf-grid-layout lg-col-3 md-col-2">
-                                    {sorted
-                                        .slice(
-                                            (currentPage - 1) * itemPerPage,
-                                            currentPage * itemPerPage
-                                        )
-                                        .map((property: any) => (
-                                            <div
-                                                key={property.id}
-                                                className="card-house style-default hover-image"
-                                                data-id={property.id}
-                                            >
-                                                <div className="img-style mb_20">
-                                                    <Image
-                                                        src={`${process.env.NEXT_PUBLIC_IMAGE}/${property.image}`}
-                                                        width={410}
-                                                        height={308}
-                                                        alt="home"
-                                                    />
-                                                    <div className="wrap-tag d-flex gap_8 mb_12">
-                                                        <div
-                                                            className="tag text-button-small fw-6 text_primary-color"
-                                                            style={{
-                                                                backgroundColor: property.category === "بيع" ? "#dc3545" : "#28a745",
-                                                                color: "#fff"
-                                                            }}
-                                                        >
-                                                            {property.category}
-                                                        </div>
-                                                        <div className="tag categoreis text-button-small fw-6 text_primary-color">
-                                                            {property.types}
-                                                        </div>
-                                                    </div>
-                                                    <Link
-                                                        href={`/property-details-1/${property.id}`}
-                                                        className="overlay-link"
-                                                    ></Link>
-                                                    <WishlistButton propertyId={property.id} />
-                                                </div>
-                                                <div className="content">
-                                                    <h4
-                                                        className="price mb_12 text-4xl lg:text-5xl font-bold"
-                                                        suppressHydrationWarning
-                                                    >
-                                                        {property.currency} {property.price}
-                                                    </h4>
-                                                    <Link
-                                                        href={`/property-details-1/${property.id}`}
-                                                        className="title mb_8 h5 link text_primary-color"
-                                                    >
-                                                        {property.name}
-                                                    </Link>
-                                                    <p>{property.location}، {property.region}</p>
-                                                    <ul className="info d-flex">
-                                                        <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
-                                                            <i className="icon-Bed"></i>
-                                                            {property.rooms_number} غرف
-                                                        </li>
-                                                        <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
-                                                            <i className="icon-Bathtub"></i>
-                                                            {property.badrooms_number} حمام
-                                                        </li>
-                                                        <li
-                                                            className="d-flex align-items-center gap_8 text-title text_primary-color fw-6"
-                                                            suppressHydrationWarning
-                                                        >
-                                                            <i className="icon-Ruler"></i>
-                                                            {property.size} قدم مربع
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        ))}
-                                </div>
-                            </div>
-                            <div
-                                className="tab-pane"
-                                id="listLayout"
-                                role="tabpanel"
-                            >
-                                <div className="wrap-list d-grid gap_30">
-                                    {sorted
-                                        .slice(
-                                            (currentPage - 1) * 5,
-                                            currentPage * 5
-                                        )
-                                        .map((property: any) => (
-                                            <div
-                                                className="card-house style-list v2"
-                                                data-id={property.id}
-                                                key={property.id}
-                                            >
-                                                <div className="wrap-img">
-                                                    <Link
-                                                        href={`/property-details-1/${property.id}`}
-                                                        className="img-style"
-                                                    >
+                                    {sorted.length === 0 ? (
+                                        <div className="col-span-3 text-center py-10">
+                                            <p>لا توجد عقارات مرئية تطابق معايير البحث</p>
+                                        </div>
+                                    ) : (
+                                        sorted
+                                            .slice(
+                                                (currentPage - 1) * itemPerPage,
+                                                currentPage * itemPerPage
+                                            )
+                                            .map((property: Listing) => (
+                                                <div
+                                                    key={property.id}
+                                                    className="card-house style-default hover-image"
+                                                    data-id={property.id}
+                                                >
+                                                    <div className="img-style mb_20">
                                                         <Image
-                                                            src={`${process.env.NEXT_PUBLIC_IMAGE}/${property.image}`}
-                                                            width={392}
-                                                            height={260}
+                                                            src={property.image ? `${process.env.NEXT_PUBLIC_IMAGE}/${property.image}` : "/default-image.jpg"}
+                                                            width={410}
+                                                            height={308}
                                                             alt="home"
                                                         />
-                                                    </Link>
-                                                </div>
-                                                <div className="content">
-                                                    <div className="d-flex align-items-center gap_6 top mb_16 flex-wrap justify-content-between">
-                                                        <h4 className="price text-4xl lg:text-5xl font-bold" suppressHydrationWarning>
-                                                            {property.currency} {property.price}
-                                                        </h4>
-                                                        <div className="wrap-tag d-flex gap_8">
+                                                        <div className="wrap-tag d-flex gap_8 mb_12">
                                                             <div
                                                                 className="tag text-button-small fw-6 text_primary-color"
                                                                 style={{
@@ -549,31 +481,129 @@ function PropertiesContent() {
                                                                 {property.types}
                                                             </div>
                                                         </div>
+                                                        <Link
+                                                            href={`/property-details-1/${property.id}`}
+                                                            className="overlay-link"
+                                                        ></Link>
+                                                        <WishlistButton propertyId={property.id} />
                                                     </div>
-                                                    <Link
-                                                        href={`/property-details-1/${property.id}`}
-                                                        className="title mb_8 h5 link text_primary-color"
-                                                    >
-                                                        {property.name}
-                                                    </Link>
-                                                    <p>{property.location}، {property.region}</p>
-                                                    <ul className="info d-flex">
-                                                        <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
-                                                            <i className="icon-Bed"></i>
-                                                            {property.rooms_number} غرف
-                                                        </li>
-                                                        <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
-                                                            <i className="icon-Bathtub"></i>
-                                                            {property.badrooms_number} حمام
-                                                        </li>
-                                                        <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6" suppressHydrationWarning>
-                                                            <i className="icon-Ruler"></i>
-                                                            {property.size} قدم مربع
-                                                        </li>
-                                                    </ul>
+                                                    <div className="content">
+                                                        <h4
+                                                            className="price mb_12 text-4xl lg:text-5xl font-bold"
+                                                            suppressHydrationWarning
+                                                        >
+                                                            {property.currency || "SAR"} {property.price || 0}
+                                                        </h4>
+                                                        <Link
+                                                            href={`/property-details-1/${property.id}`}
+                                                            className="title mb_8 h5 link text_primary-color"
+                                                        >
+                                                            {property.name || "لا يوجد اسم"}
+                                                        </Link>
+                                                        <p>{property.location || "لا يوجد موقع"}، {property.region || "لا يوجد منطقة"}</p>
+                                                        <ul className="info d-flex">
+                                                            <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
+                                                                <i className="icon-Bed"></i>
+                                                                {property.rooms_number || 0} غرف
+                                                            </li>
+                                                            <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
+                                                                <i className="icon-Bathtub"></i>
+                                                                {property.badrooms_number || 0} حمام
+                                                            </li>
+                                                            <li
+                                                                className="d-flex align-items-center gap_8 text-title text_primary-color fw-6"
+                                                                suppressHydrationWarning
+                                                            >
+                                                                <i className="icon-Ruler"></i>
+                                                                {property.size || 0} قدم مربع
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            ))
+                                    )}
+                                </div>
+                            </div>
+                            <div
+                                className="tab-pane"
+                                id="listLayout"
+                                role="tabpanel"
+                            >
+                                <div className="wrap-list d-grid gap_30">
+                                    {sorted.length === 0 ? (
+                                        <div className="text-center py-10">
+                                            <p>لا توجد عقارات مرئية تطابق معايير البحث</p>
+                                        </div>
+                                    ) : (
+                                        sorted
+                                            .slice(
+                                                (currentPage - 1) * 5,
+                                                currentPage * 5
+                                            )
+                                            .map((property: Listing) => (
+                                                <div
+                                                    className="card-house style-list v2"
+                                                    data-id={property.id}
+                                                    key={property.id}
+                                                >
+                                                    <div className="wrap-img">
+                                                        <Link
+                                                            href={`/property-details-1/${property.id}`}
+                                                            className="img-style"
+                                                        >
+                                                            <Image
+                                                                src={property.image ? `${process.env.NEXT_PUBLIC_IMAGE}/${property.image}` : "/default-image.jpg"}
+                                                                width={392}
+                                                                height={260}
+                                                                alt="home"
+                                                            />
+                                                        </Link>
+                                                    </div>
+                                                    <div className="content">
+                                                        <div className="d-flex align-items-center gap_6 top mb_16 flex-wrap justify-content-between">
+                                                            <h4 className="price text-4xl lg:text-5xl font-bold" suppressHydrationWarning>
+                                                                {property.currency || "SAR"} {property.price || 0}
+                                                            </h4>
+                                                            <div className="wrap-tag d-flex gap_8">
+                                                                <div
+                                                                    className="tag text-button-small fw-6 text_primary-color"
+                                                                    style={{
+                                                                        backgroundColor: property.category === "بيع" ? "#dc3545" : "#28a745",
+                                                                        color: "#fff"
+                                                                    }}
+                                                                >
+                                                                    {property.category}
+                                                                </div>
+                                                                <div className="tag categoreis text-button-small fw-6 text_primary-color">
+                                                                    {property.types}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <Link
+                                                            href={`/property-details-1/${property.id}`}
+                                                            className="title mb_8 h5 link text_primary-color"
+                                                        >
+                                                            {property.name || "لا يوجد اسم"}
+                                                        </Link>
+                                                        <p>{property.location || "لا يوجد موقع"}، {property.region || "لا يوجد منطقة"}</p>
+                                                        <ul className="info d-flex">
+                                                            <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
+                                                                <i className="icon-Bed"></i>
+                                                                {property.rooms_number || 0} غرف
+                                                            </li>
+                                                            <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6">
+                                                                <i className="icon-Bathtub"></i>
+                                                                {property.badrooms_number || 0} حمام
+                                                            </li>
+                                                            <li className="d-flex align-items-center gap_8 text-title text_primary-color fw-6" suppressHydrationWarning>
+                                                                <i className="icon-Ruler"></i>
+                                                                {property.size || 0} قدم مربع
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            ))
+                                    )}
                                 </div>
                             </div>
                         </div>

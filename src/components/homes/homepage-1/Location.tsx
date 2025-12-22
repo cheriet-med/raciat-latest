@@ -9,12 +9,32 @@ export default function Location() {
     const { listings } = useFetchListing(); 
     const { post, isLoading } = useFetchHomepage();
 
-    const jaddah = listings?.filter(listing => listing.region === post?.place_title_1)
-    const riyadh = listings?.filter(listing => listing.region === post?.place_title_2)
-    const makkah = listings?.filter(listing => listing.region === post?.place_title_3)
-    const tabuk = listings?.filter(listing => listing.region === post?.place_title_4)
-    const eastern = listings?.filter(listing => listing.region === post?.place_title_5)
-    const aseer = listings?.filter(listing => listing.region === post?.place_title_6)
+    // Helper function to check if a property is visible
+    const isPropertyVisible = (property: any) => {
+        return property.is_visible === true || 
+        
+               String(property.is_visible).toLowerCase() === "true";
+    };
+
+    // Filter listings by region and visibility
+    const jaddah = listings?.filter(listing => 
+        listing.region === post?.place_title_1 && isPropertyVisible(listing)
+    )
+    const riyadh = listings?.filter(listing => 
+        listing.region === post?.place_title_2 && isPropertyVisible(listing)
+    )
+    const makkah = listings?.filter(listing => 
+        listing.region === post?.place_title_3 && isPropertyVisible(listing)
+    )
+    const tabuk = listings?.filter(listing => 
+        listing.region === post?.place_title_4 && isPropertyVisible(listing)
+    )
+    const eastern = listings?.filter(listing => 
+        listing.region === post?.place_title_5 && isPropertyVisible(listing)
+    )
+    const aseer = listings?.filter(listing => 
+        listing.region === post?.place_title_6 && isPropertyVisible(listing)
+    )
 
     return (
         <div className="section-location tf-spacing-1">
@@ -100,7 +120,7 @@ export default function Location() {
                                                 href={`/category?q=${post?.place_title_1}`}
                                                 className="mb_4 link h5 text_primary-color"
                                             >
-                                                جدة
+                                               {post?.place_title_1}
                                             </a>
                                             <p>{jaddah?.length} عقار</p>
                                         </div>
@@ -122,7 +142,7 @@ export default function Location() {
                                                 href={`/category?q=${post?.place_title_2}`}
                                                 className="mb_4 link h5 text_primary-color"
                                             >
-                                                الرياض
+                                               {post?.place_title_2}
                                             </a>
                                             <p>{riyadh?.length} عقار</p>
                                         </div>
@@ -145,7 +165,7 @@ export default function Location() {
                                             href={`/category?q=${post?.place_title_3}`}
                                             className="mb_4 link h5 text_primary-color"
                                         >
-                                            مكة
+                                            {post?.place_title_3}
                                         </a>
                                         <p>{makkah?.length} عقار</p>
                                     </div>
@@ -169,9 +189,9 @@ export default function Location() {
                                             href={`/category?q=${post?.place_title_4}`}
                                             className="mb_4 link h5 text_primary-color"
                                         >
-                                            الشرقية
+                                            {post?.place_title_4}
                                         </a>
-                                        <p>{eastern?.length} عقار</p>
+                                        <p>{tabuk?.length} عقار</p>
                                     </div>
                                 </div>
                                 <div className="d-flex gap_30">
@@ -192,9 +212,9 @@ export default function Location() {
                                                 href={`/category?q=${post?.place_title_5}`}
                                                 className="mb_4 link h5 text_primary-color"
                                             >
-                                                تبوك
+                                                {post?.place_title_5}
                                             </a>
-                                            <p>{tabuk?.length} عقار</p>
+                                            <p>{eastern?.length} عقار</p>
                                         </div>
                                     </div>
                                     <div
@@ -214,7 +234,7 @@ export default function Location() {
                                                 href={`/category?q=${post?.place_title_6}`}
                                                 className="mb_4 link h5 text_primary-color"
                                             >
-                                                عسير
+                                                {post?.place_title_6}
                                             </a>
                                             <p>{aseer?.length} عقار</p>
                                         </div>

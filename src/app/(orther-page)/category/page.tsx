@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
@@ -169,10 +169,26 @@ function CategoryContent() {
         return () => window.removeEventListener("resize", checkScreen);
     }, []);
 
-    // Filter listings based on URL query parameter 'q'
-    const filteredListings = locationQuery && locationQuery !== "الكل"
-        ? listings?.filter(property => property.region === locationQuery)
-        : listings;
+    // Filter listings based on URL query parameter 'q' and is_visible status
+    const filteredListings = useMemo(() => {
+        if (!listings) return [];
+
+        return listings.filter((property) => {
+            // First filter: Check if property is visible
+            const isPropertyVisible = property.is_visible === true || String(property.is_visible).toLowerCase() === "true";
+            
+            if (!isPropertyVisible) {
+                return false;
+            }
+
+            // Filter by location if specified and not "الكل"
+            if (locationQuery && locationQuery !== "الكل") {
+                if (property.region !== locationQuery) return false;
+            }
+
+            return true;
+        });
+    }, [listings, locationQuery]);
 
     const categories = [
         { name: "الكل", label: "الكل" },
@@ -297,16 +313,23 @@ function CategoryContent() {
                       </div>
                       <div className="content text-center">
                           <div className="tf-container">
-                              <h2 className="title text_white mb_12 text-5xl lg-text-7xl font-bold"> {locationQuery}
-          </h2>
-
+                              <h2 className="title text_white mb_12 text-5xl lg-text-7xl font-bold">
+                                  {locationQuery === "الكل" || !locationQuery ? "جميع العقارات" : locationQuery}
+                              </h2>
+                              <p className="text_white mt-4">
+                                  {filteredListings.length} عقار متاح
+                              </p>
                           </div>
                       </div>
                   </div>
             <div className="section-features-property-4 tf-spacing-1 mt-6">
                 <div className="tf-container">
                     {filteredListings?.length === 0 ? (
-                        <div className="text-center py-10">لا توجد عقارات في هذه المنطقة</div>
+                        <div className="text-center py-10">
+                            {listings?.length > 0 
+                                ? "لا توجد عقارات مرئية في هذه المنطقة" 
+                                : "لا توجد عقارات متاحة حالياً"}
+                        </div>
                     ) : isMobile ? (
                         <Swiper
                             modules={[Pagination]}

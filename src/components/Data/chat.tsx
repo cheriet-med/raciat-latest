@@ -34,7 +34,7 @@ interface Conversation {
 // Loading skeleton component for conversations
 const ConversationSkeleton = () => (
   <div className="p-4 border-b border-gray-100">
-    <div className="flex items-center space-x-3">
+    <div className="flex items-center">
       <div className="w-12 h-12 md:w-10 md:h-10 bg-gray-200 rounded-full animate-pulse"></div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
@@ -50,7 +50,7 @@ const ConversationSkeleton = () => (
 // Loading skeleton component for messages
 const MessageSkeleton = ({ isOwn }: { isOwn: boolean }) => (
   <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-    <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
+    <div className={`max-w-sm sm:max-w-md px-4 py-3 rounded-2xl ${
       isOwn ? 'bg-gray-200 rounded-br-md' : 'bg-gray-200 rounded-bl-md'
     } animate-pulse`}>
       <div className="h-4 bg-gray-300 rounded w-20 mb-1"></div>
@@ -564,7 +564,7 @@ const sendMessage = async () => {
     if (days === 0) {
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } else if (days === 1) {
-      return 'Yesterday';
+      return 'مند الأمس';
     } else if (days < 7) {
       return date.toLocaleDateString([], { weekday: 'short' });
     } else {
@@ -574,7 +574,7 @@ const sendMessage = async () => {
 
   // Filter conversations based on search term
   const filteredConversations = conversations.filter(convo =>
-    convo.user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    convo.user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     convo.user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -625,13 +625,13 @@ const sendMessage = async () => {
         key={message.id}
         className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
       >
-        <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
+        <div className={`max-w-sm sm:max-w-md px-4 py-3 rounded-2xl ${
           isOwn 
-            ? 'bg-sec text-white rounded-br-md' 
-            : 'bg-white text-prim rounded-bl-md shadow-sm'
+            ? 'bg-sec text-white text-lg rounded-br-md' 
+            : 'bg-white text-prim text-lg rounded-bl-md shadow-sm'
         }`}>
-          <p className="text-sm leading-relaxed">{message.content}</p>
-          <p className={`text-xs mt-1 ${
+          <p className="text-lg leading-relaxed">{message.content}</p>
+          <p className={`text-sm mt-1 ${
             isOwn ? 'text-gray-100' : 'text-gray-500'
           }`}>
             {formatTime(message.timestamp)}
@@ -654,7 +654,7 @@ const sendMessage = async () => {
       <div className="fixed inset-0 bg-white z-50 flex flex-col md:hidden">
         {/* Mobile Chat Header */}
         <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center">
             <button
               onClick={handleBackToList}
               className="p-2 text-gray-600 hover:text-gray-800"
@@ -671,22 +671,22 @@ const sendMessage = async () => {
                 <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
               )}
             </div>
-            <div>
-              <h3 className="font-semibold text-gray-900">{selectedContact.full_name}</h3>
-              <p className="text-sm text-gray-500">
-                {isTypingNow ? 'Typing...' : selectedContact.is_active ? 'Active now' : 'Last seen recently'}
+            <div className='mx-3'>
+              <h3 className="font-semibold text-2xl text-gray-900">{selectedContact.full_name}</h3>
+              <p className="text-lg text-gray-500">
+                {isTypingNow ? 'يكتب...' : selectedContact.is_active ? ' منصل الأن' : 'شوهد آخر مرة مؤخراً'}
               </p>
             </div>
           </div>
                   {/* Connection status indicator */}
           {wsConnecting && (
-            <div className="flex items-center justify-center mt-2 text-xs text-gray-500">
+            <div className="flex items-center justify-center mt-2 text-sm text-gray-500">
               <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-400 mr-2"></div>
               Connecting...
             </div>
           )}
           {!wsConnected && !wsConnecting && (
-            <div className="flex items-center justify-center mt-2 text-xs text-red-500">
+            <div className="flex items-center justify-center mt-2 text-sm text-red-500">
               <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
               Disconnected - <button onClick={handleReconnect} className="ml-1 underline">Online</button>
             </div>
@@ -735,12 +735,12 @@ const sendMessage = async () => {
         </div>
 
         {/* Mobile Message Input */}
-        <div className="bg-white border-t border-gray-200 p-4">
+        <div className="bg-white border-t border-gray-50 p-4">
           <div className="flex items-center space-x-2">
             <div className="flex-1 relative">
               <input
                 type="text"
-                placeholder={wsConnected ? "Type a message..." : "Connecting..."}
+                placeholder={wsConnected ? "أكتب رسالة..." : "Connecting..."}
                 value={newMessage}
                 onChange={(e) => {
                   setNewMessage(e.target.value);
@@ -753,7 +753,7 @@ const sendMessage = async () => {
                 onKeyPress={handleKeyPress}
                 onBlur={stopTyping}
                 disabled={isSendingMessage || !wsConnected}
-                className="w-full px-4 py-3 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-accent focus:bg-white border border-transparent focus:border-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 bg-gray-50 rounded-full focus:outline-none focus:ring-1 focus:ring-sec focus:bg-white border border-transparent focus:border-prim disabled:opacity-50 disabled:cursor-not-allowed"
               />
              
 
@@ -761,7 +761,7 @@ const sendMessage = async () => {
             <button
               onClick={sendMessage}
               disabled={!newMessage.trim() || isSendingMessage || !wsConnected}
-              className="p-3 bg-accent text-white rounded-full hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative"
+              className="p-3 bg-sec text-white rounded-full hover:bg-prim transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative"
             >
               {isSendingMessage ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -819,7 +819,7 @@ const sendMessage = async () => {
                 <div className="text-secondary mb-2">{error}</div>
                 <button 
                   onClick={fetchConversations}
-                  className="text-sm bg-sec text-white px-3 py-1 rounded hover:bg-secondary hover:text-white"
+                  className="text-xl bg-sec text-white px-3 py-1 rounded hover:bg-secondary hover:text-white"
 
                 >
                   أعد المحاولة
@@ -835,34 +835,34 @@ const sendMessage = async () => {
                   key={conversation.user.id}
                   onClick={() => handleContactClick(conversation.user)}
                   className={`p-4 md:p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-                    selectedContact?.id === conversation.user.id ? 'bg-blue-50 md:border-r-2 md:border-r-accent' : ''
+                    selectedContact?.id === conversation.user.id ? 'bg-gray-100 md:border-r-2 md:border-r-sec' : ''
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center">
                     <div className="relative">
                       <img
                         src={`${process.env.NEXT_PUBLIC_IMAGE}/${conversation.user.profile_image}`|| '/profile.png'}
                         alt={conversation.user.full_name}
-                        className="w-12 h-12 md:w-10 md:h-10 rounded-full object-cover"
+                        className="w-16 h-16  rounded-full object-cover"
                       />
                       {conversation.user.is_active && (
                         <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-medium text-gray-900 truncate">{conversation.user.full_name}</h3>
-                        <span className="text-sm md:text-xs text-gray-500 flex-shrink-0 ml-2">
+                      <div className="flex items-center justify-between mx-3">
+                        <h3 className="font-medium text-2xl text-gray-900 truncate">{conversation.user.full_name}</h3>
+                        <span className="text-lg  text-gray-500 flex-shrink-0 ml-2">
                           {formatTime(conversation.last_message.timestamp)}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-500 truncate mt-1">
+                      <p className="text-lg text-gray-500 truncate mt-1 mx-3">
                         {conversation.last_message.sender.id === session?.user?.id ? 'You: ' : ''}
                         {conversation.last_message.content}
                       </p>
                     </div>
                     {conversation.unread_count > 0 && (
-                      <div className="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-semibold">
+                      <div className="bg-red-500 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg font-semibold">
                         {conversation.unread_count}
                       </div>
                     )}
@@ -879,23 +879,23 @@ const sendMessage = async () => {
             <>
               {/* Desktop Chat Header */}
               <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-6">
                   <div className="relative">
                     <img
                       src={`${process.env.NEXT_PUBLIC_IMAGE}/${selectedContact.profile_image}`|| '/profile.png'}
                       alt={selectedContact.full_name}
-                      className="w-10 h-10 rounded-full object-cover"
+                      className="w-16 h-16 rounded-full object-cover"
                     />
                     {selectedContact.is_active && (
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                     )}
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{selectedContact.full_name}</h3>
-                    <p className="text-sm text-gray-500">
+                  <div className='mx-3'>
+                    <h3 className="font-semibold text-2xl text-gray-900">{selectedContact.full_name}</h3>
+                    <p className="text-lg text-gray-500">
                       {typingUsers.has(selectedContact.id) 
-                        ? 'Typing...' 
-                        : selectedContact.is_active ? 'Active now' : 'Last seen recently'
+                        ? 'يكتب...' 
+                        : selectedContact.is_active ? 'منصل الأن' : 'شوهد آخر مرة مؤخراً'
                       }
                     </p>
                   </div>
@@ -906,21 +906,21 @@ const sendMessage = async () => {
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex items-center">
                     {wsConnecting && (
-                      <div className="flex items-center text-xs text-gray-500">
+                      <div className="flex items-center  text-gray-500">
                         <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-gray-400 mr-2"></div>
-                        Connecting...
+                        <p className='text-lg mr-2'> Connecting...</p>
                       </div>
                     )}
                     {wsConnected && (
-                      <div className="flex items-center text-xs text-green-600">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                        Online
+                      <div className="flex items-center text-sm text-green-600">
+                        <div className="w-4 h-4 bg-green-500 rounded-full mr-2"></div>
+                      <p className='text-lg mr-2'>Online</p>
                       </div>
                     )}
                     {!wsConnected && !wsConnecting && (
-                      <div className="flex items-center text-xs text-red-500">
+                      <div className="flex items-center  text-red-500">
                         <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                        Disconnected
+                        <p className='text-lg mr-2'>Disconnected</p> 
                       </div>
                     )}
                   </div>
@@ -929,7 +929,7 @@ const sendMessage = async () => {
                   {!wsConnected && !wsConnecting && (
                     <button 
                       onClick={handleReconnect}
-                      className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200"
+                      className="text-lg bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200"
                     >
                       Reconnect
                     </button>
@@ -951,7 +951,7 @@ const sendMessage = async () => {
                     <p className="mb-4">{error}</p>
                     <button 
                       onClick={() => selectedContact && fetchMessages(selectedContact.id)}
-                      className="bg-highlights text-white px-4 py-2 rounded hover:bg-secondary hover:text-white"
+                      className="bg-sec text-white px-4 py-2 rounded hover:bg-prim hover:text-white text-xl"
                     >
                       أعد المحاولة
                     </button>
@@ -980,13 +980,13 @@ const sendMessage = async () => {
               </div>
 
               {/* Desktop Message Input */}
-              <div className="bg-white border-t border-gray-200 p-4">
-                <div className="flex items-center space-x-3">
+              <div className="bg-white border-t border-gray-50 p-4">
+                <div className="flex items-center">
               
                   <div className="flex-1 relative">
                     <input
                       type="text"
-                      placeholder={wsConnected ? "Type message..." : "Connecting..."}
+                      placeholder={wsConnected ? " أكتب رسالة..." : "Connecting..."}
                       value={newMessage}
                       onChange={(e) => {
                         setNewMessage(e.target.value);
@@ -999,7 +999,7 @@ const sendMessage = async () => {
                       onKeyPress={handleKeyPress}
                       onBlur={stopTyping}
                       disabled={isSendingMessage || !wsConnected}
-                      className="w-full px-4 py-3 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-accent focus:bg-white border border-transparent focus:border-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full ml-12 px-6 py-3 bg-gray-50 rounded-full focus:outline-none focus:ring-1 focus:ring-sec focus:bg-white border border-transparent focus:border-prim disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                    
                   </div>
@@ -1025,7 +1025,7 @@ const sendMessage = async () => {
                 <div className="w-16 h-16 bg-sec rounded-full flex items-center justify-center mx-auto mb-4">
                   <Search className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2 font-playfair">حدد محادثة</h3>
+                <h3 className="text-sm font-medium text-gray-900 mb-2 font-playfair">حدد محادثة</h3>
                 <p className="text-gray-500">اختر جهة اتصال لبدء المراسلة</p>
               </div>
             </div>
@@ -1092,7 +1092,7 @@ export default MessagesComponent;
               <button className="p-2 text-gray-600 hover:text-gray-800">
                 <Menu className="w-5 h-5" />
               </button>
-              <button className="text-xs text-accent hover:text-secondary font-medium">
+              <button className="text-sm text-accent hover:text-secondary font-medium">
                 New Message
               </button>
             </div>

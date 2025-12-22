@@ -20,7 +20,7 @@ import { HiOutlineMenuAlt1 } from "react-icons/hi";
 import { useSession } from 'next-auth/react';
 import useFetchUser from '../requests/fetchUser';
 import ProfileCard from '../Data/userProfile';
-import { RiArticleFill } from "react-icons/ri";
+import { RiArticleFill, RiChatSettingsFill } from "react-icons/ri";
 import { HiTicket } from "react-icons/hi2";
 
 import { TbReorder } from "react-icons/tb";
@@ -75,6 +75,33 @@ export default function DashboardUser() {
   }, []);
 
 
+const [conversations, setConversations] = useState<Conversation[]>([]);
+const fetchConversations = async () => {
+ 
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/conversations/`, {
+        headers: {
+          'Authorization': `JWT ${session?.accessToken}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch conversations');
+      }
+       
+      const data = await response.json();
+      setConversations(data);
+  };
+
+    useEffect(() => {
+    if (session?.accessToken) {
+      fetchConversations();
+    }
+  }, [session?.accessToken]);
+
+ const unread = conversations.reduce((sum, convo) => {
+  return sum + (convo.unread_count || 0);
+}, 0);
+
 
 const menuItems: MenuItem[] = [
   { id: 'الملف الشخصي', label: 'الملف الشخصي', icon: <CgProfile size={24} className='text-white'/>, href: '/account' },
@@ -101,11 +128,21 @@ const menuItems: MenuItem[] = [
     : []
   ),
   ...(Users?.status === "seller"
-    ? [{ id: 'الرسائل ', label: ' الرسائل', icon:<LuMessagesSquare size={24} className='text-white'/>, href: '/account/messages' },]
+    ? [   {  id: 'الرسائل ', label: ' الرسائل',
+        icon:   unread > 0 ? <div className='relative'>   
+       <span className="absolute -top-3 -right-4 flex h-10 w-10 items-center justify-center rounded-full bg-sec text-lg text-white font-semibold">{unread}
+       </span><LuMessagesSquare size={24} className='text-white'/> 
+        </div> :<LuMessagesSquare size={24} className='text-white'/> , 
+        href: '/account/messages', },]
     : []
   ),
     ...(Users?.status === "field"
-    ? [{ id: 'الرسائل ', label: ' الرسائل', icon:<LuMessagesSquare size={24} className='text-white'/>, href: '/account/messages' },]
+    ? [   {  id: 'الرسائل ', label: ' الرسائل',
+    icon:   unread > 0 ? <div className='relative'>   
+   <span className="absolute -top-3 -right-4 flex h-10 w-10 items-center justify-center rounded-full bg-sec text-lg text-white font-semibold">{unread}
+   </span><LuMessagesSquare size={24} className='text-white'/> 
+    </div> :<LuMessagesSquare size={24} className='text-white'/> , 
+    href: '/account/messages', },]
     : []
   ),
 

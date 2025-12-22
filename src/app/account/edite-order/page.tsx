@@ -6,6 +6,7 @@ import AddHotelListingDashboard from "@/components/partner-dashboard/add-hotel-l
 import AddProduct from "@/components/admin-dashboard/add-listing";
 import AddOrderForm from "@/components/requests/addOrder";
 import EditeOrderDashboard from "@/components/user-dashboard/editeOrder";
+import EditeOrderAdmin from "@/components/admin-dashboard/editeOrder";
 export default function ProtectedPage() {
   const { data: session, status } = useSession({ required: true });
 
@@ -22,5 +23,5 @@ export default function ProtectedPage() {
     </div>  
     </div>);
   }
-  return session?.user?.is_superuser? <EditeOrderDashboard/> :  ( session?.user?.is_staff? <AddHotelListingDashboard/>:<EditeOrderDashboard/>)
+  return session?.user?.is_superuser? <EditeOrderAdmin/> :  ( session?.user?.is_staff? <AddHotelListingDashboard/>:<EditeOrderDashboard/>)
 }

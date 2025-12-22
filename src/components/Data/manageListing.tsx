@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { CiCircleChevDown } from "react-icons/ci";
 import React, { useState, useRef, useEffect } from 'react';
@@ -143,7 +143,38 @@ const ManageListing = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
   const [visible, setVisible] = useState(isVisible);
+  const [isLoading, setIsLoading] = useState(true);
   const { data: session, status } = useSession({ required: true });
+  
+  // Fetch current visibility status on component mount
+  useEffect(() => {
+    const fetchVisibilityStatus = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL}productid/${id}`, {
+          method: "GET",
+          headers: {
+            "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setVisible(data.is_visible);
+          console.log('✅ تم جلب حالة الظهور:', data.is_visible);
+        } else {
+          console.error('❌ فشل في جلب حالة الظهور');
+        }
+      } catch (error) {
+        console.error('💥 خطأ في جلب حالة الظهور:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchVisibilityStatus();
+  }, [id]);
+  
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
@@ -167,58 +198,65 @@ const ManageListing = ({
       setShowDeleteModal(false);
     }
   };
-const handleToggleVisibility = async () => {
-  setIsToggling(true);
-  try {
-    // First, get the current listing data
-    const getResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}productid/${id}`, {
-      method: "GET",
-      headers: {
-        "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
-        "Content-Type": "application/json",
-      },
-    });
 
-    if (!getResponse.ok) {
-      throw new Error('فشل في جلب بيانات العقار');
+  const handleToggleVisibility = async () => {
+    console.log('🔄 بدء تغيير حالة الظهور...');
+    setIsToggling(true);
+    try {
+      // Get user ID from session
+      const userId = session?.user?.id;
+      console.log('👤 معرف المستخدم:', userId);
+      
+      if (!userId) {
+        console.error('❌ لا يوجد معرف مستخدم');
+        throw new Error('مستخدم غير مسجل أو ليس لديه صلاحية');
+      }
+      
+      // Toggle the current visible state
+      const newVisibility = !visible;
+      console.log('👁️ الحالة الحالية:', visible, '→ الحالة الجديدة:', newVisibility);
+      
+      // Prepare the minimal payload - ONLY is_visible and user
+      const updatePayload = {
+        is_visible: newVisibility,
+        user: userId.toString()
+      };
+      
+      console.log('📤 إرسال البيانات:', updatePayload);
+      console.log('🌐 الرابط:', `${process.env.NEXT_PUBLIC_URL}productid/${id}`);
+      
+      // Send PUT request with minimal payload
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}productid/${id}`, {
+        method: "PUT",
+        headers: {
+          "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatePayload),
+      });
+
+      console.log('📥 حالة الاستجابة:', response.status, response.statusText);
+
+      if (response.ok) {
+        setVisible(newVisibility);
+        if (mutate) await mutate();
+        console.log(`✅ تم تغيير حالة الظهور إلى ${newVisibility ? 'ظاهر' : 'مخفي'} بنجاح`);
+      } else {
+        const errorData = await response.json();
+        console.error('❌ فشل في تغيير حالة الظهور:', errorData);
+        console.error('📊 رمز الخطأ:', response.status);
+      }
+    } catch (error) {
+      console.error('💥 حدث خطأ أثناء تغيير حالة الظهور:', error);
+    } finally {
+      console.log('🏁 انتهاء العملية');
+      setIsToggling(false);
     }
-
-    const currentData = await getResponse.json();
-    
-    // Create the updated data with all required fields
-    const updatedData = {
-      ...currentData, // Keep all existing fields
-      is_visible: !visible // Toggle the visibility
-    };
-
-    // Send the PUT request with complete data
-    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}productid/${id}`, {
-      method: "PUT",
-      headers: {
-        "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedData),
-    });
-
-    if (response.ok) {
-      setVisible(!visible);
-      if (mutate) await mutate();
-      console.log('تم تغيير حالة الظهور بنجاح');
-    } else {
-      const errorData = await response.json();
-      console.error('فشل في تغيير حالة الظهور:', errorData);
-    }
-  } catch (error) {
-    console.error('حدث خطأ أثناء تغيير حالة الظهور:', error);
-  } finally {
-    setIsToggling(false);
-  }
-};
+  };
 
   const dropdownItems: DropdownItem[] = [
     { 
-     label: 'تعديل', 
+      label: 'تعديل', 
       href: `/account/edit-hotel-listing?q=${id}`, 
       type: 'link',
       icon: <IoCreateOutline className="h-6 w-6" />
@@ -230,13 +268,13 @@ const handleToggleVisibility = async () => {
       icon: visible ? <IoEyeOffOutline className="h-6 w-6" /> : <IoEyeOutline className="h-6 w-6" />
     },
     { 
-     label: 'حذف', 
+      label: 'حذف', 
       onClick: () => setShowDeleteModal(true), 
       type: 'button',
       icon: <IoTrashOutline className="h-6 w-6" />
     },
     { 
-        label: 'عرض', 
+      label: 'عرض', 
       href: `/property-details-1/${id}`, 
       type: 'link',
       icon: <IoEyeOutline className="h-6 w-6" />

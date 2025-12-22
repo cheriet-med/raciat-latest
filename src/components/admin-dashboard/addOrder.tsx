@@ -80,6 +80,33 @@ export default function AccountInfo() {
 
 
  
+ const [conversations, setConversations] = useState<Conversation[]>([]);
+ const fetchConversations = async () => {
+  
+ 
+       const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/conversations/`, {
+         headers: {
+           'Authorization': `JWT ${session?.accessToken}`
+         }
+       });
+       if (!response.ok) {
+         throw new Error('Failed to fetch conversations');
+       }
+        
+       const data = await response.json();
+       setConversations(data);
+   };
+ 
+     useEffect(() => {
+     if (session?.accessToken) {
+       fetchConversations();
+     }
+   }, [session?.accessToken]);
+ 
+  const unread = conversations.reduce((sum, convo) => {
+   return sum + (convo.unread_count || 0);
+ }, 0);
+ 
 
 
   const menuItems: MenuItem[] = [
@@ -94,8 +121,13 @@ export default function AccountInfo() {
 
    { id: 'اﻹحصائيات ', label: ' اﻹحصائيات', icon:<FaChartLine size={24} className='text-white'/>, href: '/account/statistics' },
    { id: 'الطلبات السريعة ', label: ' الطلبات السريعة', icon:<TbReorder size={24} className='text-white'/>, href: '/account/fast-order' },
-   { id: 'الرسائل ', label: ' الرسائل', icon:<LuMessagesSquare size={24} className='text-white'/>, href: '/account/messages' },   
-   { id: 'إعدادت الصفحة الرئيسية ', label: ' إعدادات الصفحة الرئيسية', icon:<RiHomeGearFill size={24} className='text-white'/>, href: '/account/edite-home-page' },
+   {  id: 'الرسائل ', label: ' الرسائل',
+    icon:   unread > 0 ? <div className='relative'>   
+   <span className="absolute -top-3 -right-4 flex h-10 w-10 items-center justify-center rounded-full bg-sec text-lg text-white font-semibold">{unread}
+   </span><LuMessagesSquare size={24} className='text-white'/> 
+    </div> :<LuMessagesSquare size={24} className='text-white'/> , 
+    href: '/account/messages', },
+       { id: 'إعدادت الصفحة الرئيسية ', label: ' إعدادات الصفحة الرئيسية', icon:<RiHomeGearFill size={24} className='text-white'/>, href: '/account/edite-home-page' },
 
     { id: 'إعدادت الحساب', label: 'أعدادات الحساب', icon:<IoSettingsOutline size={24} className='text-white'/>, href: '/account/personal-information' },
     { id: 'الصفحة الرئيسية', label: 'الصفحة الرئيسية', icon: <IoHomeOutline size={24} className='text-white'/>, href: '/' },

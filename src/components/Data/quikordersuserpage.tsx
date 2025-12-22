@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Download } from 'lucide-react';
+import { Search, Download, ChevronRight, ChevronLeft } from 'lucide-react';
 import useFetchAllNewsLetterEmails from '../requests/fetchAllNewsletters';
 import NewsletterTable from './newsletterTable';
 import useFetchQuikeOrders from '../requests/fetchQuikOrders';
@@ -11,6 +11,8 @@ import Link from 'next/link';
 const QuikeOrderUser = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [lastUpdated, setLastUpdated] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const { AllNewsLetters } = useFetchAllNewsLetterEmails();
   const { data: session, status } = useSession({ required: true });
 
@@ -27,13 +29,29 @@ const QuikeOrderUser = () => {
   }, [orders, session?.user?.id]);
 
   const filteredSubscribers = useMemo(() => {
-    if (!searchTerm) return userOrders;
-    return userOrders.filter(subscriber =>
+    if (!searchTerm) return userOrders || [];
+    return (userOrders || []).filter(subscriber =>
       subscriber.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       subscriber.phone_number.includes(searchTerm) ||
       subscriber.date?.includes(searchTerm)
     );
   }, [userOrders, searchTerm]);
+
+  // Pagination calculations
+  const totalItems = filteredSubscribers.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  // Get current page items
+  const currentItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredSubscribers.slice(startIndex, endIndex);
+  }, [filteredSubscribers, currentPage, itemsPerPage]);
+
+  // Reset to first page when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const exportToCSV = () => {
     const csvContent = [
@@ -67,11 +85,46 @@ const QuikeOrderUser = () => {
     });
   };
 
+  // Handle page change
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  // Generate page numbers for pagination controls
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, currentPage + 2);
+      
+      if (currentPage <= 3) {
+        endPage = maxVisiblePages;
+      } else if (currentPage >= totalPages - 2) {
+        startPage = totalPages - maxVisiblePages + 1;
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
+  };
+
   return (
     <div dir="rtl" className="w-full max-w-4xl mx-auto pt-6 px-2 rounded-xl bg-gray-50">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-sec mb-4 font-playfair text-right">
-طلبات سريعة        </h1>
+          طلبات سريعة
+        </h1>
 
         {/* أدوات البحث والتصدير */}
         <div className="flex flex-col sm:flex-row-reverse gap-4 mb-4">
@@ -88,7 +141,7 @@ const QuikeOrderUser = () => {
 
           <button
             onClick={exportToCSV}
-            className="flex items-center gap-2 px-4 py-2 bg-sec text-white rounded-lg hover:bg-prim transition-colors duration-200 font-bold text-2xl"
+            className="flex items-center w-fit gap-2 px-4 py-2 bg-sec text-white rounded-lg hover:bg-prim transition-colors duration-200 font-bold text-2xl"
           >
             <Download className="w-6 h-6" />
             تصدير كملف CSV
@@ -120,8 +173,8 @@ const QuikeOrderUser = () => {
             </tr>
           </thead>
           <tbody className='bg-neutral'>
-            {filteredSubscribers.length > 0 ? (
-              filteredSubscribers.map((subscriber, index) => (
+            {currentItems.length > 0 ? (
+              currentItems.map((subscriber, index) => (
                 <tr
                   key={index}
                   className=" transition-colors duration-150 border-b last:border-0 border-gray-50"
@@ -151,11 +204,74 @@ const QuikeOrderUser = () => {
         </table>
       </div>
 
+      {/* Pagination Controls */}
+      {totalItems > 0 && (
+        <div className="flex flex-col flex-wrap sm:flex-row justify-between items-center mt-6 p-4 bg-white rounded-lg shadow-sm">
+          {/* Items per page selector */}
+          <div className="mb-4 sm:mb-0">
+            <label className="text-gray-700 text-2xl font-medium ml-2">
+              عدد العناصر في الصفحة:
+            </label>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1); // Reset to first page when changing items per page
+              }}
+              className="mr-2 px-3 py-1 border border-gray-300 rounded-lg text-right text-2xl"
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+
+          {/* Page info */}
+          <div className="text-gray-700 mb-4 sm:mb-0">
+            <span className="font-medium text-2xl">
+              عرض {Math.min((currentPage - 1) * itemsPerPage + 1, totalItems)} - {Math.min(currentPage * itemsPerPage, totalItems)} من {totalItems} طلب
+            </span>
+          </div>
+
+          {/* Pagination buttons */}
+          <div className="flex items-center gap-2">
+            {/* Previous button */}
+            <button
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`p-2 rounded-lg ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-100'}`}
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+            {/* Page numbers */}
+            {getPageNumbers().map(page => (
+              <button
+                key={page}
+                onClick={() => goToPage(page)}
+                className={`w-10 h-10 rounded-lg text-lg font-medium ${currentPage === page ? 'bg-prim text-white' : 'text-gray-700 hover:bg-gray-100'}`}
+              >
+                {page}
+              </button>
+            ))}
+
+            {/* Next button */}
+            <button
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`p-2 rounded-lg ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-gray-700 hover:bg-gray-100'}`}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* الفوتر */}
       <div className="mt-4 text-2xl text-gray-500 text-center">
         يتم تحديث البيانات في الوقت الفعلي {lastUpdated && `• آخر تحديث: ${lastUpdated}`}
       </div>
-    
     </div>
   );
 };

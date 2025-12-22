@@ -8,6 +8,8 @@ import { RiAccountPinBoxFill } from "react-icons/ri";
 import { FaCircleInfo } from "react-icons/fa6";
 import { IoBusiness } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { MdBlock } from "react-icons/md";
+import { MdCheckCircleOutline } from "react-icons/md";
 import { MdVerified } from "react-icons/md";
 import { VscUnverified } from "react-icons/vsc";
 import { FiFilter } from "react-icons/fi";
@@ -20,8 +22,11 @@ import { FaStar } from "react-icons/fa";
 import { IoChatboxEllipses } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
 import useFetchAllBookings from '../requests/fetchAllBookings';
+import UserConversationsPopup from './chat-popap';
+import { useSession } from 'next-auth/react';
 
 const UserAccordionDisplay = () => {
+  const { data: session, status } = useSession({ required: true });
   const { AllUsers, mutate } = useFetchAllUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,7 +39,9 @@ const UserAccordionDisplay = () => {
   const [trustUserId, setTrustUserId] = useState<number | null>(null);
   const [selectedTrust, setSelectedTrust] = useState<string>('');
   const { AllBookings, isLoading, error } = useFetchAllBookings();
-
+  const [banUserId, setBanUserId] = useState<number | null>(null);
+const [showChatPopup, setShowChatPopup] = useState(false);
+const [selectedChatUserId, setSelectedChatUserId] = useState<number | null>(null);
   const router = useRouter();
   const filteredUsers = useMemo(() => {
     if (!AllUsers) return [];
@@ -61,6 +68,31 @@ const UserAccordionDisplay = () => {
     setSearchTerm('');
     setFilterByStatus(null);
   };
+
+
+
+  const handleBanToggle = async (id:any, currentStatus:any) => {
+    const newStatus = !currentStatus;
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}infoid/${id}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json', 
+          "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+        },
+        body: JSON.stringify({ id, is_active: newStatus, status: '' })
+      });
+      if (!res.ok) throw new Error('فشل في تغيير حالة الحظر');
+      
+      console.log('Ban status updated:', id, newStatus);
+      setBanUserId(null);
+            mutate();
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
 
   const handleDelete = async (id: number) => {
     try {
@@ -251,9 +283,7 @@ const UserAccordionDisplay = () => {
               <div className="flex-shrink-0 ml-4 flex-wrap">
                 {user.profile_image ? (
                   <img
-                    src={user.profile_image.startsWith('image/upload') 
-                      ? `${process.env.NEXT_PUBLIC_IMAGE}/${user.profile_image}`
-                      : user.profile_image
+                    src={`${process.env.NEXT_PUBLIC_IMAGE}/${user.profile_image}`
                     }
                     alt={getDisplayName(user)}
                     className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
@@ -312,7 +342,7 @@ const UserAccordionDisplay = () => {
                     )}
                     {!user.is_active && (
                       <span className="inline-flex items-center select-none px-4 py-2 rounded-full text-xl font-bold bg-gray-100 text-gray-800">
-                        غير نشط
+محظور
                       </span>
                     )}
                     
@@ -356,7 +386,7 @@ const UserAccordionDisplay = () => {
                         <div>البريد الإلكتروني: {user.email}</div>
                         <div>رقم الهاتف: {user.phoneNumber || 'غير متوفر'}</div>
                      
-                        <div className="flex items-center space-x-2">
+                        <div className="flex flex-wrap items-center space-x-2">
                           تم التحقق:
                           <span className={`px-2 py-1 rounded text-2xl flex gap-2 items-center ${
                             user.is_email_verified ? 'text-green-400' : 'text-red-400'
@@ -481,13 +511,13 @@ const UserAccordionDisplay = () => {
                     </div>
                 </div>
                 
-                <div className='flex justify-end gap-4 p-4'>
+                <div className='flex flex-wrap justify-end gap-4 p-4'>
                     {user.status == "seller" && (
-                       <IoChatboxEllipses className='text-sec hover:text-prim cursor-pointer' size={32} onClick={()=>router.push(`/account/messages/?id=10`)}/>
+                       <IoChatboxEllipses className='text-sec hover:text-prim cursor-pointer' size={32} onClick={()=>router.push(`/account/messages/?id=${user.id}`)}/>
                     )}
 
                     {user.status == "field" && (
-                       <IoChatboxEllipses className='text-sec hover:text-prim cursor-pointer' size={32} onClick={()=>router.push(`/account/messages/?id=10`)}/>
+                       <IoChatboxEllipses className='text-sec hover:text-prim cursor-pointer' size={32} onClick={()=>router.push(`/account/messages/?id=${user.id}`)}/>
                     )}
                  
 
@@ -506,7 +536,23 @@ const UserAccordionDisplay = () => {
                     <MdCheckCircle className='h-6 w-6 text-white'/>
                     تغيير الحالة
                   </button>
-                  
+                       
+                  <button 
+                    className={`w-48 ${user.is_active ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'} text-white rounded-md py-3 flex gap-2 items-center justify-center transition-colors`}
+                    onClick={() => setBanUserId(user.id)}
+                  >
+                    {user.is_active ? (
+                      <>
+                        <MdBlock className='h-6 w-6 text-white'/>
+                        حظر
+                      </>
+                    ) : (
+                      <>
+                        <MdCheckCircleOutline className='h-6 w-6 text-white'/>
+                        رفع الحظر
+                      </>
+                    )}
+                  </button>
                   <button 
                     className='w-48 bg-prim text-white rounded-md py-3 hover:bg-a flex gap-2 items-center justify-center transition-colors'
                     onClick={() => setDeleteUserId(user.id)}
@@ -514,7 +560,16 @@ const UserAccordionDisplay = () => {
                     <RiDeleteBin6Line className='h-6 w-6 text-white'/>
                     حذف
                   </button>
-                  
+                <button 
+  className='w-fit px-4 bg-sec text-white rounded-md py-3 hover:bg-prim flex gap-2 items-center justify-center transition-colors'
+  onClick={() => {
+    setSelectedChatUserId(user.id);
+    setShowChatPopup(true);
+  }}
+>
+  <IoChatboxEllipses className='h-6 w-6 text-white'/>
+  عرض المحادثات
+</button>
                 </div>
               </div>
             )}
@@ -680,6 +735,61 @@ const UserAccordionDisplay = () => {
           </div>
         </div>
       )}
+
+
+
+{showChatPopup && selectedChatUserId && (
+  <UserConversationsPopup 
+    userId={selectedChatUserId}
+    session={session} // pass your session here
+    onClose={() => {
+      setShowChatPopup(false);
+      setSelectedChatUserId(null);
+    }}
+  />
+)}
+
+      {/* نافذة تأكيد الحظر/رفع الحظر */}
+      {banUserId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="rounded-2xl bg-white p-6 max-w-5xl mx-auto">
+            <h3 className="text-3xl font-bold text-gray-800 mb-4 font-playfair">
+              {AllUsers.find(u => u.id === banUserId)?.is_active ? 'تأكيد الحظر' : 'تأكيد رفع الحظر'}
+            </h3>
+            <p className="mb-6 text-2xl text-gray-600">
+              {AllUsers.find(u => u.id === banUserId)?.is_active 
+                ? 'هل أنت متأكد أنك تريد حظر هذا المستخدم؟ لن يتمكن من الوصول إلى حسابه.'
+                : 'هل أنت متأكد أنك تريد رفع الحظر عن هذا المستخدم؟ سيتمكن من الوصول إلى حسابه مجدداً.'
+              }
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setBanUserId(null)}
+                className="px-6 py-3 text-gray-700 border border-gray-300 hover:bg-gray-100 transition-colors rounded-lg"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={() => {
+                  const user = AllUsers.find(u => u.id === banUserId);
+                  if (user) {
+                    handleBanToggle(banUserId, user.is_active);
+                  }
+                }}
+                className={`px-6 py-3 text-white transition-colors rounded-lg ${
+                  AllUsers.find(u => u.id === banUserId)?.is_active
+                    ? 'bg-red-600 hover:bg-red-700'
+                    : 'bg-green-600 hover:bg-green-700'
+                }`}
+              >
+                {AllUsers.find(u => u.id === banUserId)?.is_active ? 'حظر' : 'رفع الحظر'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
 
       {/* الترقيم */}
       {totalPages > 1 && (

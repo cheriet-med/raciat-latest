@@ -25,11 +25,12 @@ import { BsBuildingsFill } from "react-icons/bs";
 import { RiArticleFill } from "react-icons/ri";
 import { HiTicket } from "react-icons/hi2";
 import AnalyticsAdmin from '../Data/analyticsAdmin';
-import OrderCart from '../Data/orderCardsUser';
+import EditRestaurantForm from '../requests/editeRestaurantListing';
 import { RiHomeGearFill } from "react-icons/ri";
 import { TbReorder } from "react-icons/tb";
 import { LuMessagesSquare } from "react-icons/lu";
 import { FaChartLine } from "react-icons/fa";
+import EditeOrderForm from '../requests/editeOrder';
 
 interface MenuItem {
   id: string;
@@ -65,7 +66,7 @@ interface Conversation {
 
 
 
-export default function ManageOrders() {
+export default function EditeOrderAdmin() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
     
@@ -108,6 +109,7 @@ const fetchConversations = async () => {
  const unread = conversations.reduce((sum, convo) => {
   return sum + (convo.unread_count || 0);
 }, 0);
+
 
 
   const menuItems: MenuItem[] = [
@@ -247,7 +249,7 @@ const fetchConversations = async () => {
       {/* Main Content Area */}
       <div className="min-h-screen flex flex-col lg:mr-96 pt-16 lg:pt-0">
         <main className="flex-grow p-4 md:p-6">
-          <OrderCart />
+          <EditeOrderForm />
         </main>
       
         {/* Footer */}

@@ -179,14 +179,23 @@ function SearchResultsContent() {
         return () => window.removeEventListener("resize", checkScreen);
     }, []);
 
-    // Advanced filtering logic with multiple parameters
+    // Advanced filtering logic with multiple parameters including is_visible
     const filteredListings = useMemo(() => {
         if (!listings) return [];
 
         return listings.filter((property) => {
+            // First filter: Check if property is visible
+            // Handle both boolean and string values
+            const isPropertyVisible = property.is_visible === true ||
+                                     String(property.is_visible).toLowerCase() === "true";
+            
+            if (!isPropertyVisible) {
+                return false;
+            }
 
+            // Filter by keyword
             if (keywordQuery && keywordQuery !== "الكل") {
-                if (property.name === keywordQuery || !property.name?.includes(keywordQuery)) {
+                if (!property.name?.includes(keywordQuery)) {
                     return false;
                 }
             }
@@ -350,30 +359,36 @@ function SearchResultsContent() {
 
     return (
         <Layout>
-           <div className="page-title style-default">
-                      <div className="thumbs">
-                          <Image
-                              src="/hero7.avif"
-                              width={1920}
-                              height={300}
-                              alt=""
-                              priority
-                          />
-                      </div>
-                      <div className="content text-center">
-                          <div className="tf-container">
-                              <h2 className="title text_white mb_12 text-5xl lg-text-7xl font-bold"> نتائج البحث
-          </h2>
-                              <p className="text_white mt-4">
-                                  {filteredListings.length} عقار متاح
-                              </p>
-                          </div>
-                      </div>
-                  </div>
+            <div className="page-title style-default">
+                <div className="thumbs">
+                    <Image
+                        src="/hero7.avif"
+                        width={1920}
+                        height={300}
+                        alt=""
+                        priority
+                    />
+                </div>
+                <div className="content text-center">
+                    <div className="tf-container">
+                        <h2 className="title text_white mb_12 text-5xl lg-text-7xl font-bold">
+                            نتائج البحث
+                        </h2>
+                        <p className="text_white mt-4">
+                            {filteredListings.length} عقار متاح
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
             <div className="section-features-property-4 tf-spacing-1 mt-6">
                 <div className="tf-container">
                     {filteredListings?.length === 0 ? (
-                        <div className="text-center py-10">لا توجد عقارات تطابق معايير البحث</div>
+                        <div className="text-center py-10">
+                            {listings?.length > 0 
+                                ? "لا توجد عقارات مرئية تطابق معايير البحث" 
+                                : "لا توجد عقارات متاحة حالياً"}
+                        </div>
                     ) : isMobile ? (
                         <Swiper
                             modules={[Pagination]}

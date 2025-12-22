@@ -290,10 +290,7 @@ const stripHtmlTags = (html: string | null | undefined) => {
                 <div className="flex-shrink-0 ml-4">
                   {order.image ? (
                     <img
-                      src={order.image.startsWith('image/upload') 
-                        ? `${process.env.NEXT_PUBLIC_IMAGE}/${order.image}`
-                        : order.image
-                      }
+                      src={`${process.env.NEXT_PUBLIC_IMAGE}/${order.image}`}
                       alt={order.name}
                       className="h-24 w-32 rounded-lg object-cover border-2 border-gray-200"
                     />
@@ -359,7 +356,7 @@ const stripHtmlTags = (html: string | null | undefined) => {
                     </span>
                     <span className="flex items-center gap-1">
               
-                      {order.price} 
+                      {order.price} SAR
                     </span>
                     <span className="flex items-center gap-1">
                       <Calendar className="h-6 w-6" />

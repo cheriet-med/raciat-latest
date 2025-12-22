@@ -34,7 +34,7 @@ export default function Properties2() {
   let hoverTimer: ReturnType<typeof setTimeout>;
 
   const featured = listings?.filter(
-    list => list.is_featured === true
+    list => list.is_featured === true && list.is_visible === true
   ) || [];
 
   const handleMouseEnter = (tabId: any) => {

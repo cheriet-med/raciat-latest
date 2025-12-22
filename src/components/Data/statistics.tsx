@@ -6,7 +6,7 @@ import { FaBuilding } from "react-icons/fa";
 import { RiArticleFill } from "react-icons/ri";
 import { LiaFirstOrder } from "react-icons/lia";
 import { FaUsers } from "react-icons/fa";
-
+import { GiPriceTag } from "react-icons/gi";
 import ApexChart from "./ApexChart";
 import useFetchListing from "../requests/fetchListings";
 import useFetchPostListing from "../requests/fetchPostsListings";
@@ -158,7 +158,7 @@ export default function Statistics() {
                   <p className="text-2xl text-white">إجمالي مبلغ الصفقات المحصل </p>
                   <p className="text-3xl font-extrabold text-white">SAR {AllBookings.filter(booking => booking.status === "منتهي").reduce((sum, booking) => sum + (Number(booking.price) || 0), 0) || 0}</p>
                 </div>
-                <FaUsers size={32} className="text-sec"/>
+                <GiPriceTag size={32} className="text-sec"/>
               </div>
             </article>
             <article className="rounded-xl border border-gray-100 bg-prim p-6 w-full shadow-sm">
@@ -167,7 +167,7 @@ export default function Statistics() {
                   <p className="text-2xl text-white">إجمالي مبلغ التذاكر</p>
                   <p className="text-3xl font-extrabold text-white">SAR {AllBookings.reduce((sum, booking) => sum + (Number(booking.price) || 0), 0) || 0}</p>
                 </div>
-                <FaUsers size={32} className="text-sec"/>
+                <GiPriceTag size={32} className="text-sec"/>
               </div>
             </article>
 
@@ -186,7 +186,7 @@ export default function Statistics() {
   })()
 }</p>
                 </div>
-                <FaUsers size={32} className="text-sec"/>
+                <GiPriceTag size={32} className="text-sec"/>
               </div>
             </article>
           </>
@@ -194,15 +194,15 @@ export default function Statistics() {
       </div>
       
       {/* Charts Section */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-9 gap-6">
+        <div className="lg:col-span-5">
           {isLoading ? (
             <ChartSkeleton />
           ) : (
             <StatisticsChart />
           )}
         </div>
-        <div className="xl:col-span-1">
+        <div className="lg:col-span-4">
           {isLoading ? (
             <DonutChartSkeleton />
           ) : (

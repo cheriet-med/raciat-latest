@@ -16,6 +16,7 @@ type BlogItem = {
     category: string;
     title: string;
     description: string;
+    content:string
 };
 
 
@@ -81,14 +82,12 @@ export default function BlogPost1({ blogItem }: { blogItem: BlogItem }) {
                                         {blogItem.description}
                                     </p>
 
-                                    {/* You can add more dynamic content here */}
-                                    <div className="passive mb_27">
-                                        <p className="text-body-2">
-                                            {/* Add your post content here */}
-                                            هذا محتوى المقال الديناميكي الذي يتم جلبها من الخادم.
-                                        </p>
-                                    </div>
-
+                               
+              <div
+                className="text-2xl text-prim dark:text-neutral-400 mt-8 space-y-2 prose-inherit text-right"
+                style={{ direction: 'rtl' }}
+                dangerouslySetInnerHTML={{ __html: blogItem?.content || '' }}
+              />
                                     {/* Rest of your component remains the same */}
                                     <div className="tag-share d-flex justify-content-between">
                                         {/* ... existing tag and share sections */}
