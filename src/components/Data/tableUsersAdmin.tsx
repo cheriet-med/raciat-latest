@@ -560,7 +560,8 @@ const [selectedChatUserId, setSelectedChatUserId] = useState<number | null>(null
                     <RiDeleteBin6Line className='h-6 w-6 text-white'/>
                     حذف
                   </button>
-                <button 
+                         {user.status == "seller" && (
+  <button 
   className='w-fit px-4 bg-sec text-white rounded-md py-3 hover:bg-prim flex gap-2 items-center justify-center transition-colors'
   onClick={() => {
     setSelectedChatUserId(user.id);
@@ -569,7 +570,20 @@ const [selectedChatUserId, setSelectedChatUserId] = useState<number | null>(null
 >
   <IoChatboxEllipses className='h-6 w-6 text-white'/>
   عرض المحادثات
-</button>
+</button>                    )}
+                {user.status == "field" && (
+  <button 
+  className='w-fit px-4 bg-sec text-white rounded-md py-3 hover:bg-prim flex gap-2 items-center justify-center transition-colors'
+  onClick={() => {
+    setSelectedChatUserId(user.id);
+    setShowChatPopup(true);
+  }}
+>
+  <IoChatboxEllipses className='h-6 w-6 text-white'/>
+  عرض المحادثات
+</button>                    )}
+              
+
                 </div>
               </div>
             )}

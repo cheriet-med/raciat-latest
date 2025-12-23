@@ -235,38 +235,46 @@ export default function Footer1() {
                             </div>
                         </div>
                         <div className="col-lg-4 col-md-6">
-                            <div className="footer-content footer-item d-flex justify-content-between">
-                                {footerSections.map((section) => (
-                                    <div
-                                        key={section.className}
-                                        className={`footer-col-block ${section.className}`}
-                                    >
-                                        <div className="footer-heading  footer-heading-mobile text-title fw-6 text_white mb_16">
-                                            {section.heading}
-                                        </div>
-                                        <div className="tf-collapse-content">
-                                            <ul className="footer-menu-list d-grid gap_12">
-                                                {section.links.map((link) => (
-                                                    <li
-                                                        key={
-                                                            link.href +
-                                                            link.label
-                                                        }
-                                                        className="text-body-default text_color-1"
-                                                    >
-                                                        <Link
-                                                            href={link.href}
-                                                            className="link"
-                                                        >
-                                                            {link.label}
-                                                        </Link>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                           <div className="footer-content footer-item d-flex justify-content-between">
+  {footerSections.map((section) => (
+    <div
+      key={section.className}
+      className={`footer-col-block ${section.className}`}
+      dir="rtl" // Add RTL direction
+    >
+      <div className="footer-heading footer-heading-mobile text-title fw-6 text_white mb_16 d-flex align-items-center justify-content-between">
+        {/* Icon on the left */}
+        <span className="tf-collapse-icon ms-2">
+          {/* Your plus/minus icon here */}
+          <svg width="12" height="12" viewBox="0 0 12 12">
+            <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="2"/>
+          </svg>
+        </span>
+        
+        {/* Heading text */}
+        <span className="text-end flex-grow-1">{section.heading}</span>
+      </div>
+      
+      <div className="tf-collapse-content">
+        <ul className="footer-menu-list d-grid gap_12 text-end">
+          {section.links.map((link) => (
+            <li
+              key={link.href + link.label}
+              className="text-body-default text_color-1"
+            >
+              <Link
+                href={link.href}
+                className="link"
+              >
+                {link.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  ))}
+</div>
                         </div>
                         <div className="col-lg-4">
                             <div className="footer-newsletter footer-item">
@@ -370,7 +378,7 @@ export default function Footer1() {
                     <p className="text_muted-color">
                         ©2025 {"  "}
                         <Link
-                            href="#"
+                            href="/"
                             className="text_white hover-underline-link"
                         >
                             راسيات.
@@ -380,22 +388,22 @@ export default function Footer1() {
                     </p>
                     <ul className="social d-flex gap_24">
                         <li>
-                            <Link href="#" className="icon-FacebookLogo"></Link>
+                            <Link href="https://web.facebook.com/" className="icon-FacebookLogo"></Link>
                         </li>
                         <li>
-                            <Link href="#" className="icon-XLogo"></Link>
+                            <Link href="https://twitter.com/" className="icon-XLogo"></Link>
                         </li>
                         <li>
-                            <Link href="#" className="icon-TiktokLogo"></Link>
+                            <Link href="https://www.tiktok.com/" className="icon-TiktokLogo"></Link>
                         </li>
                         <li>
                             <Link
-                                href="#"
+                                href="https://www.instagram.com/"
                                 className="icon-InstagramLogo"
                             ></Link>
                         </li>
                         <li>
-                            <Link href="#" className="icon-YoutubeLogo"></Link>
+                            <Link href="https://www.youtube.com/" className="icon-YoutubeLogo"></Link>
                         </li>
                     </ul>
                 </div>

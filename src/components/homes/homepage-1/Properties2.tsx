@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useFetchListing from "@/components/requests/fetchListings";
 
 // Skeleton component for the property list
@@ -30,16 +30,23 @@ const PropertyImageSkeleton = () => (
 
 export default function Properties2() {
   const { listings, isLoading } = useFetchListing(); 
-  const [activeTab, setActiveTab] = useState("tab1");
+  const [activeTab, setActiveTab] = useState<string | null>(null);
   let hoverTimer: ReturnType<typeof setTimeout>;
 
   const featured = listings?.filter(
     list => list.is_featured === true && list.is_visible === true
   ) || [];
 
+  // Set the first featured property as active when data loads
+  useEffect(() => {
+    if (featured.length > 0 && activeTab === null) {
+      setActiveTab(featured[0].id.toString());
+    }
+  }, [featured, activeTab]);
+
   const handleMouseEnter = (tabId: any) => {
     hoverTimer = setTimeout(() => {
-      setActiveTab(tabId);
+      setActiveTab(tabId.toString());
     }, 100);
   };
 
@@ -85,7 +92,7 @@ export default function Properties2() {
               <div
                 key={property.id}
                 className={`process-item item scrolling-effect effectLeft${
-                  +activeTab === property.id ? " active" : ""
+                  activeTab === property.id.toString() ? " active" : ""
                 }`}
                 data-tab={property.id}
                 onMouseEnter={() => handleMouseEnter(property.id)}
@@ -113,7 +120,7 @@ export default function Properties2() {
               <div
                 key={property.id}
                 className={`tab-content${
-                  +activeTab === property.id ? " active" : ""
+                  activeTab === property.id.toString() ? " active" : ""
                 }`}
               >
                 <Link href={`/property-details-1/${property.id}`} className="img-style">

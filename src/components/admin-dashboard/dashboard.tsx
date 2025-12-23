@@ -122,6 +122,7 @@ const fetchConversations = async () => {
     
 
    { id: 'اﻹحصائيات ', label: ' اﻹحصائيات', icon:<FaChartLine size={24} className='text-white'/>, href: '/account/statistics' },
+   { id: 'الطلبات السريعة ', label: ' الطلبات السريعة', icon:<TbReorder size={24} className='text-white'/>, href: '/account/fast-order' },
 
     {  id: 'الرسائل ', label: ' الرسائل',
     icon:   unread > 0 ? <div className='relative'>   

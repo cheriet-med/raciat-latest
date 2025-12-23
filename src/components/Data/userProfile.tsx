@@ -328,18 +328,7 @@ const ProfileCard: React.FC = () => {
   // =============== MAIN RENDER ===============
   return (
     <div dir="rtl">  
-      {profileData.is_email_verified == false ? 
-        <div className="rounded-lg m-1 sm:m-2 md:m-3 relative bg-sec p-2 flex gap-4 flex-wrap justify-center items-center">
-          <p className='text-white font-playfair text-center'>
-            الرجاء النقر فوق "التحقق" لتلقي رسالة بريد إلكتروني تحتوي على رابط التحقق الخاص بك.
-          </p>
-          {emailsendvalidation && <p className="text-white text-2xl text-center">تم إرسال رسالة التحقق، يرجى التحقق من صندوق الوارد أو مجلد البريد غير الهام.</p>}
-          {emailsenderrorvalidation && <p className="text-white text-2xl text-center">تعذّر إرسال رسالة التحقق. يرجى المحاولة مرة أخرى.</p>}
-          <p className='text-white font-extrabold underline hover:text-accent cursor-pointer font-playfair' onClick={sendVerificationEmail}>
-            تحقق
-          </p>
-        </div> 
-      : "" }
+ 
 
       <div className="mx-2 lg:mx-24 my-8 font-montserrat"> 
         

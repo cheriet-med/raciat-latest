@@ -389,7 +389,16 @@ const QuikeOrderTableAdmin = () => {
                     {subscriber.date}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold text-prim" style={{ textAlign: 'center' }}>
-                   ID: {subscriber.listing_id}  <Link href={`/property-details-1/${subscriber.listing_id}`}><FaEye className="inline-block ml-2 cursor-pointer hover:text-sec " size={18} /></Link> 
+{
+  subscriber.listing_id ? (
+    <>
+      ID: {subscriber.listing_id}
+      <Link href={`/property-details-1/${subscriber.listing_id}`}>
+        <FaEye className="inline-block ml-2 cursor-pointer hover:text-sec" size={18} />
+      </Link>
+    </>
+  ) : "غير متوفر"
+}                  
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-2xl font-bold text-prim" style={{ textAlign: 'center' }}>
                     <div className="flex items-center justify-center gap-3">

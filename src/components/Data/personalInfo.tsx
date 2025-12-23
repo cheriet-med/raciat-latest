@@ -273,11 +273,11 @@ const sendVerificationEmail = async () => {
           </div>
 <hr className="text-sec border-2"/>
           {/* Email Address */}
-          <div className="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <div className="px-4 py-1 flex flex-wrap sm:grid sm:grid-cols-3 gap-4 sm:px-0">
             <dt className="font-medium text-gray-900 font-playfair text-3xl">عنوان البريد الإلكتروني</dt>
             <dd className="mt-1 text-2xl text-gray-700 sm:col-span-2 sm:mt-0 flex justify-between items-center">
               <div>
-                <div className="flex gap-4 items-center text-2xl">
+                <div className="flex flex-wrap gap-4 mx-2 items-center text-2xl">
                   <span>{profileData.email}</span>
                    {profileData.is_email_verified == false ? "" :
                     <div className="relative h-7 w-7 ">
@@ -301,28 +301,24 @@ const sendVerificationEmail = async () => {
   </p>
 )}
 {emailsenderrorvalidation && (
-  <p className="text-sec text-2xl text-center">
+  <p className="text-sec text-2xl ">
     لم نتمكن من إرسال رسالة التحقق. يرجى المحاولة مرة أخرى.
   </p>
 )}
 {emailsend && (
-  <p className="text-sec text-2xl text-center">
+  <p className="text-sec text-2xl ">
     تم إرسال تأكيد تحديث البريد الإلكتروني بنجاح.
   </p>
 )}
 {emailsenderror && (
-  <p className="text-sec text-2xl text-center">
+  <p className="text-sec text-2xl ">
     لم يتم إرسال البريد الإلكتروني. يرجى إعادة المحاولة.
   </p>
 )}
 
               </div>
               <div className="flex gap-4 flex-wrap">
-               {profileData.is_email_verified == false ? 
-              <button className="text-2xl font-medium text-sec hover:text-secondary flex items-center"  onClick={sendVerificationEmail}>
-                <MdOutlineVerified className="h-6 w-6 ml-2"  />
-                تأكيد
-              </button>: ""}
+            
                   <button className="text-2xl font-medium text-sec hover:text-secondary flex items-center"  onClick={resetEmail}>
                      <GoPencil className="h-6 w-6 ml-2" />
                تعديل
@@ -333,11 +329,11 @@ const sendVerificationEmail = async () => {
           </div>
 <hr className="text-sec border-2"/>
           {/* Password */}
-          <div className="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <div className="px-4 py-1 sm:grid sm:grid-cols-3 gap-4 sm:px-0">
             <dt className="font-medium text-gray-900 font-playfair">كلمة المرور</dt>
             <dd className="mt-1 text-2xl text-gray-700 sm:col-span-2 sm:mt-0 flex justify-between items-center">
               <div>
-                <span>***********</span>
+                <span >***********</span>
 {passwordsend && (
   <p className="text-sec text-2xl text-center">
     تم إرسال البريد الإلكتروني لتعديل كلمة المرور بنجاح.
@@ -359,10 +355,10 @@ const sendVerificationEmail = async () => {
           </div>
 <hr className="text-sec border-2"/>
           {/* Phone Numbers */}
-          <div className="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+          <div className="px-4 py-1 flex flex-wrap sm:grid sm:grid-cols-3 gap-4 sm:px-0">
             <dt className="font-medium text-gray-900 font-playfair text-3xl">رقم الهاتف </dt>
             <dd className="mt-1 text-2xl text-gray-700 sm:col-span-2 sm:mt-0">
-              <div className="flex justify-between items-start">
+              <div className="flex flex-wrap gap-2 justify-between items-start">
                 <div>
                   
                   {profileData.phoneNumber == null ?  <p className="text-gray-500 mt-1">
@@ -370,7 +366,7 @@ const sendVerificationEmail = async () => {
                   </p>: 
                   (profileData.is_phone_number_verified == false ?
                   <p className="text-gray-700">{profileData.phoneNumber}</p> :  
-                  <div className="flex gap-4 items-center">
+                  <div className="flex gap-4 mx-2 items-center">
                   <span>{profileData.phoneNumber}</span>
                   
                     <div className="relative h-7 w-7 ">
@@ -391,16 +387,8 @@ const sendVerificationEmail = async () => {
                   }
                  
                 </div>
-<div className="flex gap-4">
-  {profileData.is_phone_number_verified == false ?
-<VerifyPhoneOTP 
-  initialPhoneNumber={profileData.phoneNumber}
-  infoId={userId}
-  onVerificationSuccess={(phoneNumber:any) => {
-    console.log('Phone verified:', phoneNumber);
-  }}
-  mutate={mutate}
-/>:""}
+<div className="flex gap-4 flex-wrap">
+
                 <EditPhone
                   initialFullName={profileData.phoneNumber}
                   infoId={userId}

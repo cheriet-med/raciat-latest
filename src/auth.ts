@@ -224,7 +224,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           
           // Authenticate with Django backend
           const response = await fetch(
-            `${API_URL}auth/o/google-oauth2/`,
+            `${process.env.NEXT_PUBLIC_SITE_URL}auth/o/google-oauth2/`,
             {
               method: "POST",
               headers: {
@@ -234,7 +234,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 access_token: account?.access_token,
                 id_token: account?.id_token,
                 code: account?.code,
-                redirect_uri: `${process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback/google`
+                redirect_uri: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback/google`
               })
             }
           );

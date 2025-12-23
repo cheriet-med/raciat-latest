@@ -3,10 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { X, Search, Loader2, MessageCircle, ChevronRight, ArrowLeft } from 'lucide-react';
 
 interface User {
-  id: string;
+  id: number;
   email: string;
-  full_name: string;
-  profile_image: string;
+  full_name: string | null;
+  profile_image: string | null;
 }
 
 interface Message {
@@ -47,7 +47,7 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
   }, [userId]);
 
   useEffect(() => {
-    if (selectedConversation) {
+    if (selectedConversation && selectedConversation.user) {
       fetchMessages(selectedConversation.user.id);
     }
   }, [selectedConversation]);
@@ -79,60 +79,36 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
       setIsLoadingConversations(true);
       setError(null);
       
-      const usersResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}api/search-users/?q=`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/conversations/`, {
         headers: {
           'Authorization': `JWT ${session?.accessToken}`
         }
       });
       
-      if (!usersResponse.ok) throw new Error('فشل في جلب المستخدمين');
+      if (!response.ok) throw new Error('فشل في جلب المحادثات');
       
-      const users = await usersResponse.json();
-      const conversationsList: Conversation[] = [];
+      const data = await response.json();
       
-      for (const otherUser of users) {
-        if (otherUser.id === userId) continue;
+      // Filter conversations where the target user is involved
+      const filteredConversations = data.filter((convo: Conversation) => {
+        const isSender = convo.last_message.sender.id === Number(userId);
+        const isReceiver = convo.last_message.receiver.id === Number(userId);
+        return isSender || isReceiver;
+      });
+      
+      // Map conversations to show the other user (not the target user)
+      const mappedConversations = filteredConversations.map((convo: Conversation) => {
+        // Determine who is the "other user" - the one we're having conversation with
+        const isTargetUserSender = convo.last_message.sender.id === Number(userId);
+        const otherUser = isTargetUserSender ? convo.last_message.receiver : convo.last_message.sender;
         
-        try {
-          const messagesResponse = await fetch(
-            `${process.env.NEXT_PUBLIC_URL}api/messages/${otherUser.id}/`,
-            {
-              headers: {
-                'Authorization': `JWT ${session?.accessToken}`
-              }
-            }
-          );
-          
-          if (messagesResponse.ok) {
-            const messages = await messagesResponse.json();
-            
-            const relevantMessages = messages.filter((msg: Message) => 
-              msg.sender.id === String(userId) || msg.receiver.id === String(userId)
-            );
-            
-            if (relevantMessages.length > 0) {
-              const lastMessage = relevantMessages[relevantMessages.length - 1];
-              const unreadCount = relevantMessages.filter((msg: Message) => 
-                msg.receiver.id === String(userId) && !msg.is_read
-              ).length;
-              
-              conversationsList.push({
-                user: otherUser,
-                last_message: lastMessage,
-                unread_count: unreadCount
-              });
-            }
-          }
-        } catch (err) {
-          console.error(`فشل في جلب الرسائل مع المستخدم ${otherUser.id}:`, err);
-        }
-      }
+        return {
+          ...convo,
+          user: otherUser // Replace the user with the actual conversation partner
+        };
+      });
       
-      conversationsList.sort((a, b) => 
-        new Date(b.last_message.timestamp).getTime() - new Date(a.last_message.timestamp).getTime()
-      );
-      
-      setConversations(conversationsList);
+      setConversations(mappedConversations);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'حدث خطأ');
     } finally {
@@ -140,12 +116,13 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
     }
   };
 
-  const fetchMessages = async (otherUserId: string) => {
+  const fetchMessages = async (otherUserId: number) => {
     try {
       setIsLoadingMessages(true);
       setError(null);
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/messages/${otherUserId}/`, {
+      // Fetch all messages then filter them
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/messages/${userId}`, {
         headers: {
           'Authorization': `JWT ${session?.accessToken}`
         }
@@ -155,12 +132,24 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
       
       const data = await response.json();
       
-      const relevantMessages = data.filter((msg: Message) => 
-        (msg.sender.id === String(userId) && msg.receiver.id === otherUserId) ||
-        (msg.sender.id === otherUserId && msg.receiver.id === String(userId))
-      );
       
-      setMessages(relevantMessages);
+      // Filter to show only messages between the target user (userId) and the other user (otherUserId)
+      const relevantMessages = data.filter((msg: Message) => {
+        const currentUserId = Number(userId);
+        const isBetweenUsers = 
+          (msg.sender.id === currentUserId && msg.receiver.id === otherUserId) ||
+          (msg.sender.id === otherUserId && msg.receiver.id === currentUserId);
+        
+        return isBetweenUsers;
+      });
+      
+      // Sort messages by timestamp (oldest to newest)
+      const sortedMessages = relevantMessages.sort((a: Message, b: Message) => {
+        return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+      });
+      
+      console.log('✅ Filtered messages:', sortedMessages);
+      setMessages(sortedMessages);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'حدث خطأ');
     } finally {
@@ -211,7 +200,7 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4" dir="rtl">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-sec to-prim text-white p-6">
+        <div className="bg-sec text-white p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <MessageCircle className="w-8 h-8" />
@@ -220,7 +209,7 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
                   <div className="h-6 w-48 bg-white/20 rounded animate-pulse"></div>
                 ) : userData ? (
                   <>
-                    <h2 className="text-2xl font-bold font-playfair">محادثات {userData.full_name}</h2>
+                    <h2 className="text-2xl font-bold font-playfair">محادثات {userData.full_name || userData.email}</h2>
                     <p className="text-sm opacity-90">{userData.email}</p>
                   </>
                 ) : (
@@ -237,7 +226,7 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
           </div>
           
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 text-center">
+          <div className="grid grid-cols-2 gap-4 text-center">
             <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
               <MessageCircle className="w-5 h-5 mx-auto mb-1" />
               <p className="text-2xl font-bold">{totalConversations}</p>
@@ -248,11 +237,7 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
               <p className="text-2xl font-bold">{totalMessages}</p>
               <p className="text-xs opacity-90">رسائل</p>
             </div>
-            <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-              <MessageCircle className="w-5 h-5 mx-auto mb-1" />
-              <p className="text-2xl font-bold">{totalUnread}</p>
-              <p className="text-xs opacity-90">غير مقروءة</p>
-            </div>
+
           </div>
         </div>
 
@@ -306,21 +291,21 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
                   >
                     <div className="flex items-center gap-3">
                       <img
-                        src={`${process.env.NEXT_PUBLIC_IMAGE}/${convo.user.profile_image}` || '/profile.png'}
-                        alt={convo.user.full_name}
+                        src={convo.user.profile_image ? `${process.env.NEXT_PUBLIC_IMAGE}${convo.user.profile_image}` : '/profile.png'}
+                        alt={convo.user.full_name || convo.user.email}
                         className="w-12 h-12 rounded-full object-cover"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
                           <h4 className="font-semibold text-gray-900 truncate text-lg">
-                            {convo.user.full_name}
+                            {convo.user.full_name || convo.user.email}
                           </h4>
                           <span className="text-xs text-gray-400 flex-shrink-0 mr-2">
                             {formatDate(convo.last_message.timestamp)}
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 truncate">
-                          {convo.last_message.sender.id === String(userId) ? 'أنت: ' : ''}
+                          {convo.last_message.sender.id === Number(userId) ? 'أخر رسالة: ' : ''}
                           {convo.last_message.content}
                         </p>
                         {convo.unread_count > 0 && (
@@ -340,7 +325,7 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
           </div>
 
           {/* Messages View */}
-          <div className={`${selectedConversation ? 'flex' : 'hidden lg:flex'} flex-col flex-1 bg-white`}>
+          <div className={`${selectedConversation ? 'flex' : 'hidden lg:flex'} flex-col  w-[700px] bg-white`}>
             {selectedConversation ? (
               <>
                 {/* Messages Header */}
@@ -353,19 +338,19 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
                       <ArrowLeft className="w-5 h-5 rotate-180" />
                     </button>
                     <img
-                      src={`${process.env.NEXT_PUBLIC_IMAGE}/${userData?.profile_image}` || '/profile.png'}
-                      alt={userData?.full_name}
-                      className="w-10 h-10 rounded-full object-cover"
+                      src={userData?.profile_image ? `${process.env.NEXT_PUBLIC_IMAGE}${userData.profile_image}` : '/profile.png'}
+                      alt={userData?.full_name || 'User'}
+                      className="w-12 h-12 rounded-full object-cover"
                     />
                     <span className="text-gray-400">↔</span>
                     <img
-                      src={`${process.env.NEXT_PUBLIC_IMAGE}/${selectedConversation.user.profile_image}` || '/profile.png'}
-                      alt={selectedConversation.user.full_name}
-                      className="w-10 h-10 rounded-full object-cover"
+                      src={selectedConversation.user.profile_image ? `${process.env.NEXT_PUBLIC_IMAGE}${selectedConversation.user.profile_image}` : '/profile.png'}
+                      alt={selectedConversation.user.full_name || selectedConversation.user.email}
+                      className="w-12 h-12 rounded-full object-cover"
                     />
                     <div>
                       <h3 className="font-semibold text-gray-900 text-xl">
-                        {userData?.full_name} و {selectedConversation.user.full_name}
+                        {userData?.full_name || userData?.email} و {selectedConversation.user.full_name || selectedConversation.user.email}
                       </h3>
                       <p className="text-sm text-gray-500">
                         {messages.length} رسالة
@@ -378,71 +363,67 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-white to-gray-50">
                   {isLoadingMessages ? (
                     <div className="flex items-center justify-center h-32">
-                      <Loader2 className="w-8 h-8 text-sec animate-spin" />
+                      <Loader2 className="w-10 h-10 text-sec animate-spin" />
                     </div>
                   ) : messages.length === 0 ? (
                     <div className="flex items-center justify-center h-32 text-gray-500">
                       لا توجد رسائل
                     </div>
                   ) : (
-                    messages
-                      .sort((a, b) => 
-                        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-                      )
-                      .map((message) => {
-                        const isFromTargetUser = message.sender.id === String(userId);
-                        const sender = isFromTargetUser ? userData : selectedConversation.user;
-                        
-                        return (
-                          <div
-                            key={message.id}
-                            className={`flex ${isFromTargetUser ? 'justify-start' : 'justify-end'}`}
-                          >
-                            <div className="flex items-start gap-2 max-w-[70%]">
-                              {isFromTargetUser && (
-                                <img
-                                  src={`${process.env.NEXT_PUBLIC_IMAGE}/${sender?.profile_image}` || '/profile.png'}
-                                  alt={sender?.full_name}
-                                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                                />
-                              )}
-                              <div className={isFromTargetUser ? '' : 'flex flex-col items-end'}>
-                                <div className={`px-4 py-2 rounded-2xl ${
-                                  isFromTargetUser 
-                                    ? 'bg-gradient-to-br from-sec/90 to-prim/90 text-white rounded-tr-sm' 
-                                    : 'bg-gradient-to-br from-gray-100 to-gray-50 text-gray-900 rounded-tl-sm'
-                                }`}>
-                                  <p className="text-base leading-relaxed">{message.content}</p>
-                                </div>
-                                <div className="flex items-center mt-1 px-2 gap-2">
-                                  <span className={`text-xs font-medium ${
-                                    isFromTargetUser ? 'text-sec' : 'text-gray-600'
-                                  }`}>
-                                    {sender?.full_name}
-                                  </span>
-                                  <span className="text-xs text-gray-400">•</span>
-                                  <p className="text-xs text-gray-500">
-                                    {formatTime(message.timestamp)}
-                                  </p>
-                                  {message.is_read && (
-                                    <>
-                                      <span className="text-xs text-gray-400">•</span>
-                                      <span className="text-xs text-green-600">مقروءة</span>
-                                    </>
-                                  )}
-                                </div>
+                    messages.map((message) => {
+                      const isFromTargetUser = message.sender.id === Number(userId);
+                      const sender = isFromTargetUser ? userData : selectedConversation.user;
+                      
+                      return (
+                        <div
+                          key={message.id}
+                          className={`flex ${isFromTargetUser ? 'justify-start' : 'justify-end'}`}
+                        >
+                          <div className="flex items-start gap-2 max-w-[70%]">
+                            {isFromTargetUser && (
+                              <img
+                                src={sender?.profile_image ? `${process.env.NEXT_PUBLIC_IMAGE}${sender.profile_image}` : '/profile.png'}
+                                alt={sender?.full_name || sender?.email}
+                                className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                              />
+                            )}
+                            <div className={isFromTargetUser ? '' : 'flex flex-col items-end'}>
+                              <div className={`px-4 py-2 rounded-2xl ${
+                                isFromTargetUser 
+                                  ? 'bg-sec text-white rounded-tr-sm' 
+                                  : 'bg-gradient-to-br from-gray-100 to-gray-50 text-gray-900 rounded-tl-sm'
+                              }`}>
+                                <p className="text-base leading-relaxed">{message.content}</p>
                               </div>
-                              {!isFromTargetUser && (
-                                <img
-                                  src={`${process.env.NEXT_PUBLIC_IMAGE}/${sender?.profile_image}` || '/profile.png'}
-                                  alt={sender?.full_name}
-                                  className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                                />
-                              )}
+                              <div className="flex items-center mt-1 px-2 gap-2">
+                                <span className={`text-xs font-medium ${
+                                  isFromTargetUser ? 'text-sec' : 'text-gray-600'
+                                }`}>
+                                  {sender?.full_name || sender?.email}
+                                </span>
+                                <span className="text-xs text-gray-400">•</span>
+                                <p className="text-xs text-gray-500">
+                                  {formatTime(message.timestamp)}
+                                </p>
+                                {message.is_read && (
+                                  <>
+                                    <span className="text-xs text-gray-400">•</span>
+                                    <span className="text-xs text-green-600">مقروءة</span>
+                                  </>
+                                )}
+                              </div>
                             </div>
+                            {!isFromTargetUser && (
+                              <img
+                                src={sender?.profile_image ? `${process.env.NEXT_PUBLIC_IMAGE}${sender.profile_image}` : '/profile.png'}
+                                alt={sender?.full_name || sender?.email}
+                                className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                              />
+                            )}
                           </div>
-                        );
-                      })
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </>

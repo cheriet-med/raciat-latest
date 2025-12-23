@@ -34,6 +34,7 @@ interface Product {
   badrooms_number: string;
   garages: string;
   region: string;
+  is_visible: boolean;
 
 }
 
@@ -97,7 +98,7 @@ export default function HotelForm() {
     badrooms_number: '',
     garages: '',
     region: '',
-
+    is_visible: true,
   });
   
   const [images, setImages] = useState<ImagePreview[]>([]);
@@ -387,7 +388,8 @@ const handleSubmit = async (e: FormEvent) => {
     productFormData.append('badrooms_number', product.badrooms_number);
     productFormData.append('garages', product.garages);
     productFormData.append('region', product.region);
-
+    productFormData.append('is_visible', product.is_visible.toString());
+    
     if (product.image) {
       productFormData.append('image', product.image);
     }
