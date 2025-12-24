@@ -7,23 +7,68 @@ export default function Banner() {
   const { post, isLoading } = useFetchHomepage();
 
   return (
-    <div className="banner-2">
-      <div
-        className="parallaxie"
-        style={{
-          background: `url("${
-            post?.section_features 
-              ? `${process.env.NEXT_PUBLIC_IMAGE}/${post?.section_features}`
-              : '/hero1.avif'
-          }") center/cover no-repeat`,
-        }}
-      >
-        <div className="content">
-          <div className="wrap d-flex flex-column">
+    <div style={{
+      position: 'relative',
+      height: '550px',
+      overflow: 'hidden',
+      direction: 'rtl'
+    }}>
+      {/* Simple parallax with background-attachment: fixed */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundImage: `url("${
+          post?.section_features 
+            ? `${process.env.NEXT_PUBLIC_IMAGE}/${post?.section_features}`
+            : '/hero1.avif'
+        }")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
+        zIndex: 0
+      }} />
+      
+      {/* Overlay */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: 'linear-gradient(to left, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 100%)',
+        zIndex: 1
+      }} />
+      
+      {/* Content */}
+      <div style={{
+        position: 'relative',
+        zIndex: 2,
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 5%'
+      }}>
+        <div style={{
+          width: '100%',
+          maxWidth: '1200px',
+          margin: '0 auto'
+        }}>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '2rem',
+            maxWidth: '600px',
+            marginLeft: 'auto', // Changed from marginRight to marginLeft to move to right
+            marginRight: '0'
+          }}>
             {isLoading ? (
               // Skeleton loader
               <>
-                {/* First box skeleton */}
+                {/* First box skeleton - full width */}
                 <div className="tf-box-icon style-1 animate-pulse">
                   <div className="heading d-flex justify-content-between mb_19">
                     <div className="h-12 w-24 bg-gray-300 rounded"></div>
@@ -32,8 +77,8 @@ export default function Banner() {
                   <div className="h-8 w-32 bg-gray-300 rounded"></div>
                 </div>
 
-                <div className="d-flex gap_12 bot">
-                  {/* Second box skeleton */}
+                {/* Second and third boxes in same line */}
+                <div className="d-flex gap_12" style={{ gap: '12px' }}>
                   <div className="tf-box-icon style-1 animate-pulse">
                     <div className="heading d-flex justify-content-between mb_19">
                       <div className="h-12 w-24 bg-gray-300 rounded"></div>
@@ -42,7 +87,6 @@ export default function Banner() {
                     <div className="h-8 w-32 bg-gray-300 rounded"></div>
                   </div>
 
-                  {/* Third box skeleton */}
                   <div className="tf-box-icon style-1 animate-pulse">
                     <div className="heading d-flex justify-content-between mb_19">
                       <div className="h-12 w-24 bg-gray-300 rounded"></div>
@@ -54,7 +98,8 @@ export default function Banner() {
               </>
             ) : (
               <>
-                {/* Actual content */}
+                <div className="h-32"></div>
+                {/* First box - Awards - full width */}
                 <div className="tf-box-icon style-1">
                   <div className="heading d-flex justify-content-between mb_19">
                     <div className="counter-item style-default h2">
@@ -69,6 +114,7 @@ export default function Banner() {
                   </h6>
                 </div>
 
+                {/* Second and third boxes in same line */}
                 <div className="d-flex gap_12 bot">
                   <div className="tf-box-icon style-1">
                     <div className="heading d-flex justify-content-between mb_19">

@@ -529,7 +529,7 @@ const handleSubmit = async (e: FormEvent) => {
           <div className="bg-sec px-8 py-6 text-right">
             <h1 className="text-3xl font-bold text-white font-playfair">إضافة عقار جديد</h1>
             <p className="text-white mt-2">
-              يرجى ملء جميع الحقول المطلوبة والمميزة بعلامة النجمة. لتحسين منشورك، أكمل جميع الحقول. للحصول على أفضل النتائج، استخدم صورة عالية الجودة بحجم 160 × 30.
+              يرجى ملء جميع الحقول المطلوبة والمميزة بعلامة النجمة. لتحسين منشورك، أكمل جميع الحقول. للحصول على أفضل النتائج، استخدم صورة عالية الجودة.
             </p>
           </div>
 
@@ -832,6 +832,7 @@ const handleSubmit = async (e: FormEvent) => {
                     {/* Main Image */}
 <div className="mb-2 bg-gray-50 rounded-xl p-6 mt-1">
   <label className="block text-xl font-semibold text-gray-500 mb-3">الصورة الرئيسية *</label>
+<p className='text-sec mb-3 text-lg'>يجب أن تكون أبعاد الصور 444 في الطول و 592 في العرض px</p>
   {!mainImagePreview ? (
     <label className="block w-full cursor-pointer">
       <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sec hover:bg-gray-50 transition-all h-72">
@@ -1053,6 +1054,7 @@ const handleSubmit = async (e: FormEvent) => {
                               {/* Award Image Upload */}
                               <div>
                                 <label className="block text-xl font-medium text-gray-500 mb-2">صورة المخطط</label>
+                                <p className='text-sec mb-3 text-lg'>أبعاد صورة المخطط ليسة محددة </p>
                                 {!awardPreview ? (
                                   <label className="block cursor-pointer">
                                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-sec hover:bg-gray-50 transition-all">

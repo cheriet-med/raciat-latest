@@ -375,6 +375,8 @@ console.log(mainImagePreview)
   <label className="block text-xl font-semibold text-gray-500 mb-3">
     الصورة الرئيسية {!query && '*'}
   </label>
+    <p className='text-sec mb-3 text-lg'>يجب أن تكون أبعاد الصور 784 في الطول و 520 في العرض px</p>
+
   {!mainImagePreview ? (
     <label className="block w-full cursor-pointer">
       <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sec hover:bg-gray-50 transition-all h-72">

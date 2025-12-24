@@ -385,21 +385,7 @@ const [selectedChatUserId, setSelectedChatUserId] = useState<number | null>(null
                       <div className="space-y-3 text-2xl text-white">
                         <div>البريد الإلكتروني: {user.email}</div>
                         <div>رقم الهاتف: {user.phoneNumber || 'غير متوفر'}</div>
-                     
-                        <div className="flex flex-wrap items-center space-x-2">
-                          تم التحقق:
-                          <span className={`px-2 py-1 rounded text-2xl flex gap-2 items-center ${
-                            user.is_email_verified ? 'text-green-400' : 'text-red-400'
-                          }`}>
-                            البريد الإلكتروني {user.is_email_verified ? <MdVerified className='h-7 w-7'/> : <VscUnverified className='h-7 w-7'/>}
-                          </span>
-                          |
-                          <span className={`px-2 py-1 rounded text-2xl flex gap-2 items-center ${
-                            user.is_phone_number_verified ? 'text-green-400' : 'text-red-400'
-                          }`}>
-                            الهاتف {user.is_phone_number_verified ? <MdVerified className='h-7 w-7'/> : <VscUnverified className='h-7 w-7'/>}
-                          </span>
-                        </div>
+                    
                       </div>
                     </div>
 

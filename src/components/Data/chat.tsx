@@ -322,60 +322,94 @@ const connectWebSocket = useCallback(() => {
     }
   };
 
-  const handleNewMessage = (message: Message) => {
- //   console.log("📨 Handling new message:", message);
-    
-    // Add message to current chat if it's from/to the selected contact
-    if (selectedContact && 
-        (message.sender.id === selectedContact.id || message.receiver.id === selectedContact.id)) {
-      setMessages(prev => {
-        // Prevent duplicate messages
-        const exists = prev.some(m => m.id === message.id);
-        if (exists) return prev;
-        return [...prev, message];
-      });
-      
-      // Mark as read if we're viewing this conversation
-      if (message.sender.id === selectedContact.id) {
-        markMessagesAsRead(selectedContact.id);
+ const handleNewMessage = (message: Message) => {
+  console.log("📨 Handling new message:", message);
+  console.log("👤 Current user ID:", session?.user?.id);
+  console.log("💬 Selected contact ID:", selectedContact?.id);
+  
+  // Determine if this message is part of the current conversation
+  const isPartOfCurrentConversation = selectedContact && (
+    // Message sent by selected contact to me
+    (message.sender.id === selectedContact.id && message.receiver.id === session?.user?.id) ||
+    // Message sent by me to selected contact
+    (message.sender.id === session?.user?.id && message.receiver.id === selectedContact.id)
+  );
+  
+  console.log("🔄 Is part of current conversation:", isPartOfCurrentConversation);
+  
+  // Add message to current chat if it's part of this conversation
+  if (isPartOfCurrentConversation) {
+    setMessages(prev => {
+      // Prevent duplicate messages (check both real ID and temp ID)
+      const exists = prev.some(m => 
+        m.id === message.id || 
+        (m.id.startsWith('temp-') && m.content === message.content && m.sender.id === message.sender.id)
+      );
+      if (exists) {
+        console.log("⚠️ Message already exists, replacing temp with real");
+        // Replace temp message with real one
+        return prev.map(m => 
+          (m.id.startsWith('temp-') && m.content === message.content && m.sender.id === message.sender.id)
+            ? message 
+            : m
+        ).filter(m => m.id === message.id || !m.id.startsWith('temp-'));
       }
+      console.log("✅ Adding message to chat");
+      return [...prev, message];
+    });
+    
+    // Mark as read if the selected contact sent it to me
+    if (message.sender.id === selectedContact.id && message.receiver.id === session?.user?.id) {
+      markMessagesAsRead(selectedContact.id);
+    }
+  }
+  
+  // Update conversations list
+  setConversations(prev => {
+    const updated = [...prev];
+    
+    // Determine the "other user" in this conversation
+    const isMyMessage = message.sender.id === session?.user?.id;
+    const otherUserId = isMyMessage ? message.receiver.id : message.sender.id;
+    const otherUser = isMyMessage ? message.receiver : message.sender;
+    
+    const convoIndex = updated.findIndex(c => c.user.id === otherUserId);
+    
+    if (convoIndex !== -1) {
+      // Update existing conversation
+      const currentConvo = updated[convoIndex];
+      
+      // Calculate unread count
+      let unreadCount = currentConvo.unread_count;
+      if (!isMyMessage && (!selectedContact || selectedContact.id !== message.sender.id)) {
+        // Increment unread if: not my message AND (no contact selected OR different contact selected)
+        unreadCount += 1;
+      } else if (isMyMessage || (selectedContact && selectedContact.id === message.sender.id)) {
+        // Reset unread if: my message OR viewing this conversation
+        unreadCount = 0;
+      }
+      
+      const updatedConvo = {
+        ...currentConvo,
+        last_message: message,
+        unread_count: unreadCount
+      };
+      
+      // Remove from current position and add to top
+      updated.splice(convoIndex, 1);
+      updated.unshift(updatedConvo);
+    } else {
+      // Create new conversation
+      updated.unshift({
+        user: otherUser,
+        last_message: message,
+        unread_count: isMyMessage ? 0 : 1
+      });
     }
     
-    // Update conversations list
-    setConversations(prev => {
-      const updated = [...prev];
-      const otherUserId = message.sender.id === session?.user?.id ? message.receiver.id : message.sender.id;
-      const otherUser = message.sender.id === session?.user?.id ? message.receiver : message.sender;
-      
-      const convoIndex = updated.findIndex(c => c.user.id === otherUserId);
-      
-      if (convoIndex !== -1) {
-        // Update existing conversation
-        const updatedConvo = {
-          ...updated[convoIndex],
-          last_message: message,
-          unread_count: message.sender.id !== session?.user?.id && 
-                       (!selectedContact || selectedContact.id !== message.sender.id)
-                       ? updated[convoIndex].unread_count + 1 
-                       : updated[convoIndex].unread_count
-        };
-        
-        // Remove from current position and add to top
-        updated.splice(convoIndex, 1);
-        updated.unshift(updatedConvo);
-      } else {
-        // Create new conversation
-        updated.unshift({
-          user: otherUser,
-          last_message: message,
-          unread_count: message.sender.id !== session?.user?.id ? 1 : 0
-        });
-      }
-      
-      return updated;
-    });
-  };
-
+    return updated;
+  });
+};
 
 
 

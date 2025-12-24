@@ -79,7 +79,8 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
       setIsLoadingConversations(true);
       setError(null);
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/conversations/`, {
+      // Fetch all messages for the target user
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL}api/messages/${userId}`, {
         headers: {
           'Authorization': `JWT ${session?.accessToken}`
         }
@@ -87,28 +88,42 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
       
       if (!response.ok) throw new Error('فشل في جلب المحادثات');
       
-      const data = await response.json();
+      const allMessages = await response.json();
       
-      // Filter conversations where the target user is involved
-      const filteredConversations = data.filter((convo: Conversation) => {
-        const isSender = convo.last_message.sender.id === Number(userId);
-        const isReceiver = convo.last_message.receiver.id === Number(userId);
-        return isSender || isReceiver;
-      });
+      // Group messages by conversation partner to create conversation list
+      const conversationMap = new Map<number, Conversation>();
       
-      // Map conversations to show the other user (not the target user)
-      const mappedConversations = filteredConversations.map((convo: Conversation) => {
-        // Determine who is the "other user" - the one we're having conversation with
-        const isTargetUserSender = convo.last_message.sender.id === Number(userId);
-        const otherUser = isTargetUserSender ? convo.last_message.receiver : convo.last_message.sender;
+      allMessages.forEach((msg: Message) => {
+        const targetUserId = Number(userId);
+        const isUserSender = msg.sender.id === targetUserId;
+        const partnerId = isUserSender ? msg.receiver.id : msg.sender.id;
+        const partnerUser = isUserSender ? msg.receiver : msg.sender;
         
-        return {
-          ...convo,
-          user: otherUser // Replace the user with the actual conversation partner
-        };
+        const existing = conversationMap.get(partnerId);
+        const msgTime = new Date(msg.timestamp).getTime();
+        
+        if (!existing || new Date(existing.last_message.timestamp).getTime() < msgTime) {
+          // Count unread messages for this conversation
+          const unreadCount = allMessages.filter((m: Message) => 
+            m.sender.id === partnerId && 
+            m.receiver.id === targetUserId && 
+            !m.is_read
+          ).length;
+          
+          conversationMap.set(partnerId, {
+            user: partnerUser,
+            last_message: msg,
+            unread_count: unreadCount
+          });
+        }
       });
       
-      setConversations(mappedConversations);
+      // Convert map to array and sort by last message timestamp
+      const conversationsArray = Array.from(conversationMap.values()).sort((a, b) => {
+        return new Date(b.last_message.timestamp).getTime() - new Date(a.last_message.timestamp).getTime();
+      });
+      
+      setConversations(conversationsArray);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'حدث خطأ');
     } finally {
@@ -132,7 +147,6 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
       
       const data = await response.json();
       
-      
       // Filter to show only messages between the target user (userId) and the other user (otherUserId)
       const relevantMessages = data.filter((msg: Message) => {
         const currentUserId = Number(userId);
@@ -148,7 +162,6 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
         return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
       });
       
-      console.log('✅ Filtered messages:', sortedMessages);
       setMessages(sortedMessages);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'حدث خطأ');
@@ -194,7 +207,6 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
 
   const totalConversations = conversations.length;
   const totalMessages = messages.length;
-  const totalUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50 p-4" dir="rtl">
@@ -237,7 +249,6 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
               <p className="text-2xl font-bold">{totalMessages}</p>
               <p className="text-xs opacity-90">رسائل</p>
             </div>
-
           </div>
         </div>
 
@@ -325,7 +336,7 @@ const UserConversationsPopup: React.FC<UserConversationsPopupProps> = ({ userId,
           </div>
 
           {/* Messages View */}
-          <div className={`${selectedConversation ? 'flex' : 'hidden lg:flex'} flex-col  w-[700px] bg-white`}>
+          <div className={`${selectedConversation ? 'flex' : 'hidden lg:flex'} flex-col w-[700px] bg-white`}>
             {selectedConversation ? (
               <>
                 {/* Messages Header */}

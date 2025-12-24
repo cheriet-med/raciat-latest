@@ -7,53 +7,56 @@ export default function Process() {
     const { post, isLoading } = useFetchHomepage();
     
     return (
-        <div className="section-process-1">
-            <style>{`
-                .wrap-process {
-                    direction: rtl;
-                    position: relative;
-                }
-                
-                /* Remove any default lines */
-                .process-item.style-1::before,
-                .process-item.style-1::after {
-                    display: none !important;
-                }
-                
-                /* Single continuous line on the right side aligned with numbers */
-                .wrap-process::before {
-                    content: '';
-                    position: absolute;
-                    right: 32px;
-                    top: 5px;
-                    width: 2px;
-                    height: calc(100% - 10px);
-                    background: #e0e0e0;
-                    z-index: 0;
-                }
-                
-                .process-item.style-1 {
-                    position: relative;
-                }
-                
-                /* Style for the number container */
-                .process-item.style-1 .number {
-                    position: relative;
-                    z-index: 1;
-                    background: white;
-                }
-            `}</style>
-            <div
-                className="parallaxie"
-                style={{
-                    background: `url("${
-                        post?.section_steps 
-                            ? `${process.env.NEXT_PUBLIC_IMAGE}/${post?.section_steps}`
-                            : '/hero4.avif'
-                    }") center/cover no-repeat`,
-                }}
-            >
-                <div className="tf-container">
+        <div className="section-process-1" style={{
+            position: 'relative',
+            height: '550px',
+            overflow: 'hidden',
+            direction: 'rtl'
+        }}>
+            {/* Parallax Background */}
+            <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundImage: `url("${
+                    post?.section_steps 
+                        ? `${process.env.NEXT_PUBLIC_IMAGE}/${post?.section_steps}`
+                        : '/hero4.avif'
+                }")`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'fixed',
+                zIndex: 0
+            }} />
+            
+            {/* Overlay */}
+            <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                background: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 1
+            }} />
+            
+            {/* Content */}
+            <div style={{
+                position: 'relative',
+                zIndex: 2,
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center'
+            }}>
+                <div className="tf-container" style={{
+                    width: '100%',
+                    maxWidth: '1200px',
+                    margin: '0 auto',
+                    padding: '0 5%'
+                }}>
                     <div className="box scrolling-effect effectFade">
                         {isLoading ? (
                             // Skeleton loader
@@ -63,6 +66,41 @@ export default function Process() {
                                     <div className="h-10 w-64 bg-gray-300 rounded"></div>
                                 </div>
                                 <div className="wrap-process">
+                                    <style>{`
+                                        .wrap-process {
+                                            direction: rtl;
+                                            position: relative;
+                                        }
+                                        
+                                        /* Remove any default lines */
+                                        .process-item.style-1::before,
+                                        .process-item.style-1::after {
+                                            display: none !important;
+                                        }
+                                        
+                                        /* Single continuous line on the right side aligned with numbers */
+                                        .wrap-process::before {
+                                            content: '';
+                                            position: absolute;
+                                            right: 32px;
+                                            top: 5px;
+                                            width: 2px;
+                                            height: calc(100% - 10px);
+                                            background: #e0e0e0;
+                                            z-index: 0;
+                                        }
+                                        
+                                        .process-item.style-1 {
+                                            position: relative;
+                                        }
+                                        
+                                        /* Style for the number container */
+                                        .process-item.style-1 .number {
+                                            position: relative;
+                                            z-index: 1;
+                                            background: white;
+                                        }
+                                    `}</style>
                                     {[1, 2, 3].map((item) => (
                                         <div key={item} className="process-item style-1 animate-pulse mb-6">
                                             <div className="w-12 h-8 bg-gray-300 rounded"></div>
@@ -78,13 +116,48 @@ export default function Process() {
                         ) : (
                             // Actual content
                             <>
-                                <div className="heading-section mb_32">
+                                <style>{`
+                                    .wrap-process {
+                                        direction: rtl;
+                                        position: relative;
+                                    }
+                                    
+                                    /* Remove any default lines */
+                                    .process-item.style-1::before,
+                                    .process-item.style-1::after {
+                                        display: none !important;
+                                    }
+                                    
+                                    /* Single continuous line on the right side aligned with numbers */
+                                    .wrap-process::before {
+                                        content: '';
+                                        position: absolute;
+                                        right: 32px;
+                                        top: 5px;
+                                        width: 2px;
+                                        height: calc(100% - 10px);
+                                        background: #e0e0e0;
+                                        z-index: 0;
+                                    }
+                                    
+                                    .process-item.style-1 {
+                                        position: relative;
+                                    }
+                                    
+                                    /* Style for the number container */
+                                    .process-item.style-1 .number {
+                                        position: relative;
+                                        z-index: 1;
+                                        background: white;
+                                    }
+                                `}</style>
+                                <div className="heading-section mb_32 ">
                                     <span className="sub text-uppercase fw-6 text_secondary-color-2">
                                         خطوات العمل
                                     </span>
                                     <h3 className="text-5xl font-bold">خطوات شراء المنزل</h3>
                                 </div>
-                                <div className="wrap-process">
+                                <div className="wrap-process mt-24">
                                     <div className="process-item style-1">
                                         <span className="number h5">01.</span>
                                         <div className="content">

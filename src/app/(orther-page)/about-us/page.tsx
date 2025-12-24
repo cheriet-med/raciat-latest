@@ -25,7 +25,7 @@ export default function Page() {
             <div className="section-testimonials tf-spacing-1">
                 <Testimonial1 />
             </div>
-            <Banner1 />
+       
           
         </Layout>
     );
