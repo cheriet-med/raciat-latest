@@ -15,7 +15,7 @@ import AmenitiesSelectorUpdate from './amenitesUpdates';
 import { mutate } from 'swr';
 import { useSession } from 'next-auth/react';
 
-// TypeScript interfaces
+// TypeScript interfaces - FIXED: Corrected the typo in Award interface
 interface Product {
   name: string;
   description: string;
@@ -36,6 +36,8 @@ interface Product {
   badrooms_number: string;
   garages: string;
   region: string;
+  is_featured: string;
+  is_visible: string;
 }
 
 interface NearbyAttraction {
@@ -45,10 +47,11 @@ interface NearbyAttraction {
   product: any;
 }
 
+// FIXED: Corrected the typo from 'badrbadroomes' to 'badrooms_number'
 interface Award {
   id: any;
   rooms: string;
-  badrbadroomes: string;
+  badrooms_number: string; // FIXED TYPO
   image: File | string | null;
   product: any;
 }
@@ -98,6 +101,8 @@ interface ListingData {
   badrooms_number: string;
   garages: string;
   region: string;
+  is_featured: string;
+  is_visible: string;
 }
 
 export default function EditeHotelForm() {
@@ -126,13 +131,16 @@ export default function EditeHotelForm() {
     badrooms_number: '',
     garages: '',
     region: '',
+    is_featured: 'false',
+    is_visible: 'true',
   });
 
   const [fetchedImages, setFetchedImages] = useState<FetchedImage[]>([]);
   const [images, setImages] = useState<ImagePreview[]>([]);
   const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
   const [nearbyAttractions, setNearbyAttractions] = useState<NearbyAttraction[]>([]);
-  const [awards, setAwards] = useState<Award[]>([{ id: '', rooms: '', badrbadroomes: '', image: null, product: '' }]);
+  // FIXED: Updated initial state with correct field name
+  const [awards, setAwards] = useState<Award[]>([{ id: '', rooms: '', badrooms_number: '', image: null, product: '' }]);
   const [awardImagePreviews, setAwardImagePreviews] = useState<AwardImagePreview[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -186,6 +194,8 @@ export default function EditeHotelForm() {
           badrooms_number: data.badrooms_number || '',
           garages: data.garages || '',
           region: data.region || '',
+          is_featured: data.is_featured || 'false',
+          is_visible: 'true',
         });
 
         // Handle image
@@ -222,14 +232,18 @@ export default function EditeHotelForm() {
           imagesRes.ok ? imagesRes.json() : []
         ]);
 
-        // Set states
+        // Debug: Check what data comes from awards API
+        console.log('Awards data from API:', awardsData);
+
+        // Set states with corrected field name
         setAwards(
           awardsData
             .filter((item: any) => item.product === data.id)
             .map((item: any) => ({
               id: item.id || '',
               rooms: item.rooms || '',
-              badrbadroomes: item.badrbadroomes || '',
+              // FIXED: Use the correct field name from your API response
+              badrooms_number: item.badrooms_number || item.badrbadroomes || '', // Handle both field names
               image: item.image || null,
               product: item.product || '',
             }))
@@ -247,6 +261,9 @@ export default function EditeHotelForm() {
         );
 
         setFetchedImages(imagesData);
+
+        // Debug: Check what awards were set
+        console.log('Processed awards:', awardsData.filter((item: any) => item.product === data.id));
 
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -386,7 +403,9 @@ export default function EditeHotelForm() {
   const handleAwardChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const updated = [...awards];
-    updated[index] = { ...updated[index], [name]: value };
+    // FIXED: Handle both possible field names in the form
+    const fieldName = name === 'badrbadroomes' ? 'badrooms_number' : name;
+    updated[index] = { ...updated[index], [fieldName]: value };
     setAwards(updated);
   };
 
@@ -436,7 +455,8 @@ export default function EditeHotelForm() {
   };
 
   const addAward = () => {
-    setAwards([...awards, {id: '', rooms: '', badrbadroomes: '', image: null, product: '' }]);
+    // FIXED: Use correct field name
+    setAwards([...awards, {id: '', rooms: '', badrooms_number: '', image: null, product: '' }]);
   };
 
   const removeAward = (index: number) => {
@@ -536,10 +556,14 @@ export default function EditeHotelForm() {
       productFormData.append('badrooms_number', product.badrooms_number);
       productFormData.append('garages', product.garages);
       productFormData.append('region', product.region);
+      productFormData.append('is_visible', product.is_visible);
+      productFormData.append('is_featured', product.is_featured);
 
       if (product.image) {
         productFormData.append('image', product.image);
       }
+
+      console.log('Updating product with ID:', query);
 
       const productResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}productid/${query}`, {
         method: 'PUT',
@@ -551,14 +575,18 @@ export default function EditeHotelForm() {
 
       if (!productResponse.ok) {
         const errorData: ApiError = await productResponse.json();
+        console.error('Product update error:', errorData);
         throw new Error(errorData.message || 'Failed to update product');
       }
 
       const productData = await productResponse.json();
-      const productId = productData.id;
+      const productId = productData.id || query; // Use existing ID if not returned
+
+      console.log('Product updated with ID:', productId);
 
       // Submit additional images
       if (images.length > 0) {
+        console.log('Submitting additional images...');
         for (let i = 0; i < images.length; i++) {
           const imageFormData = new FormData();
           imageFormData.append('image', images[i].file);
@@ -638,41 +666,73 @@ export default function EditeHotelForm() {
         })
       );
 
-      // Update awards
+      // Update awards - FIXED: Use correct field name
+      console.log('Processing awards:', awards);
       await Promise.all(
         awards.map(async (award) => {
-          if (award.rooms.trim() || award.badrbadroomes.trim() || award.image) {
+          // Check if award has any data to submit
+          const hasData = award.rooms.trim() || award.badrooms_number.trim() || award.image;
+          
+          if (hasData) {
             const awardFormData = new FormData();
             awardFormData.append('product', productId);
             awardFormData.append('rooms', award.rooms);
-            awardFormData.append('badrbadroomes', award.badrbadroomes);
+            // FIXED: Use the correct field name for your backend
+            awardFormData.append('badrooms_number', award.badrooms_number);
             
-            if (award.image) {
+            if (award.image && award.image instanceof File) {
               awardFormData.append('image', award.image);
             }
 
+            console.log('Submitting award:', {
+              id: award.id,
+              rooms: award.rooms,
+              badrooms_number: award.badrooms_number,
+              hasImage: !!award.image
+            });
+
             if (award.id) {
-              // Update existing
-              const response = await fetch(`${process.env.NEXT_PUBLIC_URL}awardsid/${award.id}`, {
-                method: 'PUT',
-                headers: {
-                  "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
-                },
-                body: awardFormData,
-              });
+              // Update existing award
+              try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_URL}awardsid/${award.id}`, {
+                  method: 'PUT',
+                  headers: {
+                    "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+                  },
+                  body: awardFormData,
+                });
 
-              if (!response.ok) throw new Error('Failed to update award');
+                if (!response.ok) {
+                  const errorText = await response.text();
+                  console.error('Failed to update award:', errorText);
+                  throw new Error('Failed to update award');
+                }
+                console.log('Award updated successfully:', award.id);
+              } catch (error) {
+                console.error('Error updating award:', error);
+                throw error;
+              }
             } else {
-              // Add new
-              const response = await fetch(`${process.env.NEXT_PUBLIC_URL}awards/`, {
-                method: 'POST',
-                headers: {
-                  "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
-                },
-                body: awardFormData,
-              });
+              // Add new award
+              try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_URL}awards/`, {
+                  method: 'POST',
+                  headers: {
+                    "Authorization": "Token " + process.env.NEXT_PUBLIC_TOKEN,
+                  },
+                  body: awardFormData,
+                });
 
-              if (!response.ok) throw new Error('Failed to create award');
+                if (!response.ok) {
+                  const errorText = await response.text();
+                  console.error('Failed to create award:', errorText);
+                  throw new Error('Failed to create award');
+                }
+                console.log('Award created successfully');
+              } catch (error) {
+                console.error('Error creating award:', error);
+                throw error;
+              }
             }
           }
         })
@@ -1127,13 +1187,13 @@ export default function EditeHotelForm() {
                   <div className='my-2'></div>
 
                   {/* Amenities Selector */}
-<AmenitiesSelectorUpdate  
-  initialAmenities={initialAmenities}
-  user={query} 
-  product={query} // Pass the product ID
-  mutate={mutate}
-  language={"ar"}
-/>
+                  <AmenitiesSelectorUpdate  
+                    initialAmenities={initialAmenities}
+                    user={query} 
+                    product={query} // Pass the product ID
+                    mutate={mutate}
+                    language={"ar"}
+                  />
 
                   {/* Nearby Attractions */}
                   <div className="bg-gray-50 rounded-xl p-6">
@@ -1248,11 +1308,12 @@ export default function EditeHotelForm() {
                                 </div>
                                 <div>
                                   <label className="block text-xl font-medium text-gray-500 mb-2">عدد الحمامات</label>
+                                  {/* FIXED: Use correct field name but keep 'badrbadroomes' for form compatibility */}
                                   <input
                                     type="text"
                                     name="badrbadroomes"
                                     min="0"
-                                    value={award.badrbadroomes}
+                                    value={award.badrooms_number}
                                     onChange={(e) => handleAwardChange(index, e)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg placeholder:text-gray-600 placeholder:text-xl focus:outline-none focus:ring-1 focus:ring-sec focus:border-sec"
                                     placeholder="مثلا: 4 حمامات"
@@ -1261,65 +1322,65 @@ export default function EditeHotelForm() {
                               </div>
                               
                               {/* Award Image Upload */}
-           <div>
-              <label className="block text-xl font-medium text-gray-500 mb-2">صورة المخطط</label>
-                <p className='text-sec mb-3 text-lg'>أبعاد صورة المخطط ليسة محددة </p>
-              {!awardPreview && !hasExistingImage ? (
-                <label className="block cursor-pointer">
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-sec hover:bg-gray-50 transition-all">
-                    <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2" />
-                    <p className="text-xl text-gray-600">إضغط هنا لتحميل صورة المخطط</p>
-                    <p className="text-xl text-gray-500">PNG, JPG, AVIF الحد اﻷقصى 10MB</p>
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/avif,image/png,image/jpeg,image/webp"
-                    onChange={(e) => handleAwardImageChange(index, e)}
-                    className="hidden"
-                  />
-                </label>
-              ) : (
-                <div className="relative mt-2 flex justify-center">
-                  <div className="relative">
-                    <Image
-                      src={
-                        awardPreview?.url || 
-                        (hasExistingImage ? `${process.env.NEXT_PUBLIC_IMAGE}/${award.image}` : '')
-                      }
-                      alt="Award preview"
-                      width={150}
-                      height={100}
-                      className="object-cover h-full w-full rounded-lg border border-gray-200"
-                    />
-                    {/* Always visible remove button */}
-                    <button
-                      type="button"
-                      onClick={() => removeAwardImage(index)}
-                      className="absolute -top-2 -right-2 w-8 h-8 bg-sec text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg border-2 border-white"
-                      title="Remove image"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              )}
-              
-              {/* Upload new image button when there's an existing image */}
-              {(hasExistingImage || awardPreview) && (
-                <div className="mt-3 text-center">
-                  <label className="inline-flex items-center gap-2 px-3 py-3 text-sec rounded-xl hover:bg-gray-100 border border-sec transition-colors cursor-pointer text-xl font-bold">
-                    <Upload className="w-8 h-8" />
-                    تغيير الصورة
-                    <input
-                      type="file"
-                      accept="image/avif,image/png,image/jpeg,image/webp"
-                      onChange={(e) => handleAwardImageChange(index, e)}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-              )}
-            </div>
+                              <div>
+                                <label className="block text-xl font-medium text-gray-500 mb-2">صورة المخطط</label>
+                                <p className='text-sec mb-3 text-lg'>أبعاد صورة المخطط ليسة محددة </p>
+                                {!awardPreview && !hasExistingImage ? (
+                                  <label className="block cursor-pointer">
+                                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-sec hover:bg-gray-50 transition-all">
+                                      <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+                                      <p className="text-xl text-gray-600">إضغط هنا لتحميل صورة المخطط</p>
+                                      <p className="text-xl text-gray-500">PNG, JPG, AVIF الحد اﻷقصى 10MB</p>
+                                    </div>
+                                    <input
+                                      type="file"
+                                      accept="image/avif,image/png,image/jpeg,image/webp"
+                                      onChange={(e) => handleAwardImageChange(index, e)}
+                                      className="hidden"
+                                    />
+                                  </label>
+                                ) : (
+                                  <div className="relative mt-2 flex justify-center">
+                                    <div className="relative">
+                                      <Image
+                                        src={
+                                          awardPreview?.url || 
+                                          (hasExistingImage ? `${process.env.NEXT_PUBLIC_IMAGE}/${award.image}` : '')
+                                        }
+                                        alt="Award preview"
+                                        width={150}
+                                        height={100}
+                                        className="object-cover h-full w-full rounded-lg border border-gray-200"
+                                      />
+                                      {/* Always visible remove button */}
+                                      <button
+                                        type="button"
+                                        onClick={() => removeAwardImage(index)}
+                                        className="absolute -top-2 -right-2 w-8 h-8 bg-sec text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg border-2 border-white"
+                                        title="Remove image"
+                                      >
+                                        <X className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {/* Upload new image button when there's an existing image */}
+                                {(hasExistingImage || awardPreview) && (
+                                  <div className="mt-3 text-center">
+                                    <label className="inline-flex items-center gap-2 px-3 py-3 text-sec rounded-xl hover:bg-gray-100 border border-sec transition-colors cursor-pointer text-xl font-bold">
+                                      <Upload className="w-8 h-8" />
+                                      تغيير الصورة
+                                      <input
+                                        type="file"
+                                        accept="image/avif,image/png,image/jpeg,image/webp"
+                                        onChange={(e) => handleAwardImageChange(index, e)}
+                                        className="hidden"
+                                      />
+                                    </label>
+                                  </div>
+                                )}
+                              </div>
 
                               <div className="flex justify-between items-center">
                                 <div></div>

@@ -9,7 +9,7 @@ export default function Banner() {
   return (
     <div style={{
       position: 'relative',
-      height: '550px',
+      height: '650px',
       overflow: 'hidden',
       direction: 'rtl'
     }}>
@@ -33,15 +33,7 @@ export default function Banner() {
       }} />
       
       {/* Overlay */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        background: 'linear-gradient(to left, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 100%)',
-        zIndex: 1
-      }} />
+   
       
       {/* Content */}
       <div style={{

@@ -95,7 +95,13 @@ export default function BlogPostForm() {
 
       // Set existing image preview if available
       if (productData.image) {
-        setMainImagePreview(productData.image);
+        // Check if it's already a full URL or a relative path
+        if (productData.image.startsWith('http://') || productData.image.startsWith('https://')) {
+          setMainImagePreview(productData.image);
+        } else {
+          // If it's a relative path, store it as-is
+          setMainImagePreview(productData.image);
+        }
       }
 
     } catch (error) {
@@ -118,23 +124,20 @@ export default function BlogPostForm() {
   const handleMainImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setProduct(prev => ({ ...prev, image: file }));
+      setProduct(prev => ({ ...prev, image: file, existing_image: '' }));
       const url = URL.createObjectURL(file);
       setMainImagePreview(url);
     }
   };
-console.log(mainImagePreview)
+
   const removeMainImage = () => {
     setProduct(prev => ({ ...prev, image: null }));
-    if (mainImagePreview) {
-      // Only revoke object URL if it's a blob URL (new image)
-      if (mainImagePreview.startsWith('blob:')) {
-        URL.revokeObjectURL(mainImagePreview);
-      }
-      setMainImagePreview(null);
+    if (mainImagePreview && mainImagePreview.startsWith('blob:')) {
+      URL.revokeObjectURL(mainImagePreview);
     }
+    setMainImagePreview(null);
   };
-
+  
   const handleSubmit = async () => {
     setErrortitle('');
     setErrordescription('');
@@ -181,9 +184,12 @@ console.log(mainImagePreview)
       }
 
       let response;
+      let endpoint = process.env.NEXT_PUBLIC_URL || '';
+      
       if (query && product.id) {
         // Update existing post
-        response = await fetch(`${process.env.NEXT_PUBLIC_URL || ''}postid/${query}`, {
+        endpoint += `postid/${query}`;
+        response = await fetch(endpoint, {
           method: 'PUT',
           headers: {
             "Authorization": "Token " + (process.env.NEXT_PUBLIC_TOKEN || ''),
@@ -191,9 +197,10 @@ console.log(mainImagePreview)
           body: productFormData,
         });
       } else {
-        // Create new post
-        response = await fetch(`${process.env.NEXT_PUBLIC_URL || ''}postid/${query}`, {
-          method: 'PUT',
+        // Create new post - FIXED: Should be POST request, not PUT
+        endpoint += 'postid/';
+        response = await fetch(endpoint, {
+          method: 'POST',
           headers: {
             "Authorization": "Token " + (process.env.NEXT_PUBLIC_TOKEN || ''),
           },
@@ -208,20 +215,10 @@ console.log(mainImagePreview)
 
       setSuccessMessage(`تم ${query ? 'تحديث' : 'إنشاء'} المقال بنجاح!`);
       
-      if (!query) {
-        // Only reset form for new posts
-        setProduct({
-          user: session?.user?.id,
-          title: '',
-          description: '',
-          content: '',
-          image: null,
-          image_owner: session?.user?.image,
-          owner_title: session?.user?.name,
-          category: '',
-        });
-        setMainImagePreview(null);
-      }
+      // Redirect after a short delay
+      setTimeout(() => {
+        router.push('/account/posts');
+      }, 1500);
       
     } catch (error) {
       console.error('خطأ أثناء الإرسال:', error);
@@ -230,11 +227,6 @@ console.log(mainImagePreview)
       );
     } finally {
       setIsSubmitting(false);
-      if (successMessage) {
-        setTimeout(() => {
-          router.push('/account/posts');
-        }, 2000);
-      }
     }
   };
 
@@ -252,6 +244,24 @@ console.log(mainImagePreview)
       </div>
     );
   }
+
+  // Helper function to get image URL
+  const getImageUrl = (imagePath: string | null) => {
+    if (!imagePath) return '';
+    
+    // If it's a blob URL (from file upload)
+    if (imagePath.startsWith('blob:')) {
+      return imagePath;
+    }
+    
+    // If it's already a full URL
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+    
+    // If it's a relative path, prepend the base URL
+    return `${process.env.NEXT_PUBLIC_IMAGE}/${imagePath}`;
+  };
 
   return (
     <div className="py-4" dir="rtl">
@@ -371,63 +381,63 @@ console.log(mainImagePreview)
 
                 {/* العمود الأيمن - تحميل الصورة */}
                 <div className="lg:col-span-1">
-<div className="mb-2 bg-gray-50 rounded-xl p-2 mt-1">
-  <label className="block text-xl font-semibold text-gray-500 mb-3">
-    الصورة الرئيسية {!query && '*'}
-  </label>
-    <p className='text-sec mb-3 text-lg'>يجب أن تكون أبعاد الصور 784 في الطول و 520 في العرض px</p>
+                  <div className="mb-2 bg-gray-50 rounded-xl p-2 mt-1">
+                    <label className="block text-xl font-semibold text-gray-500 mb-3">
+                      الصورة الرئيسية {!query && '*'}
+                    </label>
+                    <p className='text-sec mb-3 text-lg'>يجب أن تكون أبعاد الصور 784 في الطول و 520 في العرض px</p>
 
-  {!mainImagePreview ? (
-    <label className="block w-full cursor-pointer">
-      <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sec hover:bg-gray-50 transition-all h-72">
-        <LuImagePlus className="w-12 h-12 text-gray-400 mx-auto mt-10" />
-        <p className="text-lg font-medium text-gray-600 mb-1">انقر لتحميل الصورة الرئيسية</p>
-        <p className="text-xl text-gray-500">PNG, JPG, AVIF حتى 10 ميغابايت</p>
-      </div>
-      {errorimage && <p className="text-xl mt-2 text-red-600">{errorimage}</p>}
-      <input
-        type="file"
-        accept="image/avif,image/png,image/jpeg,image/webp"
-        onChange={handleMainImageChange}
-        className="hidden"
-      />
-    </label>
-  ) : (
-    <div className="relative inline-block">
-      <div className="relative group">
-        <img
-          src={`${process.env.NEXT_PUBLIC_IMAGE}/${mainImagePreview}`}
-          alt="عرض الصورة"
-          className="object-cover h-full w-full rounded-xl shadow-lg border-2 border-gray-200"
-        />
-        <button
-          type="button"
-          onClick={removeMainImage}
-          className="absolute -top-2 -right-2 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100 border-2 border-white"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-      <div className="mt-3 text-center">
-        <label className="inline-flex items-center gap-2 px-3 py-3 text-sec rounded-3xl hover:bg-gray-100 border border-sec transition-colors cursor-pointer font-bold">
-          <Upload className="w-6 h-6" />
-          تغيير الصورة
-          <input
-            type="file"
-            accept="image/avif,image/png,image/jpeg,image/webp"
-            onChange={handleMainImageChange}
-            className="hidden"
-          />
-        </label>
-      </div>
-    </div>
-  )}
-  {query && !product.image && (
-    <p className="text-2xl text-sec mt-2 text-center">
-      إذا لم تقم بتحميل صورة جديدة، سيتم الاحتفاظ بالصورة الحالية
-    </p>
-  )}
-</div>
+                    {!mainImagePreview ? (
+                      <label className="block w-full cursor-pointer">
+                        <div className="border-2 bg-white border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-sec hover:bg-gray-50 transition-all h-72">
+                          <LuImagePlus className="w-12 h-12 text-gray-400 mx-auto mt-10" />
+                          <p className="text-lg font-medium text-gray-600 mb-1">انقر لتحميل الصورة الرئيسية</p>
+                          <p className="text-xl text-gray-500">PNG, JPG, AVIF حتى 10 ميغابايت</p>
+                        </div>
+                        {errorimage && <p className="text-xl mt-2 text-red-600">{errorimage}</p>}
+                        <input
+                          type="file"
+                          accept="image/avif,image/png,image/jpeg,image/webp"
+                          onChange={handleMainImageChange}
+                          className="hidden"
+                        />
+                      </label>
+                    ) : (
+                      <div className="relative inline-block w-full">
+                        <div className="relative group">
+                          <img
+                            src={getImageUrl(mainImagePreview)}
+                            alt="عرض الصورة"
+                            className="object-cover w-full h-64 rounded-xl shadow-lg border-2 border-gray-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={removeMainImage}
+                            className="absolute -top-2 -right-2 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg opacity-0 group-hover:opacity-100 border-2 border-white"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+                        <div className="mt-3 text-center">
+                          <label className="inline-flex items-center gap-2 px-3 py-3 text-sec rounded-3xl hover:bg-gray-100 border border-sec transition-colors cursor-pointer font-bold">
+                            <Upload className="w-6 h-6" />
+                            تغيير الصورة
+                            <input
+                              type="file"
+                              accept="image/avif,image/png,image/jpeg,image/webp"
+                              onChange={handleMainImageChange}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    )}
+                    {query && !product.image && mainImagePreview && (
+                      <p className="text-2xl text-sec mt-2 text-center">
+                        إذا لم تقم بتحميل صورة جديدة، سيتم الاحتفاظ بالصورة الحالية
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 

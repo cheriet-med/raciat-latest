@@ -9,7 +9,7 @@ export default function Process() {
     return (
         <div className="section-process-1" style={{
             position: 'relative',
-            height: '550px',
+            height: '650px',
             overflow: 'hidden',
             direction: 'rtl'
         }}>
@@ -33,15 +33,7 @@ export default function Process() {
             }} />
             
             {/* Overlay */}
-            <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                background: 'rgba(0, 0, 0, 0.5)',
-                zIndex: 1
-            }} />
+
             
             {/* Content */}
             <div style={{
